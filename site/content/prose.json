@@ -1,0 +1,33 @@
+{
+  "standfirst": "Every figure on this site was produced by code in the repository, run against the corpus in the repository, on the date printed beside it. Nothing is quoted from a lecture slide, estimated, or rounded up. Where a result contradicted what I predicted, the prediction is still committed next to the result.",
+  "what_this_is": "I built one evaluation harness, <a href=\"https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/rag_eval.py\"><code>rag_eval.py</code></a> (2,187 lines, four commands), and then spent thirteen sessions trying to break the pipeline it measures. The interesting results are mostly the negative ones. The guardrail I trusted most turned out to endorse the attack that beat it; the obvious fix for that attack catches none of it; and the library that promises durable execution loses a paid API call on its default setting.",
+  "shipping_note": "Shipping configuration, unchanged since experiment 06 because nothing since has beaten it: <code>bge-small · chunk 1000 · fixed · top-5 · rerank pool=20 · hardened prompt</code>.",
+  "reference_intro": "Thirteen pages compressing each topic to what is worth remembering. Written to be reread the night before an interview.",
+  "scope": "This is applied LLM and RAG engineering, built on four years of Python, FastAPI, Docker and CI/CD backend work. It is not deep learning research, reinforcement learning, or MLOps at scale, and nothing here claims otherwise. One piece is deliberately unfinished and labelled as such: task 2 of experiment 04, the false positive hunt, was left blank rather than filled in after the fact.",
+  "stats": [
+    {
+      "n": "13",
+      "l": "experiments"
+    },
+    {
+      "n": "6,390",
+      "l": "lines of Python"
+    },
+    {
+      "n": "15/15 → 0/15",
+      "l": "trap hallucinations"
+    },
+    {
+      "n": "8/18 → 1/18",
+      "l": "injection obedience"
+    },
+    {
+      "n": "$4.95",
+      "l": "total API spend"
+    },
+    {
+      "n": "5 of 13",
+      "l": "disproved my own thesis"
+    }
+  ]
+}

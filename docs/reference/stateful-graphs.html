@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Stateful graphs: state, nodes, edges, checkpoints · Muneeb Ahmad</title>
+<meta name="description" content="The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/stateful-graphs.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Stateful graphs: state, nodes, edges, checkpoints · Muneeb Ahmad">
+<meta property="og:description" content="The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/stateful-graphs.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Stateful graphs: state, nodes, edges, checkpoints · Muneeb Ahmad">
+<meta name="twitter:description" content="The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-one-sentence-definition">The one-sentence definition</a></li><li><a href="#the-four-ideas">The four ideas</a></li><li><a href="#the-minimal-graph">The minimal graph</a></li><li><a href="#what-a-checkpoint-protects-and-what-it-doesn-t">What a checkpoint protects</a></li><li><a href="#human-in-the-loop">Human in the loop</a></li><li><a href="#inspecting-and-rewinding">Inspecting and rewinding</a></li><li><a href="#checkpointers">Checkpointers</a></li><li><a href="#the-decision-rule">The decision rule</a></li><li><a href="#glossary">Glossary</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · LangGraph</p>
+<h1>Stateful graphs</h1>
+<p class="standfirst">The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it. Compressed from Lesson 15. Versions and quotes checked against the docs on 2026-08-10 &mdash; <code>langgraph 1.2.10</code>.</p>
+
+<h2 id="the-one-sentence-definition">The one-sentence definition</h2>
+
+<div class="panel">
+  <p style="margin:0"><strong>An agent described as a state graph: one typed state object, nodes that are plain functions returning updates to it, edges that decide what runs next &mdash; and, with a checkpointer attached, the state written down after every node so the run can pause, crash, rewind and resume.</strong> <a href="https://docs.langchain.com/oss/python/langgraph/overview">LangChain&rsquo;s own docs</a>: <em>&ldquo;you don&rsquo;t need to use LangChain to use LangGraph&rdquo;</em>; it is <em>&ldquo;very low-level, and focused entirely on agent orchestration.&rdquo;</em></p>
+</div>
+
+<h2 id="the-four-ideas">The four ideas</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Idea</th><th>What it is</th><th>Gotcha</th></tr></thead>
+  <tbody>
+    <tr><td><strong>State</strong></td><td>A <code>TypedDict</code>. Nodes return a <em>partial</em> dict; the runtime merges it.</td><td>Without a reducer, a returned field <strong>overwrites</strong>. <code>Annotated[list, add_messages]</code> is what makes it append.</td></tr>
+    <tr><td><strong>Node</strong></td><td><code>def f(state) -&gt; dict</code>. Ordinary Python; your own SDK calls go straight in.</td><td>No checkpoint exists <em>inside</em> a node. It is the unit of atomicity you get, and the only one.</td></tr>
+    <tr><td><strong>Edge</strong></td><td>Static <code>add_edge(a, b)</code>, or <code>add_conditional_edges(a, router)</code> where the router returns the next node&rsquo;s <em>name</em>.</td><td>The router is where your <code>if tool_calls: … else: break</code> went. The model never sees the graph.</td></tr>
+    <tr><td><strong>Checkpointer<br>+ <code>thread_id</code></strong></td><td>Saves state after every node under a thread id. The only thing here a <code>while</code> loop can&rsquo;t do.</td><td><code>InMemorySaver</code> dies with the process &mdash; useless for the thing you adopted it for. Use a file or a database.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="the-minimal-graph">The minimal graph</h2>
+
+<pre><code>from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.checkpoint.sqlite import SqliteSaver   # pip install langgraph-checkpoint-sqlite
+import sqlite3
+
+class S(TypedDict):
+    messages: Annotated[list, add_messages]      # reducer: append, don't overwrite
+
+def agent(state: S) -> dict:                     # your existing model call, unchanged
+    reply = client.chat.completions.create(...)
+    return {"messages": [reply]}
+
+def tools(state: S) -> dict:
+    ...
+    return {"messages": [result]}
+
+def route(state: S) -> str:                      # returns a NODE NAME
+    return "tools" if state["messages"][-1].tool_calls else END
+
+b = StateGraph(S)
+b.add_node("agent", agent); b.add_node("tools", tools)
+b.add_edge(START, "agent")
+b.add_conditional_edges("agent", route)
+b.add_edge("tools", "agent")                     # the loop-back arrow
+
+graph = b.compile(checkpointer=SqliteSaver(sqlite3.connect("cp.db", check_same_thread=False)))
+
+cfg = {"configurable": {"thread_id": "ticket-4471"}}
+graph.invoke({"messages": [{"role": "user", "content": q}]}, cfg)
+</code></pre>
+
+<p>Same <code>thread_id</code> &rarr; same run. Different <code>thread_id</code> &rarr; a fresh, unrelated conversation. <strong>You must compile before use.</strong></p>
+
+<h2 id="what-a-checkpoint-protects-and-what-it-doesn-t">What a checkpoint protects &mdash; and what it doesn&rsquo;t</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Situation</th><th>What happens on resume</th></tr></thead>
+  <tbody>
+    <tr><td>A node <strong>completed</strong> before the failure</td><td class="tag-good">Not re-run. Docs: pending writes are stored <em>&ldquo;so that whenever we resume graph execution from that superstep we don&rsquo;t re-run the successful nodes.&rdquo;</em></td></tr>
+    <tr><td>A node was <strong>in flight</strong> &mdash; crashed, or paused at <code>interrupt()</code></td><td class="tag-bad">Re-entered <strong>at line one</strong>. Everything before the interrupt runs again.</td></tr>
+    <tr><td>A side effect (charge, email, <code>INSERT</code>) <strong>before</strong> the interrupt</td><td class="tag-bad">Happens twice. Docs: <em>&ldquo;side effects called before <code>interrupt</code> should (ideally) be idempotent.&rdquo;</em></td></tr>
+    <tr><td>A side effect <strong>after</strong> the interrupt, or in its own node</td><td class="tag-good">Once. This is the fix, and it is design, not configuration.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>&ldquo;Nothing is lost&rdquo; and &ldquo;nothing is repeated&rdquo; are different promises.</strong> The framework makes the first one.</p>
+
+<h2 id="human-in-the-loop">Human in the loop</h2>
+
+<pre><code>from langgraph.types import interrupt, Command
+
+def approval(state: S) -> dict:
+    ok = interrupt("Approve this action?")       # raises; run is persisted and returns
+    return {"approved": ok}
+
+graph.invoke(Command(resume=True), cfg)          # ok == True, node restarts from the top
+</code></pre>
+
+<ul>
+  <li><strong>A checkpointer is required</strong> &mdash; docs: <em>&ldquo;To use <code>interrupt</code>, you need: 1. A checkpointer to persist the graph state.&rdquo;</em></li>
+  <li>Never wrap <code>interrupt()</code> in a bare <code>try/except</code> &mdash; it works by raising, and the exception must reach the runtime.</li>
+  <li>Multiple interrupts in one node are matched <strong>by index</strong>, so their order must be stable across re-runs.</li>
+</ul>
+
+<h2 id="inspecting-and-rewinding">Inspecting and rewinding</h2>
+
+<pre><code>graph.get_state(cfg)                  # latest StateSnapshot: values, next, config, metadata
+list(graph.get_state_history(cfg))    # every checkpoint, newest first  → time travel
+</code></pre>
+
+<h2 id="checkpointers">Checkpointers</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Class</th><th>Import</th><th>Package</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>InMemorySaver</code></td><td><code>langgraph.checkpoint.memory</code></td><td>included</td><td>tests only &mdash; dies with the process</td></tr>
+    <tr><td><code>SqliteSaver</code></td><td><code>langgraph.checkpoint.sqlite</code></td><td><code>langgraph-checkpoint-sqlite</code></td><td>local dev, single machine</td></tr>
+    <tr><td><code>PostgresSaver</code></td><td><code>langgraph.checkpoint.postgres</code></td><td><code>langgraph-checkpoint-postgres</code></td><td>production</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="the-decision-rule">The decision rule</h2>
+
+<div class="panel">
+  <p class="panel-label">Adopt it for a property, never for the shape</p>
+  <p style="margin:0 0 0.6rem">A graph buys exactly three things, all downstream of the saved state: <strong>resume after failure</strong>, <strong>a human in the middle</strong>, <strong>replay / time travel</strong>. If none of the three is on your list, you have bought a dependency and an abstraction.</p>
+  <p style="margin:0">Same shape as the <a href="agents-vs-workflows.html">agent-or-workflow rule</a>: machinery is a price you pay for something specific. &ldquo;We used a plain loop, because the run is 20 seconds and unattended&rdquo; is a stronger interview answer than the library&rsquo;s name.</p>
+</div>
+
+<h2 id="glossary">Glossary</h2>
+
+<ul>
+  <li><strong>Superstep</strong> &mdash; one round of the graph: everything that runs before the next checkpoint is written.</li>
+  <li><strong>Reducer</strong> &mdash; the function attached to a state field saying how an update merges (append vs overwrite).</li>
+  <li><strong>Thread</strong> &mdash; one run&rsquo;s history, addressed by <code>thread_id</code>. Its checkpoints are its timeline.</li>
+  <li><strong>Checkpoint</strong> &mdash; the saved state after a superstep. <strong>Durable execution</strong> &mdash; the property those checkpoints give you.</li>
+  <li><strong>Time travel</strong> &mdash; resuming from an <em>older</em> checkpoint instead of the newest, to replay or branch.</li>
+</ul>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/15-langgraph/"><span class="d-k">Experiment 15</span><span class="d-t">Kill it, then resume it</span><span class="d-m">1 call paid for and lost on kill -9 with async</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="agents-vs-workflows.html">Agents vs workflows</a></li><li><a href="mcp.html">MCP</a></li><li><a href="orchestration-and-validation.html">Orchestration &amp; validation</a></li></ul></div>
+        <div class="doc-seq"><a href="mcp.html"><span class="s-k">Previous</span>MCP</a><a href="../index.html#experiments"><span class="s-k">Next</span>The thirteen experiments</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

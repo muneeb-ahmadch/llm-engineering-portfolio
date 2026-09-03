@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Reranking: Reference Card · Muneeb Ahmad</title>
+<meta name="description" content="Two-stage retrieval, the pool-depth trap, and the one line that defends it.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/reranking.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Reranking: Reference Card · Muneeb Ahmad">
+<meta property="og:description" content="Two-stage retrieval, the pool-depth trap, and the one line that defends it.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/reranking.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reranking: Reference Card · Muneeb Ahmad">
+<meta name="twitter:description" content="Two-stage retrieval, the pool-depth trap, and the one line that defends it.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-vocabulary">The vocabulary</a></li><li><a href="#the-pipeline">The pipeline</a></li><li><a href="#what-it-fixes-and-what-it-can-t">What it fixes, and what it can't</a></li><li><a href="#choosing-pool-depth-honestly">Choosing pool depth</a></li><li><a href="#model-choice">Model choice</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG</p>
+<h1>Reranking: bi-encoder wide, cross-encoder narrow</h1>
+<p class="standfirst">Two-stage retrieval, the pool-depth trap, and the one line that defends it. Compressed from Lesson 06. Made to be reread the night before.</p>
+
+<h2 id="the-vocabulary">The vocabulary</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Term</th><th>Is</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bi-encoder</strong></td><td>Embeds query and chunk <em>separately</em> into the same vector space; compared by cosine. What your retriever already is (MiniLM, BGE).</td><td>Not query-aware at index time &mdash; chunks are embedded once, offline, before any query exists. That's what makes it cheap.</td></tr>
+    <tr><td><strong>Cross-encoder</strong></td><td>Reads the query and <em>one</em> candidate chunk together, in a single forward pass, and outputs a relevance score directly.</td><td>Not precomputable. Needs the query at scoring time, so it only ever runs on a short list, live.</td></tr>
+    <tr><td><strong>Pool / candidate set</strong></td><td>The top-N chunks retrieved by the bi-encoder, handed to the reranker to re-score. N &gt; final top-k.</td><td>Not the same as top-k. Pool is the reranker's <em>input</em>; top-k is what you keep after it reorders.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="the-pipeline">The pipeline</h2>
+
+<pre><code># stage 1: bi-encoder, cheap, wide net
+scores  = query_vec @ chunk_vecs.T
+pool    = top_N_by(scores)                    # e.g. N=20, not 5
+
+# stage 2: cross-encoder, expensive, narrow
+pairs   = [(query, c["text"]) for c in pool]
+rscores = CrossEncoder("cross-encoder/ms-marco-MiniLM-L6-v2").predict(pairs)
+top_k   = [pool[i] for i in argsort(-rscores)][:k]</code></pre>
+
+<p>Stage 1 answers &ldquo;what's roughly relevant?&rdquo; cheaply, at any scale. Stage 2 answers &ldquo;what's <em>actually</em> most relevant?&rdquo; accurately, but only across the handful stage 1 already found. Neither stage alone is both cheap and accurate &mdash; that trade is why the two are chained instead of picking one.</p>
+
+<h2 id="what-it-fixes-and-what-it-can-t">What it fixes, and what it can't</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Failure</th><th>Signal</th><th>Reranker helps?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Recall failure</strong></td><td>Coverage near 0% &mdash; answer never in the top-k at all.</td><td class="tag-bad">No.</td> </tr>
+    <tr><td><strong>Ranking failure, in the pool</strong></td><td>High coverage, still a miss; full-corpus rank &le; pool size.</td><td class="tag-good">Yes &mdash; this is the target case.</td></tr>
+    <tr><td><strong>Ranking failure, outside the pool</strong></td><td>Answer exists, but full-corpus rank &gt; pool size.</td><td class="tag-bad">No &mdash; a recall failure at the pool stage.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The trap:</strong> row three looks identical to row one from the outside &mdash; &ldquo;I added a reranker and nothing changed.&rdquo; It isn't the same failure. Before concluding a reranker didn't help, check the candidate's full-corpus rank against your pool size. A reranker that never receives a candidate can't be blamed for not surfacing it.</p>
+
+<h2 id="choosing-pool-depth-honestly">Choosing pool depth &mdash; honestly</h2>
+
+<p>Pick the pool size <em>before</em> you know where the answer landed, for a stated reason (a common default, a latency budget) &mdash; not after, by reverse-engineering it from a miss you already diagnosed. Picking the pool to fit a known answer isn't a design decision, it's answer-shopping, and it won't generalize to the next miss.</p>
+
+<ul>
+  <li><strong>Cost of widening the pool:</strong> one extra cross-encoder forward pass per extra candidate, per query &mdash; linear, and cheap in absolute terms for a MiniLM-class reranker on CPU (dozens to low hundreds of pairs is seconds, not minutes).</li>
+  <li><strong>Cost of narrowing it:</strong> real candidates fall outside the reranker's reach, silently. Narrower pools look faster in a benchmark and can be quietly wrong on exactly the long-tail question you'll be asked about in an interview.</li>
+</ul>
+
+<h2 id="model-choice">Model choice</h2>
+
+<p><code>cross-encoder/ms-marco-MiniLM-L6-v2</code> &mdash; 6 transformer layers, trained on MS MARCO query-passage relevance. The standard lightweight default: a fraction of a point of NDCG@10 behind the larger MS MARCO cross-encoders, for roughly double the throughput. Right call on CPU, on a golden set sized in the tens.</p>
+
+<p><strong>Score scale, a common trap:</strong> cross-encoder scores are <em>not</em> cosine similarity. They aren't bounded to &minus;1..1 and aren't comparable across models or directly to a bi-encoder's score &mdash; use them only to <em>rank</em> the pool, never to compare against a cosine threshold from stage 1.</p>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;A reranker is a second stage: cheap bi-encoder retrieval widens the net, then a cross-encoder that reads the query and each candidate together re-scores that shortlist. It only fixes ranking failures, never recall &mdash; and I treat pool depth as its own recall boundary, checking a candidate's full-corpus rank before I trust a &lsquo;reranking didn't help&rsquo; result.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/06-reranking/"><span class="d-k">Experiment 06</span><span class="d-t">Retrieve wide, then rerank</span><span class="d-m">1 of 2 misses rescued at pool 20</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="embeddings-and-retrieval.html">Embeddings &amp; retrieval</a></li><li><a href="chunking.html">Chunking</a></li></ul></div>
+        <div class="doc-seq"><a href="rag-metrics.html"><span class="s-k">Previous</span>RAG metrics</a><a href="pipeline-and-cost.html"><span class="s-k">Next</span>Pipeline &amp; cost</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

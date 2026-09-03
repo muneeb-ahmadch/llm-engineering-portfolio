@@ -1,0 +1,20 @@
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc"{{toc_open}}>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol>{{toc}}</ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">{{eyebrow}}</p>
+{{body}}
+      <nav class="doc-nav" aria-label="Related reading">
+        {{related_exp}}
+        {{related_cards}}
+        <div class="doc-seq">{{prev_next}}</div>
+      </nav>
+    </article>
+  </div>
+</div>

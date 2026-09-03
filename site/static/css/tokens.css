@@ -1,0 +1,86 @@
+/* Palette and scale. Light on :root, dark redefined in three guarded places so the
+   toggle wins in both directions and the system default still works. */
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #5c5c5c;
+  --ink-faint: #6b6b6b;
+  --bg: #fffef9;
+  --bg-panel: #f6f4ec;
+  --bg-sunk: #efece1;
+  --rule: #d8d4c6;
+  --rule-strong: #bdb8a6;
+  --accent: #7a2e1e;
+  --accent-soft: #f0e4df;
+  --good: #2d5f3f;
+  --good-soft: #e3efe6;
+  --bad: #8a2020;
+  --bad-soft: #f7e4e4;
+  --header-bg: rgb(255 254 249 / .88);
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --max: 72rem;
+  --measure: 38rem;
+  --header-h: 56px;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgb(0 0 0 / .06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8e6df;
+    --ink-soft: #a8a49a;
+    --ink-faint: #8f8b80;
+    --bg: #16150f;
+    --bg-panel: #201f18;
+    --bg-sunk: #100f0a;
+    --rule: #3a382e;
+    --rule-strong: #55523f;
+    --accent: #e08b6a;
+    --accent-soft: #33241d;
+    --good: #7fc099;
+    --good-soft: #1c2a21;
+    --bad: #e28080;
+    --bad-soft: #2c1c1c;
+    --header-bg: rgb(22 21 15 / .9);
+    --shadow: 0 1px 2px rgb(0 0 0 / .4);
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #e8e6df;
+  --ink-soft: #a8a49a;
+  --ink-faint: #8f8b80;
+  --bg: #16150f;
+  --bg-panel: #201f18;
+  --bg-sunk: #100f0a;
+  --rule: #3a382e;
+  --rule-strong: #55523f;
+  --accent: #e08b6a;
+  --accent-soft: #33241d;
+  --good: #7fc099;
+  --good-soft: #1c2a21;
+  --bad: #e28080;
+  --bad-soft: #2c1c1c;
+  --header-bg: rgb(22 21 15 / .9);
+  --shadow: 0 1px 2px rgb(0 0 0 / .4);
+}
+
+:root[data-theme="light"] {
+  --ink: #1a1a1a;
+  --ink-soft: #5c5c5c;
+  --ink-faint: #6b6b6b;
+  --bg: #fffef9;
+  --bg-panel: #f6f4ec;
+  --bg-sunk: #efece1;
+  --rule: #d8d4c6;
+  --rule-strong: #bdb8a6;
+  --accent: #7a2e1e;
+  --accent-soft: #f0e4df;
+  --good: #2d5f3f;
+  --good-soft: #e3efe6;
+  --bad: #8a2020;
+  --bad-soft: #f7e4e4;
+  --header-bg: rgb(255 254 249 / .88);
+  --shadow: 0 1px 2px rgb(0 0 0 / .06);
+}

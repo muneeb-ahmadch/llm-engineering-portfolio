@@ -1,0 +1,114 @@
+/* Elements. Tufte-influenced measure and restrained palette, carried over from the
+   original stylesheet so the thirteen reference bodies keep rendering as written. */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.62;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 { text-wrap: balance; }
+
+h1 { font-weight: 400; font-size: clamp(2rem, 5.2vw, 3.1rem); line-height: 1.08;
+     letter-spacing: -0.022em; margin: 0 0 0.5rem; }
+
+h2 { font-weight: 400; font-size: clamp(1.4rem, 3vw, 1.75rem); letter-spacing: -0.012em;
+     margin: 0 0 1rem; }
+
+h3 { font-family: var(--sans); font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+     margin: 2rem 0 0.6rem; }
+
+p { margin: 0 0 1.15rem; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+strong { font-weight: 600; }
+
+code { font-family: var(--mono); font-size: 0.84em; background: var(--bg-panel);
+       padding: 0.1em 0.35em; border-radius: 3px; overflow-wrap: anywhere; }
+
+pre { font-family: var(--mono); font-size: 0.8rem; line-height: 1.5; background: var(--bg-panel);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 1rem 1.15rem;
+      overflow-x: auto; max-width: 100%; }
+pre code { background: none; padding: 0; font-size: inherit; }
+
+img, svg { max-width: 100%; }
+
+.eyebrow { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.14em;
+           text-transform: uppercase; color: var(--ink-faint); margin: 0 0 0.6rem; }
+
+.standfirst { font-size: 1.14rem; color: var(--ink-soft); font-style: italic; margin: 0 0 2rem;
+              padding-bottom: 2rem; border-bottom: 1px solid var(--rule); }
+
+.panel { background: var(--bg-panel); border: 1px solid var(--rule); border-radius: var(--radius);
+         padding: 1.3rem 1.5rem; margin: 2rem 0; }
+.panel > :last-child { margin-bottom: 0; }
+.panel > :first-child { margin-top: 0; }
+
+.panel-label { font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.13em;
+               text-transform: uppercase; color: var(--ink-faint); margin: 0 0 0.7rem; }
+
+blockquote { margin: 2rem 0; padding: 0.2rem 0 0.2rem 1.4rem; border-left: 2px solid var(--accent);
+             font-style: italic; color: var(--ink-soft); }
+blockquote > :last-child { margin-bottom: 0; }
+
+.ask { font-family: var(--sans); font-size: 1.02rem; font-style: normal; background: var(--accent-soft);
+       border: none; border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0;
+       padding: 1.1rem 1.3rem; margin: 2rem 0; color: var(--ink); }
+.ask::before { content: "The interviewer asks"; display: block; font-size: 0.66rem;
+               letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent);
+               margin-bottom: 0.5rem; }
+
+table { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 0.86rem;
+        margin: 1.6rem 0; }
+th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--rule); }
+th { font-size: 0.68rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-soft);
+     font-weight: 600; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.scroll-x { overflow-x: auto; overflow-y: hidden; margin: 1.6rem 0;
+            -webkit-overflow-scrolling: touch; }
+.scroll-x table { margin: 0; }
+
+/* Below the first breakpoint a wide table scrolls sideways instead of crushing its
+   columns: a five-column table in 390 px of viewport is unreadable when squeezed. */
+@media (max-width: 599px) {
+  .scroll-x table { min-width: 33rem; }
+  /* Two affordances, because one was not readable at a glance: a shadow pinned to the
+     scrolling edge (it disappears once you reach the end) and a visible container edge. */
+  .scroll-x {
+    border-inline-end: 2px solid var(--rule-strong);
+    /* The fade is the cue that actually reads in a still image: content visibly
+       dissolves into the edge instead of stopping at a hard crop. */
+    -webkit-mask-image: linear-gradient(to right, #000 0 76%, rgb(0 0 0 / 0) 98%);
+    mask-image: linear-gradient(to right, #000 0 76%, rgb(0 0 0 / 0) 98%);
+    background:
+      linear-gradient(to right, var(--bg) 30%, rgb(0 0 0 / 0)) left center / 2.5rem 100% no-repeat local,
+      linear-gradient(to left, var(--bg) 30%, rgb(0 0 0 / 0)) right center / 2.5rem 100% no-repeat local,
+      radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / .3), rgb(0 0 0 / 0)) left center / 1.1rem 100% no-repeat scroll,
+      radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / .3), rgb(0 0 0 / 0)) right center / 1.1rem 100% no-repeat scroll;
+  }
+}
+
+.tag-good { color: var(--good); font-weight: 600; }
+.tag-bad { color: var(--bad); font-weight: 600; }
+
+.teacher-note { font-family: var(--sans); font-size: 0.88rem; background: var(--good-soft);
+                border-radius: var(--radius); padding: 1.05rem 1.25rem; margin: 2.5rem 0 0;
+                color: var(--ink); }
+.teacher-note strong { color: var(--good); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important;
+                           scroll-behavior: auto !important; }
+}

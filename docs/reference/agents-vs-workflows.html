@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Agent or workflow?, the decision, the loop, the guardrails · Muneeb Ahmad</title>
+<meta name="description" content="The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/agents-vs-workflows.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agent or workflow?, the decision, the loop, the guardrails · Muneeb Ahmad">
+<meta property="og:description" content="The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/agents-vs-workflows.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent or workflow?, the decision, the loop, the guardrails · Muneeb Ahmad">
+<meta name="twitter:description" content="The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-split">The split</a></li><li><a href="#what-does-not-make-it-an-agent">What does not make it an agent</a></li><li><a href="#the-five-workflow-patterns-reach-for-these-first">The five workflow patterns: reach for these first</a></li><li><a href="#the-minimal-loop">The minimal loop</a></li><li><a href="#the-three-process-guardrails">The three process guardrails</a></li><li><a href="#trajectory-metrics-what-you-measure-once-the-path-varies">Trajectory metrics: what you measure once the path varies</a></li><li><a href="#the-two-honest-interview-answers">The two honest interview answers</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · Agents</p>
+<h1>Agent or workflow?</h1>
+<p class="standfirst">The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once. Compressed from Lesson 11. Made to be reread the night before.</p>
+
+<h2 id="the-split">The split</h2>
+
+<p>Both are &ldquo;agentic systems.&rdquo; The distinction that matters is <strong>who chooses the next step</strong>, and it is a spectrum, not a binary. Definitions verbatim from <a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, Building Effective Agents</a>.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Definition</th><th>Next step chosen by</th><th>Step count</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Workflow</strong></td><td>LLMs and tools orchestrated through <strong>predefined code paths</strong>.</td><td>You, at write time</td><td class="tag-good">Known before the request</td></tr>
+    <tr><td><strong>Agent</strong></td><td>LLMs <strong>dynamically direct their own processes</strong> and tool usage, maintaining control over how they accomplish tasks.</td><td>The model, at run time</td><td class="tag-bad">Unknown until it finishes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The decision rule</p>
+  <p style="margin:0 0 0.6rem"><strong>Can you enumerate the steps before the request arrives?</strong> If yes → workflow. Write the path down; it is cheaper, faster, testable, and traces to a fixed shape.</p>
+  <p style="margin:0"><strong>Autonomy is a price you pay for a path you couldn't write down in advance.</strong> Anthropic's own framing: add complexity <em>&ldquo;only when it demonstrably improves outcomes&rdquo;</em>; agentic systems <em>&ldquo;often trade latency and cost for better task performance.&rdquo;</em></p>
+</div>
+
+<h2 id="what-does-not-make-it-an-agent">What does <em>not</em> make it an agent</h2>
+
+<ul>
+  <li><strong>Tool use.</strong> A retriever is a tool. A fixed retrieve-then-answer chain is a workflow.</li>
+  <li><strong>Multiple LLM calls.</strong> A generator plus a nightly faithfulness judge is two calls and zero agency.</li>
+  <li><strong>The model deciding <em>something</em>.</strong> A router picks a branch: but you enumerated the branches. Autonomy without an open path is still a workflow.</li>
+</ul>
+
+<p>The one thing that does: <strong>a loop-back arrow where the next action depends on what the last one returned.</strong></p>
+
+<h2 id="the-five-workflow-patterns-reach-for-these-first">The five workflow patterns: reach for these first</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Pattern</th><th>Shape</th><th>Reach for it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Prompt chaining</strong></td><td>step → step → step, fixed order</td><td>The task decomposes into known stages; each stage's output feeds the next.</td></tr>
+    <tr><td><strong>Routing</strong></td><td>classify → one of N specialised prompts</td><td>Inputs fall into distinct kinds that want different handling. Cheap and very common.</td></tr>
+    <tr><td><strong>Parallelization</strong></td><td>fan out → aggregate</td><td>Independent subtasks, or several votes on the same one. (A nightly judge pass over 200 answers is this.)</td></tr>
+    <tr><td><strong>Orchestrator&ndash;workers</strong></td><td>planner splits → workers execute → merge</td><td>Subtasks aren't known up front but the <em>structure</em> is. The most agent-like workflow.</td></tr>
+    <tr><td><strong>Evaluator&ndash;optimizer</strong></td><td>generate → critique → revise, until accepted or capped</td><td>Quality is judgeable and iteration measurably helps. Needs a cap, like any loop.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="the-minimal-loop">The minimal loop</h2>
+
+<pre><code>while steps &lt; MAX_STEPS:                 # guardrail 1
+    step = model(question, history, tools=ALLOWED)   # guardrail 2
+    if step.is_final:
+        return step.answer, steps, "goal"            # guardrail 3
+    history += run_tool(step.tool_call)   &larr; the loop closes here
+    steps += 1
+return best_effort, steps, "cap"                     # guardrail 3
+</code></pre>
+
+<p>Every agent framework: OpenAI Agents SDK, LangGraph, CrewAI, is a wrapper around this. Knowing the twelve lines is what lets you say what a framework actually buys you.</p>
+
+<h2 id="the-three-process-guardrails">The three process guardrails</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Guardrail</th><th>Contains</th><th>Why it's non-optional</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Step cap</strong></td><td>Unbounded consumption: <a href="https://genai.owasp.org/llm-top-10/">OWASP LLM10</a></td><td>The only agent failure that shows up on a credit card instead of in an output. A stuck loop bills until someone notices.</td></tr>
+    <tr><td><strong>Tool allowlist</strong></td><td>Excessive agency: <strong>OWASP LLM06</strong></td><td>Every exposed tool is a capability reachable on a path you never imagined. Grant the minimum; a read-only tool is a different risk class from a writing one.</td></tr>
+    <tr><td><strong>Termination reason</strong></td><td>Silent truncation</td><td>An answer returned <em>because the cap was hit</em> is indistinguishable from a finished one unless you record which. Cap-terminated runs are a health metric, not a footnote.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Input and output guardrails sit either side of these (validate the request; validate the answer before it ships), that's the <a href="answer-defense.html">answer-defense</a> ladder, unchanged. The loop only adds the middle column.</p>
+
+<h2 id="trajectory-metrics-what-you-measure-once-the-path-varies">Trajectory metrics: what you measure once the path varies</h2>
+
+<p>A fixed chain has one call per question, so <em>cost</em> and <em>latency</em> are constants. A loop turns each into a distribution, and adds numbers that have no equivalent upstream. Attach them the same way as any other verdict (see <a href="tracing-and-scores.html">Tracing answer quality</a>):</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Metric</th><th>What a bad reading means</th><th>Emit as</th></tr></thead>
+  <tbody>
+    <tr><td><code>steps</code> (mean / max / p95)</td><td>Creeping mean = the model is compensating for retrieval, not reasoning.</td><td><code>score(name="steps", data_type="NUMERIC")</code></td></tr>
+    <tr><td><code>terminated_by = cap</code> rate</td><td>Questions the loop cannot finish. Above a few percent, the cap is hiding a design fault.</td><td><code>score(…, data_type="CATEGORICAL")</code></td></tr>
+    <tr><td><code>tool_calls</code> / question</td><td>Repeated identical calls = the model is looping without learning from the result.</td><td><code>score(…, data_type="NUMERIC")</code></td></tr>
+    <tr><td>cost &amp; latency / question</td><td>Compare against the fixed-chain baseline. This is the &ldquo;trade&rdquo; being priced.</td><td>already in the trace</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The non-determinism rule, extended</p>
+  <p style="margin:0">At <code>temperature=1</code> a fixed chain rewords its answer every run, so you gate on <strong>properties, not text</strong>. An agent varies on a second axis: the <strong>path</strong>. Two runs can produce the same answer in one step and in three, at triple the bill. So the trajectory joins the property set: gate on <em>rates and distributions</em> (hallucination count, abstention rate, mean steps, cap rate), never on the transcript.</p>
+</div>
+
+<h2 id="the-two-honest-interview-answers">The two honest interview answers</h2>
+
+<blockquote>
+<p>&ldquo;I measured a loop against my fixed chain on a question my abstention score had flagged. It rescued it, here's what it cost per query, and here's what it did to the trap set.&rdquo;</p>
+<p>&ldquo;I measured it and didn't ship it. Here's the number that stopped me.&rdquo;</p>
+</blockquote>
+
+<p>Both are senior. The weak answer is <em>&ldquo;we used an agent&rdquo;</em> with no number behind it: and that's the one an interviewer who has built agents will find in about ninety seconds.</p>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/11-agent-loop/"><span class="d-k">Experiment 11</span><span class="d-t">Is a search loop worth it?</span><span class="d-m">4 of 5 preregistered hypotheses wrong</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="tracing-and-scores.html">Tracing &amp; scores</a></li><li><a href="answer-defense.html">Answer defense</a></li><li><a href="pipeline-and-cost.html">Pipeline &amp; cost</a></li></ul></div>
+        <div class="doc-seq"><a href="tracing-and-scores.html"><span class="s-k">Previous</span>Tracing &amp; scores</a><a href="prompt-injection-and-guardrails.html"><span class="s-k">Next</span>Injection &amp; guardrails</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

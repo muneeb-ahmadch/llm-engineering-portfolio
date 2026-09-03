@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/chunking.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/embeddings-and-retrieval.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/rag-metrics.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/reranking.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/pipeline-and-cost.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/rag-vs-finetune-vs-prompt.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/answer-defense.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/tracing-and-scores.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/agents-vs-workflows.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/prompt-injection-and-guardrails.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/orchestration-and-validation.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/mcp.html</loc></url>
+  <url><loc>https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/stateful-graphs.html</loc></url>
+</urlset>

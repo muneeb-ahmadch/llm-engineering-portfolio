@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>RAG vs fine-tune vs prompt: Reference Card · Muneeb Ahmad</title>
+<meta name="description" content="Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/rag-vs-finetune-vs-prompt.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RAG vs fine-tune vs prompt: Reference Card · Muneeb Ahmad">
+<meta property="og:description" content="Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/rag-vs-finetune-vs-prompt.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RAG vs fine-tune vs prompt: Reference Card · Muneeb Ahmad">
+<meta name="twitter:description" content="Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#three-levers-on-three-different-parts-of-the-system">Three levers on three different parts of the system</a></li><li><a href="#the-distinction-that-settles-it-knowledge-vs-behaviour">The distinction that settles it: knowledge vs behaviour</a></li><li><a href="#why-fine-tuning-is-bad-at-facts-the-citable-part">Why fine-tuning is bad at facts (the citable part)</a></li><li><a href="#they-compose-cheapest-lever-first">They compose: cheapest lever first</a></li><li><a href="#the-cost-trade">The cost trade</a></li><li><a href="#the-failure-each-one-hides">The failure each one hides</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG</p>
+<h1>RAG vs fine-tune vs prompt</h1>
+<p class="standfirst">Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides. Compressed from Lesson 08. Made to be reread the night before.</p>
+
+<h2 id="three-levers-on-three-different-parts-of-the-system">Three levers on three different parts of the system</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Tool</th><th>Changes</th><th>Touched when</th><th>Cost shape</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Prompt</strong></td><td>What you <em>say</em>, instructions + examples. Model untouched.</td><td>Inference only. No training.</td><td>Per-query tokens; few-shot examples lengthen every call.</td></tr>
+    <tr><td><strong>RAG</strong></td><td>What the model can <em>see</em>, retrieved knowledge in the prompt. Weights untouched.</td><td>Inference + an index you maintain.</td><td>Per-query context tokens + retrieval infra. No training cost.</td></tr>
+    <tr><td><strong>Fine-tune</strong></td><td>What the model <em>is</em>, its default behaviour, via weight updates.</td><td>Training run up front, then inference.</td><td>Fixed training cost, then cheaper per query (shorter prompts).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Prompting changes what you say. RAG changes what the model can see. Fine-tuning changes what the model is.</strong></p>
+
+<h2 id="the-distinction-that-settles-it-knowledge-vs-behaviour">The distinction that settles it: knowledge vs behaviour</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Gap</th><th>Symptom</th><th>Reach for</th><th>Not the other, because</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Knowledge</strong>, doesn't <em>know</em> a fact</td><td>&ldquo;Answer about our private / fresh / changing docs.&rdquo;</td><td>RAG (or prompt if it fits)</td><td>Fine-tuning is bad at new facts, and facts change → retrain forever.</td></tr>
+    <tr><td><strong>Behaviour</strong>, knows, won't <em>act</em> right</td><td>&ldquo;Always this format / tone / abstain when unsure.&rdquo; Prompt plateaus.</td><td>Fine-tuning (after prompt's ceiling)</td><td>RAG can't help: no missing fact, the <em>form</em> is wrong.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="standfirst" style="font-size:1.05rem"><strong>RAG fixes what the model doesn't know. Fine-tuning fixes how the model behaves.</strong></p>
+
+<h2 id="why-fine-tuning-is-bad-at-facts-the-citable-part">Why fine-tuning is bad at facts (the citable part)</h2>
+
+<p>Fine-tuning makes <em>patterns of response</em> more likely: great for format, tone, task-shape. Teaching it a new <em>fact</em> means over-writing weights to memorise one string: models learn new facts slowly under fine-tuning, and learning them correlates with <em>more</em> hallucination nearby (the model generalises &ldquo;confidently state things like this&rdquo;). Paper to name: <a href="https://arxiv.org/abs/2405.05904">Gekhman et al., 2024, &ldquo;Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?&rdquo;</a>. RAG sidesteps it: the fact lives in a retrievable, citable, swappable document, nothing memorised, nothing stale.</p>
+
+<h2 id="they-compose-cheapest-lever-first">They compose: cheapest lever first</h2>
+
+<pre><code>1. Prompt        →  always first. Free, instant. Exhaust it.
+2. + RAG         →  gap is knowledge the model lacks (private / fresh / changing).
+3. + Fine-tune   →  behaviour gap SURVIVES a good prompt AND task is stable + high-volume.</code></pre>
+
+<p>The mature answer names the <em>ladder</em> and where you stop: not one tool. Prompt+RAG is a correct stopping point until a <em>measured</em> behaviour gap justifies rung 3.</p>
+
+<h2 id="the-cost-trade">The cost trade</h2>
+
+<pre><code>break-even volume  ≈  training_cost  /  (per-query saving from a shorter prompt)</code></pre>
+
+<p>RAG / prompt = pure per-query cost, context-dominated ($0.002174 in Lesson 07, input was 59% of the bill). Fine-tuning = fixed cost traded for lower variable cost. Pays off at <strong>high volume on a stable task</strong>; a bad deal for <strong>low volume or changing knowledge</strong>, you re-pay the training cost every time the facts move. (Fine-tune prices drift too: pull the current rate the day you need it.)</p>
+
+<h2 id="the-failure-each-one-hides">The failure each one hides</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Tool</th><th>Hidden failure</th></tr></thead>
+  <tbody>
+    <tr><td>Prompt</td><td>Silent ceiling: accuracy plateaus, no error, no signal you've hit the tool's limit.</td></tr>
+    <tr><td>RAG</td><td>Retrieval miss → hallucination or abstention. Quality capped by retrieval; no parametric fallback on a private corpus.</td></tr>
+    <tr><td>Fine-tune</td><td>Stale fact stated confidently, unattributable, no trace, no citation. You hear it from a user, not a metric.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;Prompting changes what I say, RAG changes what the model can see, fine-tuning changes what the model is. First question: is the gap knowledge or behaviour? Knowledge, especially private or changing, is RAG, because facts belong in an index I can update and cite, not weights that go stale. Behaviour is fine-tuning, but only after a prompt hits a measured ceiling and only if the task is stable and high-volume enough to earn back the training cost. My RAG system stops at prompt+retrieval on purpose, I haven't measured a behaviour gap that justifies the third rung.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/08-rag-vs-finetune/"><span class="d-k">Experiment 08</span><span class="d-t">RAG, fine-tune, or prompt</span><span class="d-m">~$72.47/day break-even that pays for a fine-tune</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="pipeline-and-cost.html">Pipeline &amp; cost</a></li><li><a href="reranking.html">Reranking</a></li></ul></div>
+        <div class="doc-seq"><a href="pipeline-and-cost.html"><span class="s-k">Previous</span>Pipeline &amp; cost</a><a href="answer-defense.html"><span class="s-k">Next</span>Answer defense</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

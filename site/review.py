@@ -16,6 +16,16 @@ NAMES = ["index-desktop-light", "index-desktop-dark", "index-mobile-light", "ind
          "mcp-desktop-light", "mcp-desktop-dark", "chunking-mobile-light", "chunking-mobile-dark"]
 
 
+def candidates(text):
+    """Every plausible JSON object in the reply, plus repairs for a tail the model ran out
+    of room to close. A verdict is only ever taken from something that parses."""
+    found = re.findall(r"\{.*\}", text, re.S)
+    tail = text[text.rfind('{"verdict"'):] if '{"verdict"' in text else ""
+    if tail:
+        found += [tail, tail + "}", tail + "]}", tail + '"}]}']
+    return found
+
+
 def main():
     files = [SHOTS / f"{n}.png" for n in NAMES]
     missing = [str(f) for f in files if not f.exists()]
@@ -40,7 +50,7 @@ def main():
             text = json.loads(r.stdout).get("result", r.stdout)
         except Exception:
             pass
-        m = re.findall(r"\{.*\}", text, re.S)
+        m = candidates(text)
         transient = re.search(r"API Error|Overloaded|529|rate.?limit|timed? ?out", text, re.I)
         if m or not transient:
             break

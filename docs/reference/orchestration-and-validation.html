@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Orchestration &amp; the deterministic check · Muneeb Ahmad</title>
+<meta name="description" content="A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/orchestration-and-validation.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Orchestration &amp; the deterministic check · Muneeb Ahmad">
+<meta property="og:description" content="A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/orchestration-and-validation.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Orchestration &amp; the deterministic check · Muneeb Ahmad">
+<meta name="twitter:description" content="A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-stage-map-do-this-before-you-defend-anything">The stage map: do this before you defend anything</a></li><li><a href="#code-stage-vs-model-stage">Code stage vs model stage</a></li><li><a href="#structured-output-what-it-does-and-doesn-t-buy">Structured output: what it does and doesn&rsquo;t buy</a></li><li><a href="#the-decidability-ladder-pick-the-property-before-writing-the-check">The decidability ladder: pick the property before writing the check</a></li><li><a href="#guardrails-as-tripwires-where-a-check-may-sit">Guardrails as tripwires: where a check may sit</a></li><li><a href="#orchestration-patterns-the-vocabulary">Orchestration patterns: the vocabulary</a></li><li><a href="#the-honest-interview-answer">The honest interview answer</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · Agents · Orchestration</p>
+<h1>Orchestration &amp; the deterministic check</h1>
+<p class="standfirst">A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check, and what a check is actually able to decide. Compressed from Lesson 13. Made to be reread the night before an interview.</p>
+
+<h2 id="the-stage-map-do-this-before-you-defend-anything">The stage map: do this before you defend anything</h2>
+
+<p>One row per stage. The two columns that matter are the last two, and most people never fill them in.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Stage</th><th>Code or model</th><th>Reads untrusted text?</th><th>An attacker can make it&hellip;</th></tr></thead>
+  <tbody>
+    <tr><td>retrieve / rerank</td><td>code + local model</td><td>yes</td><td class="tag-good">&hellip;return their chunk. Not <em>behave</em> differently: similarity has no instructions to hijack.</td></tr>
+    <tr><td>build context</td><td>code</td><td>yes (passes it through)</td><td class="tag-good">&hellip;nothing, unless the format itself is forgeable, hence a per-request nonce.</td></tr>
+    <tr><td>generate</td><td class="tag-bad">model</td><td>yes</td><td class="tag-bad">&hellip;answer their way, skip a tool, refuse a question it could answer.</td></tr>
+    <tr><td>judge / guard</td><td class="tag-bad">model</td><td>yes</td><td class="tag-bad">&hellip;pass an attack, or <em>punish the answers that resisted it.</em></td></tr>
+    <tr><td>scores / gate</td><td>code</td><td>no (reads verdicts)</td><td class="tag-good">&hellip;nothing directly, but it inherits whatever the stage above it decided.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The one durable idea</p>
+  <p style="margin:0"><strong>Every guard that is a model can be argued out of its verdict.</strong> Stacking a second model on top moves the target, it does not remove it, and now there are two. The only stage an attacker cannot argue with is <strong>the stage that isn&rsquo;t a model.</strong> Orchestration&rsquo;s real question is not &ldquo;how many agents?&rdquo; but <em>which stages have to be models at all.</em></p>
+</div>
+
+<h2 id="code-stage-vs-model-stage">Code stage vs model stage</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Deterministic (code)</th><th>Probabilistic (a model)</th></tr></thead>
+  <tbody>
+    <tr><td>Same input twice</td><td>Same output, always</td><td>Different wording; in a loop, a different <em>path</em></td></tr>
+    <tr><td>Attack surface</td><td>Its inputs only</td><td>Its inputs <em>and</em> its instructions: the text it reads is text it can obey</td></tr>
+    <tr><td>Assurance available</td><td class="tag-good">Proof. Read the branch.</td><td class="tag-bad">Measurement only. &ldquo;A measured absence of the failure, not proof of its impossibility.&rdquo;</td></tr>
+    <tr><td>Cost</td><td class="tag-good"><code>$0</code>, microseconds</td><td>Tokens + latency; an LLM guard often costs more than what it guards</td></tr>
+    <tr><td>Good at</td><td>Relations, formats, set membership, counts, thresholds</td><td>Meaning, paraphrase, judgement, open-ended text</td></tr>
+  </tbody>
+</table>
+</div>
+
+<blockquote><p>&ldquo;Orchestrating via code makes tasks more deterministic and predictable, in terms of speed, cost and performance.&rdquo;, <a href="https://openai.github.io/openai-agents-python/multi_agent/">OpenAI Agents SDK</a></p></blockquote>
+
+<h2 id="structured-output-what-it-does-and-doesn-t-buy">Structured output: what it does and doesn&rsquo;t buy</h2>
+
+<p>Prose gives code nothing to check. A schema gives it fields. That is the whole reason structured output is a <em>security</em> control (OWASP LLM01 #2) and not just a parsing convenience.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Endpoint</th><th>Key</th></tr></thead>
+  <tbody>
+    <tr><td>Chat Completions</td><td><code>chat.completions.create</code></td><td><code>response_format: {type:"json_schema", json_schema:{name, strict:true, schema}}</code></td></tr>
+    <tr><td>Responses</td><td><code>responses.create</code></td><td><code>text: {format: {type:"json_schema", strict:true, schema}}</code></td></tr>
+    <tr><td>Agents SDK</td><td><code>Agent(&hellip;)</code></td><td><code>output_type=PydanticModel</code>, &ldquo;tells the model to use structured outputs instead of regular plain text&rdquo;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Schema rules that bite: every field must be in <code>required</code>, every object needs <code>additionalProperties: false</code>, and <code>allOf</code> / <code>not</code> / <code>if&ndash;then&ndash;else</code> are unsupported.</p>
+
+<div class="panel">
+  <p class="panel-label">The limit, verbatim</p>
+  <p style="margin:0 0 0.6rem">&ldquo;The model will always generate responses that adhere to your supplied JSON Schema&rdquo; &mdash; <em>but</em> &ldquo;<strong>Structured Outputs can still contain mistakes</strong>&rdquo; and &ldquo;the model will always try to adhere to the provided schema, which can result in hallucinations if the input is completely unrelated to the schema&rdquo; (<a href="https://developers.openai.com/api/docs/guides/structured-outputs">OpenAI</a>).</p>
+  <p style="margin:0"><strong>The shape is guaranteed; the values are not.</strong> So the check must decide a property of <em>relations you control</em>, never a property of the content the model wrote.</p>
+</div>
+
+<h2 id="the-decidability-ladder-pick-the-property-before-writing-the-check">The decidability ladder: pick the property before writing the check</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Check</th><th>Decidable</th><th>Catches</th><th>Blind to</th></tr></thead>
+  <tbody>
+    <tr><td>Every claim carries a citation id</td><td class="tag-good">production</td><td>Uncited assertions: parametric rescue</td><td>Anything the model will cite</td></tr>
+    <tr><td>The id is in <em>this request&rsquo;s</em> retrieved set</td><td class="tag-good">production</td><td>Invented or smuggled ids</td><td>A truthful citation of a poisoned chunk</td></tr>
+    <tr><td>The cited chunk supports the claim</td><td>heuristic only</td><td>Citation drift</td><td>Paraphrase; has its own false-positive rate</td></tr>
+    <tr><td>The cited chunk is not poisoned</td><td class="tag-bad">CI only</td><td>Every planted injection, deterministically</td><td>Production: you don&rsquo;t have the poison list at runtime</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The trap to avoid saying out loud:</strong> &ldquo;citation validation defends against prompt injection.&rdquo; It does not. In an adversarial suite the poison list makes it a perfect oracle, because <em>you wrote the poison.</em> In production, if you knew which chunk was poisoned you would have deleted it. What rows 1&ndash;2 genuinely buy in production is a control against <em>uncited and invented</em> content. Injection is defended upstream, segregation, and above that corpus provenance.</p>
+
+<h2 id="guardrails-as-tripwires-where-a-check-may-sit">Guardrails as tripwires: where a check may sit</h2>
+
+<pre><code>@input_guardrail    # runs only if this is the FIRST agent
+@output_guardrail   # runs only if this is the LAST  agent
+
+def guard(...) -&gt; GuardrailFunctionOutput:
+    return GuardrailFunctionOutput(output_info=..., tripwire_triggered=True)
+    # → raises InputGuardrailTripwireTriggered / OutputGuardrailTripwireTriggered
+</code></pre>
+
+<ul>
+  <li>A tripwire <strong>halts the run</strong> and shows on the trace. It is a boolean, not a score, the same score-vs-tag distinction from L10, one level up.</li>
+  <li>Guardrails sit at <strong>boundaries, not mid-loop</strong>. Segregate on entry, validate on exit. There is no legal place to stand between a tool result and the model reading it, which is exactly where a poisoned chunk enters.</li>
+  <li>Input guardrails run <em>in parallel</em> with the agent by default (latency); <code>run_in_parallel=False</code> blocks first and spends no tokens when the tripwire fires. Cost versus safety, as a flag.</li>
+</ul>
+
+<h2 id="orchestration-patterns-the-vocabulary">Orchestration patterns: the vocabulary</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Pattern</th><th>Shape</th><th>Reach for it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Single agent + tools</strong></td><td>One loop, N tools</td><td>The default. Add tools before you add agents.</td></tr>
+    <tr><td><strong>Agents as tools</strong></td><td>Specialist called like a function; control returns</td><td>&ldquo;a specialist should help with a bounded subtask but should not take over the user-facing conversation&rdquo;</td></tr>
+    <tr><td><strong>Handoff</strong></td><td>Control transfers and stays</td><td>&ldquo;routing itself is part of the workflow and you want the chosen specialist to own the next part&rdquo;</td></tr>
+    <tr><td><strong>Chaining</strong></td><td>Output of one is input to the next</td><td>Decomposable work: retrieve &rarr; generate &rarr; judge</td></tr>
+    <tr><td><strong>Evaluator loop</strong></td><td>Generate &rarr; grade &rarr; regenerate until it passes</td><td>Quality has a checkable criterion and a retry is cheaper than a wrong answer</td></tr>
+    <tr><td><strong>Parallel</strong></td><td><code>asyncio.gather</code> over independent stages</td><td>Speed, when nothing downstream depends on the others</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two things worth saying in an interview: a <strong>judge is an evaluator that was never put in a loop</strong>, closing that arrow is the evaluator-optimizer pattern, and it multiplies a bill that is often already larger than generation. And <strong>a second model call is not a second agent</strong>: only the loop-back arrow changes the category.</p>
+
+<h2 id="the-honest-interview-answer">The honest interview answer</h2>
+
+<blockquote>
+<p>&ldquo;My grader was an LLM reading the same untrusted corpus as the generator, so a poisoned chunk could make it punish the answers that resisted the attack, I have the transcript. Adding a second grader would have had the same exposure, so I moved the check out of the model: structured output with per-claim citations, and a Python validator that every cited id is one I actually put in the context. It decides <em>uncited</em> and <em>invented</em>, deterministically and for free. It does not decide <em>poisoned</em>, that needs the poison list, which only exists in my test suite.&rdquo;</p>
+</blockquote>
+
+<p>The weak version stops at &ldquo;we validate the output.&rdquo; The strong one names what the check can decide <em>and what it can&rsquo;t</em>, which is the same move as reporting the regression next to the win.</p>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/13-citation-validation/"><span class="d-k">Experiment 13</span><span class="d-t">The stage that cannot be argued with</span><span class="d-m">0 of 8 landed attacks caught by citations</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="prompt-injection-and-guardrails.html">Injection &amp; guardrails</a></li><li><a href="agents-vs-workflows.html">Agents vs workflows</a></li><li><a href="answer-defense.html">Answer defense</a></li></ul></div>
+        <div class="doc-seq"><a href="prompt-injection-and-guardrails.html"><span class="s-k">Previous</span>Injection &amp; guardrails</a><a href="mcp.html"><span class="s-k">Next</span>MCP</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

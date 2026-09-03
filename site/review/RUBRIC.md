@@ -44,6 +44,7 @@ mcp-desktop (a reference page, 1440, light and dark), chunking-mobile (a referen
 
 ## Output
 
-Reply with a short list of what you saw per screenshot, then the JSON object on the last
-line exactly as instructed. PASS only when every hard criterion passes and there are fewer
+Reply with AT MOST ONE SHORT LINE per screenshot (eight lines total, no paragraphs, no
+headings), then the JSON object on the last line exactly as instructed. Budget your output:
+the JSON must be complete, so keep the notes terse enough that it always fits. PASS only when every hard criterion passes and there are fewer
 than three minor findings.

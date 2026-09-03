@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Chunking &amp; Retrieval Misses: Reference Card · Muneeb Ahmad</title>
+<meta name="description" content="How to cut text so answers surface, and how to name a miss before you fix it.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/chunking.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Chunking &amp; Retrieval Misses: Reference Card · Muneeb Ahmad">
+<meta property="og:description" content="How to cut text so answers surface, and how to name a miss before you fix it.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/chunking.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Chunking &amp; Retrieval Misses: Reference Card · Muneeb Ahmad">
+<meta name="twitter:description" content="How to cut text so answers surface, and how to name a miss before you fix it.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#when-a-golden-question-misses-it-is-one-of-three">When a golden question misses, it is one of three</a></li><li><a href="#why-good-answers-rank-low-dilution">Why good answers rank low: dilution</a></li><li><a href="#the-splitter-ladder-cheapest-first">The splitter ladder</a></li><li><a href="#keep-the-heading-path-as-metadata">Keep the heading path as metadata</a></li><li><a href="#special-cases-that-break-naive-chunkers">Special cases that break naive chunkers</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG</p>
+<h1>Chunking &amp; the three misses</h1>
+<p class="standfirst">How to cut text so answers surface, and how to name a miss before you fix it. Compressed from Lesson 05. Made to be reread the night before.</p>
+
+<h2 id="when-a-golden-question-misses-it-is-one-of-three">When a golden question misses, it is one of three</h2>
+
+<p>Guessing which is the junior move. <strong>Two cheap looks</strong> turn the guess into a diagnosis: <em>read the top-k</em>, then <em>grep the corpus</em>.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Miss</th><th>What&rsquo;s true</th><th>Read top-k?</th><th>Grep corpus?</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bent ruler</strong></td><td>Answer is in the top-k; keyword rule scores it 0.</td><td>Good chunk is there.</td><td>&mdash;</td><td>Judge by meaning: LLM-judge, context precision.</td></tr>
+    <tr><td><strong>Ranking miss</strong></td><td>Answer exists in corpus but not in top-k.</td><td>Nothing good.</td><td>It&rsquo;s there.</td><td>Chunking, reranking, wider net, query rewrite.</td></tr>
+    <tr><td><strong>Content gap</strong></td><td>Answer is nowhere in the corpus.</td><td>Nothing good.</td><td>Empty.</td><td>Add the document, or drop / rewrite the question.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The tell that&rsquo;s easy to miss:</strong> the top-k read alone <em>cannot</em> separate a ranking miss from a content gap &mdash; both look like &ldquo;no good chunk here.&rdquo; Only the grep splits them. Skipping it is how you re-chunk a corpus that has no answer, or delete a question whose answer was there all along.</p>
+
+<h2 id="why-good-answers-rank-low-dilution">Why good answers rank low: dilution</h2>
+
+<p>A chunk&rsquo;s embedding is the <strong>average of everything in it</strong> (cosine ranks by direction &mdash; see Lesson&nbsp;02). One relevant line inside forty lines of code produces a vector pointing at the code, not the line. The answer isn&rsquo;t missing &mdash; it&rsquo;s <em>outvoted</em>. Better boundaries concentrate the signal so the chunk&rsquo;s direction matches the query.</p>
+
+<h2 id="the-splitter-ladder-cheapest-first">The splitter ladder &mdash; cheapest first</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Splitter</th><th>Cuts on</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Fixed-size</strong></td><td>A character / token count.</td><td>A throwaway baseline. Blind to structure &mdash; dilutes.</td></tr>
+    <tr><td><strong>Recursive</strong></td><td>Paragraph &rarr; line &rarr; sentence &rarr; word, until it fits.</td><td>The sane default for prose. Rarely cuts mid-thought.</td></tr>
+    <tr><td><strong>Structure-aware</strong></td><td>The document&rsquo;s own markup: Markdown headings, HTML, code AST.</td><td>Structured docs. Each chunk = one section.</td></tr>
+    <tr><td><strong>Semantic</strong></td><td>Embedding-similarity breakpoints between sentences.</td><td>Unstructured text where topics drift with no headings. Costs embeddings up front.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Overlap</strong> (e.g. 10&ndash;15%) re-includes a few trailing chars/sentences in the next chunk so an answer split across a boundary survives in at least one piece. A patch for blind cutting &mdash; less needed once you cut on structure.</p>
+
+<h2 id="keep-the-heading-path-as-metadata">Keep the heading path as metadata</h2>
+
+<p>When you split on headings, attach the trail &mdash; <code>file &rsaquo; H2 &rsaquo; H3</code> &mdash; to each chunk. Cheap at split time, expensive to reconstruct later. It buys: <strong>citations</strong> (&ldquo;<code>day26 &sect; Monitoring Training</code> says&rdquo; beats &ldquo;the docs say&rdquo;), context for the generator, and metadata filters at query time. LangChain&rsquo;s <code>MarkdownHeaderTextSplitter</code> returns it for free.</p>
+
+<h2 id="special-cases-that-break-naive-chunkers">Special cases that break naive chunkers</h2>
+<ul>
+  <li><strong>Tables:</strong> keep whole; a half-table is worse than none. Consider one row-group per chunk with the header row repeated.</li>
+  <li><strong>Code:</strong> split on function / class boundaries, never mid-block.</li>
+  <li><strong>Lists &amp; checklists:</strong> keep the list with its heading &mdash; the item is meaningless without &ldquo;Signs of problems:&rdquo; above it. (This is the exact <code>overfitting</code> failure.)</li>
+</ul>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;There&rsquo;s no universal chunk size &mdash; it&rsquo;s a measured trade-off. I start with a recursive or structure-aware splitter matched to the document, keep heading metadata for citations, and I let the eval decide the size: a new splitter helps some questions and hurts others, so I ship the one that moves overall MRR, not the one that fixes a single query.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/05-heading-chunker/"><span class="d-k">Experiment 05</span><span class="d-t">Heading aware chunking</span><span class="d-m">#8 &rarr; #67 target chunk rank after the change</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="rag-metrics.html">RAG metrics</a></li><li><a href="embeddings-and-retrieval.html">Embeddings &amp; retrieval</a></li></ul></div>
+        <div class="doc-seq"><a href="../index.html#reference"><span class="s-k">Back</span>All reference cards</a><a href="embeddings-and-retrieval.html"><span class="s-k">Next</span>Embeddings &amp; retrieval</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

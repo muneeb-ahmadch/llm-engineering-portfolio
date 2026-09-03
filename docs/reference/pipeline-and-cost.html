@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>The RAG Pipeline &amp; Its Cost, Reference Card · Muneeb Ahmad</title>
+<meta name="description" content="Retrieve → augment → generate; the vector-DB landscape; the cost and latency formulas.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/pipeline-and-cost.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The RAG Pipeline &amp; Its Cost, Reference Card · Muneeb Ahmad">
+<meta property="og:description" content="Retrieve → augment → generate; the vector-DB landscape; the cost and latency formulas.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/pipeline-and-cost.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The RAG Pipeline &amp; Its Cost, Reference Card · Muneeb Ahmad">
+<meta name="twitter:description" content="Retrieve → augment → generate; the vector-DB landscape; the cost and latency formulas.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-three-stages">The three stages</a></li><li><a href="#determinism-and-temperature">Determinism &amp; temperature</a></li><li><a href="#where-the-index-lives">Where the index lives</a></li><li><a href="#cost-defined">Cost, defined</a></li><li><a href="#latency-defined">Latency, defined</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG</p>
+<h1>The pipeline, where the index lives, and what it costs</h1>
+<p class="standfirst">Retrieve &rarr; augment &rarr; generate; the vector-DB landscape; the cost and latency formulas. Compressed from Lesson 07. Made to be reread the night before.</p>
+
+<h2 id="the-three-stages">The three stages</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Stage</th><th>Is</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Retrieve</strong></td><td>Embed the query, rank chunks by similarity, keep the top-k. What Lessons 01&ndash;06 measured with MRR.</td><td>Not an answer &mdash; just candidate text. A perfect retrieval score says nothing about what a generator does with it.</td></tr>
+    <tr><td><strong>Augment</strong></td><td>Build the prompt: system instructions + retrieved context + the question, in one message set.</td><td>Not optional glue &mdash; how the context is framed (told to say &ldquo;I don't know&rdquo; or not, ordered how) changes what the model does with good chunks.</td></tr>
+    <tr><td><strong>Generate</strong></td><td>One LLM call, given the augmented prompt, producing the answer text. The only stage with real cost and real latency.</td><td>Not deterministic even at <code>temperature=0.0</code> across model versions &mdash; re-run before trusting a single generated answer as representative.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code>chunks   = retrieve_chunks(question)                 # stage 1, reuse eval's top-k, don't re-retrieve
+context  = "\n\n".join(c["text"] for c in chunks)     # stage 2
+messages = [{"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}]
+response = client.chat.completions.create(model=ANSWER_MODEL, messages=messages, temperature=0.0)  # stage 3</code></pre>
+
+<h2 id="determinism-and-temperature">Determinism &amp; temperature</h2>
+
+<p>Retrieval is deterministic: embed &rarr; cosine-rank &rarr; top-k is arithmetic on fixed numbers, so the same query against the same corpus returns the same chunks every time. That's why MRR/coverage/misses can gate every commit &mdash; a drop between two runs of identical code is a real regression, not noise. Generation is a different animal: an LLM emits one token at a time from a probability distribution over the vocabulary, and <strong>temperature</strong> controls how that distribution is sampled.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Temperature</th><th>Sampling behavior</th></tr></thead>
+  <tbody>
+    <tr><td><code>0</code></td><td>Always take the single highest-probability token (argmax). No randomness by design &mdash; same prompt in, same text out, run after run.</td></tr>
+    <tr><td><code>1</code> (default)</td><td>Sample proportionally to the model's own probabilities &mdash; a genuine weighted random draw. Same prompt can yield different wording, or a different fact included/omitted, on every call.</td></tr>
+    <tr><td><code>&gt;1</code></td><td>Flattens the distribution further &mdash; lower-probability tokens become relatively more likely. More variety, more risk of incoherence.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>gpt-5.6-luna</code> <strong>rejects</strong> <code>temperature=0.0</code> outright (&ldquo;Only the default (1) value is supported&rdquo;) &mdash; there is no dial to turn off. Every call samples from the full distribution, so generated answers vary run-to-run even with identical code and identical retrieval. That's the concrete reason a content-based CI gate on generated text would flake, and why Lesson 07 splits the pipeline: deterministic retrieval metrics on every commit, non-deterministic priced generation nightly. Note that even <code>temperature=0.0</code> on other models isn't a perfect guarantee across model versions or hardware &mdash; but a model forced to <code>temperature=1</code> is a much larger, deliberate source of variance, not a rounding-error edge case.</p>
+
+<h2 id="where-the-index-lives">Where the index lives</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Store</th><th>Tier</th><th>Adds over brute-force numpy</th></tr></thead>
+  <tbody>
+    <tr><td>Plain array + cosine</td><td>Dev / learning</td><td>Nothing &mdash; exact search, zero infra. Correct choice under a few thousand chunks.</td></tr>
+    <tr><td>Chroma</td><td>Dev &rarr; small prod</td><td>SQLite persistence, metadata filtering, a real client API.</td></tr>
+    <tr><td>FAISS</td><td>Prototyping at scale</td><td>Very fast in-memory search; no persistence by default.</td></tr>
+    <tr><td>pgvector</td><td>Small &rarr; medium prod</td><td>Vectors inside Postgres you already operate &mdash; no new database.</td></tr>
+    <tr><td>Pinecone / Weaviate</td><td>Large-scale prod</td><td>Managed, sharded, built for billions of vectors.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The load-bearing line</strong> (Day 15 lecture notes, verbatim): <em>&ldquo;Remember: the encoder choice matters much more than the database choice!&rdquo;</em> At a scale where exact search is still fast &mdash; low thousands of chunks &mdash; a numpy array and Chroma return identical nearest neighbours. The gap only opens once a store switches to <em>approximate</em> search (HNSW) to stay fast at millions of vectors, trading a sliver of recall for speed. Don't claim a database you haven't needed yet.</p>
+
+<h2 id="cost-defined">Cost, defined</h2>
+
+<pre><code>cost = (usage.prompt_tokens     / 1_000_000) * input_price_per_million
+     + (usage.completion_tokens / 1_000_000) * output_price_per_million</code></pre>
+
+<p>Token counts come off the real API response &mdash; never estimated from character count once you have a live call. Prices come from the vendor's <em>current</em> published rate, checked the day you run it, not a remembered number from a lecture or a prior session: model pricing tables change, and the exact model a course notebook hardcodes can rotate off the current page entirely (it did, mid-course, for this one &mdash; see Lesson 07).</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Model</th><th>Input / 1M tok</th><th>Output / 1M tok</th><th>Confirmed</th></tr></thead>
+  <tbody>
+    <tr><td>OpenAI <code>gpt-5.4-mini</code></td><td>$0.75 <span style="color:var(--ink-faint)">($0.075 cached)</span></td><td>$4.50</td><td>2026-07-21, <a href="https://platform.openai.com/docs/pricing">OpenAI pricing docs</a></td></tr>
+    <tr><td>Claude Haiku 4.5</td><td>$1.00</td><td>$5.00</td><td>2026-07-21, <a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic pricing docs</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Re-check both before quoting either in an interview &mdash; these are snapshots, not constants.</p>
+
+<h2 id="latency-defined">Latency, defined</h2>
+
+<p>Time <em>only</em> the generation call &mdash; wall-clock around <code>client.chat.completions.create(...)</code> itself, the same way <code>embed_secs</code> already isolates embedding time from the rest of the pipeline. Conflating retrieval and generation latency hides which stage actually dominates a real deployment's response time (generation, almost always, by a wide margin).</p>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;Retrieval, augmentation, and generation are three separable stages &mdash; I measure retrieval quality with MRR independent of any LLM, then add a real, priced, timed generation call on top once retrieval is trustworthy. I keep the vector store as the simplest thing that's provably equivalent to a real database at my scale, and I price every generation run from the vendor's current rate, checked the day I ran it &mdash; not a number I remembered.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/07-generation/"><span class="d-k">Experiment 07</span><span class="d-t">What an answer costs</span><span class="d-m">$0.002174 per query, 2.1 s mean latency</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="reranking.html">Reranking</a></li><li><a href="chunking.html">Chunking</a></li></ul></div>
+        <div class="doc-seq"><a href="reranking.html"><span class="s-k">Previous</span>Reranking</a><a href="rag-vs-finetune-vs-prompt.html"><span class="s-k">Next</span>RAG vs fine-tune vs prompt</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

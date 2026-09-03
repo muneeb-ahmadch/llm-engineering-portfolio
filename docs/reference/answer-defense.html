@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Closing the answer gap: grounding, faithfulness &amp; the CI gate · Muneeb Ahmad</title>
+<meta name="description" content="RAG never scores 1.0. You don&#x27;t fix that, you make it fail safe and measurable. Every gap between your golden set and perfect gets a named control.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/answer-defense.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Closing the answer gap: grounding, faithfulness &amp; the CI gate · Muneeb Ahmad">
+<meta property="og:description" content="RAG never scores 1.0. You don&#x27;t fix that, you make it fail safe and measurable. Every gap between your golden set and perfect gets a named control.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/answer-defense.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Closing the answer gap: grounding, faithfulness &amp; the CI gate · Muneeb Ahmad">
+<meta name="twitter:description" content="RAG never scores 1.0. You don&#x27;t fix that, you make it fail safe and measurable. Every gap between your golden set and perfect gets a named control.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-premise-no-rag-system-is-ever-fully-correct">The premise: no RAG system is ever fully correct</a></li><li><a href="#what-generation-adds-two-new-ways-to-be-wrong">What generation adds: two new ways to be wrong</a></li><li><a href="#the-defense-ladder-one-control-per-gap">The defense ladder: one control per gap</a></li><li><a href="#the-ci-gate-how-you-catch-the-llm-gave-its-own-answer">The CI gate: how you catch &ldquo;the LLM gave its own answer&rdquo;</a></li><li><a href="#where-guardrails-proper-fit-forward-pointer">Where guardrails proper fit (forward pointer)</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG · the defense layer</p>
+<h1>Closing the answer gap</h1>
+<p class="standfirst">RAG never scores 1.0. You don't fix that, you make it <em>fail safe</em> and <em>measurable</em>. Every gap between your golden set and perfect gets a named control. Compressed from Lesson 09. Made to be reread the night before.</p>
+
+<h2 id="the-premise-no-rag-system-is-ever-fully-correct">The premise: no RAG system is ever fully correct</h2>
+
+<p>Your own numbers say so. Six lessons of measurement landed at <strong>MRR 0.785, 2/20 misses</strong>, and Day 16's tuned baseline peaked at 0.790. That is the ceiling honest RAG lives under: <em>&ldquo;Anyone claiming RAG metrics near 1.0 is either overfitting the golden set or not measuring what they think&rdquo;</em> (<a href="rag-metrics.html">rag-metrics</a>). So the engineering question is never &ldquo;how do I get every answer right?&rdquo; It is: <strong>when the system is wrong: and it will be, does it fail loudly and safely, or silently and dangerously?</strong> The controls below are how you buy the first over the second.</p>
+
+<h2 id="what-generation-adds-two-new-ways-to-be-wrong">What generation adds: two new ways to be wrong</h2>
+
+<p>Retrieval-only (Lessons 01&ndash;06) had exactly one failure: the right chunk isn't in the top-k. The moment an LLM enters the loop (Lesson 07), two failures appear that <em>no retrieval metric can see</em>, both of which you already produced:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Failure</th><th>What it looks like</th><th>Your evidence</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Ungrounded &amp; wrong<br>(hallucination)</strong></td><td>The answer states a fact that's in <em>none</em> of the retrieved chunks, and it's false. The grounding instruction was ignored.</td><td class="tag-bad">The &ldquo;Paris&rdquo; probe: context was an LSTM chunk, instruction said abstain, model answered &ldquo;Paris, the capital of France.&rdquo;</td></tr>
+    <tr><td><strong>Ungrounded &amp; lucky<br>(parametric rescue)</strong></td><td>The answer is <em>correct</em> but came from the model's pre-training, not the context. Fine today; a landmine on a private corpus where the model has no fallback.</td><td>Both retrieval MISSes got textbook-correct answers, because <code>overfitting</code> / <code>reranking</code> are generic ML the model knew cold.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">Why &ldquo;lucky&rdquo; is the more dangerous one</p>
+  <p style="margin:0">A hallucination on a public fact you can catch by eye. But <em>parametric rescue</em> passes every test you're watching, the answer <em>is</em> right: so you ship it, then deploy on <strong>InsureElm's proprietary policies</strong> where the model has never seen the answer, and the exact same retrieval miss that looked harmless now returns a confident fabrication. <strong>This is why Lesson 04 kept retrieval and answer metrics separate:</strong> answer quality on a public corpus flatters you. Keep measuring retrieval on its own, and never trust a right answer whose chunk you can't point to.</p>
+</div>
+
+<h2 id="the-defense-ladder-one-control-per-gap">The defense ladder: one control per gap</h2>
+
+<p>Cheapest first. Each catches something the one above it can't. You don't need all six on day one; you need to know which gap each one closes.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>#</th><th>Control</th><th>Catches</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><strong>Grounded prompt</strong></td><td>Some hallucination. <em>Necessary, not sufficient</em>, Paris proves it leaks.</td><td>Free</td></tr>
+    <tr><td>2</td><td><strong>Forced abstention</strong> + measure abstention rate</td><td>Turns a miss into &ldquo;I don't know&rdquo; instead of a guess, <em>if</em> it holds.</td><td>Free</td></tr>
+    <tr><td>3</td><td><strong>Citations</strong> (cite the chunk per claim)</td><td>Makes every ungrounded claim <em>visible and checkable</em>; the user can verify.</td><td>~free (tokens)</td></tr>
+    <tr><td>4</td><td><strong>Faithfulness judge</strong> (LLM-as-judge)</td><td>Both failures above: grades the answer against <em>only</em> its context.</td><td>1 call / question</td></tr>
+    <tr><td>5</td><td><strong>Retrieval-confidence gate</strong></td><td>Refuses to generate at all when the top chunk's score is too low.</td><td>Free (a threshold)</td></tr>
+    <tr><td>6</td><td><strong>Human-in-the-loop</strong> + trace log</td><td>The residual no automation closes, and feeds the corpus back.</td><td>Ops time</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>1 · Grounded prompting: necessary, never sufficient</h3>
+<p>Your harness already does this: <em>&ldquo;Use the provided context… If you don't know, say 'I don't have that information.'&rdquo;</em> Keep it: a model told to ground itself hallucinates <em>less</em>. But it is a nudge on a probability distribution, not a lock. The Paris probe is the proof: same prompt, model reached past the context anyway because it &ldquo;knew&rdquo; the answer. <strong>Treat grounded prompting as the floor, then verify that it held, don't assume it.</strong></p>
+
+<h3>2 · Abstention as a first-class answer</h3>
+<p>&ldquo;I don't have that information&rdquo; is not a failure, on a question the corpus can't answer, it is the <em>only correct output</em>. So make it measurable. <strong>Abstention rate</strong> = fraction of answers that decline. Read it as a band, not a target:</p>
+<pre><code>abstention too LOW   → the model is answering things it shouldn't (hallucinating)
+abstention too HIGH  → uselessly timid; retrieval or threshold is starving it
+</code></pre>
+<p>A system that <em>never</em> abstains on a hard corpus isn't confident, it's lying somewhere you haven't looked.</p>
+
+<h3>3 · Citations: make the lie visible</h3>
+<p>Require the model to tag each claim with the chunk it came from (<code>[source: day26]</code>). Two payoffs: a citation that doesn't actually support its claim is a <em>caught</em> hallucination (you or a judge can check it), and the reader gets a verification path instead of a black box. Forcing attribution also empirically pulls answers back toward the context.</p>
+
+<h3>4 · Faithfulness: the metric that catches the hallucination</h3>
+<p>The one <a href="rag-metrics.html">rag-metrics</a> said to remember, now operationalized. An LLM judge reads the answer and <em>only</em> its retrieved context, and scores: <strong>is every claim in the answer entailed by the context?</strong> A claim that's true-but-ungrounded still fails. That's the point, it catches both the Paris fabrication <em>and</em> the parametric rescue, neither of which any retrieval metric or gold-answer match can see.</p>
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Property</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Reference-free</strong></td><td>Needs no gold answer: just answer + context. So it scales to questions you never hand-labelled.</td></tr>
+    <tr><td><strong>Judge ≥ generator</strong></td><td>A weaker judge rubber-stamps. Use a model at least as strong as the one that wrote the answer.</td></tr>
+    <tr><td><strong>Structured output</strong></td><td>Force a parseable verdict (score or claim-by-claim yes/no), or you can't aggregate or gate on it.</td></tr>
+    <tr><td><strong>Non-deterministic</strong></td><td>The judge samples too. Gate on a threshold <em>with margin</em>, never exact equality, see below.</td></tr>
+  </tbody>
+</table>
+</div>
+<p><a href="https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/">Ragas</a> implements exactly this (decompose answer into claims → check each against context → faithfulness = grounded claims / total claims). You can hand-roll the same shape with one extra API call in the shape your harness already makes.</p>
+
+<h3>5 · Retrieval-confidence gating: don't answer from weak evidence</h3>
+<p>Before generating, look at the top chunk's similarity score. Below a threshold, the context is probably junk, so <em>don't generate</em>; abstain or route to a fallback. The threshold is empirical: read the score distribution of your golden hits vs misses and cut where they separate. This stops the pipeline from dressing up a bad retrieval as a confident answer.</p>
+
+<h3>6 · Human-in-the-loop &amp; the feedback loop</h3>
+<p>Whatever the automation doesn't catch, log. Every abstention and every low-faithfulness answer goes to your <a href="pipeline-and-cost.html">trace</a> (you already wired Langfuse). That log is not exhaust, it's your <strong>work queue</strong>: each abstention is a question the corpus should answer but can't. Fix it (add the doc, re-chunk, add a golden question) and the gap shrinks. This is what makes the answer gap <em>close over time</em> instead of sitting constant at 2/20 forever.</p>
+
+<h2 id="the-ci-gate-how-you-catch-the-llm-gave-its-own-answer">The CI gate: how you catch &ldquo;the LLM gave its own answer&rdquo;</h2>
+
+<p>Lesson 07 left this exactly half-answered. It correctly said: generation runs at <code>temperature=1</code> (the GPT-5 tier <em>rejects</em> <code>0.0</code>), so a commit gate on answer <em>text</em> would flake: you can't diff a non-deterministic string. True. But that is not a reason to skip the gate. <strong>You don't gate on the answer's wording. You gate on stable <em>properties</em> of the answer, aggregated into rates.</strong> Rates are robust to wording variance; that's the whole trick.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Gate</th><th>Rule (example)</th><th>Runs</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Trap-set hallucination</strong></td><td>Questions whose answer is <em>not</em> in the corpus (Paris, generalized). Correct = abstain. <strong>Hallucination count must be 0.</strong></td><td>Every commit: the abstention check is a cheap string match, so it's fast and deterministic <em>enough</em>.</td></tr>
+    <tr><td><strong>Faithfulness floor</strong></td><td>Mean faithfulness across the golden set <strong>≥ threshold</strong> (e.g. 4.0/5), and no regression vs last run.</td><td>Nightly: it's a paid judge call per question.</td></tr>
+    <tr><td><strong>Abstention band</strong></td><td>Abstention rate on the real golden set stays within <strong>[lo, hi]</strong>, flags both a newly-timid and a newly-reckless model.</td><td>Nightly.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The key insight: why a trap set beats a content diff</p>
+  <p style="margin:0 0 0.8rem">A <strong>trap set</strong> is a handful of questions you <em>know</em> the corpus can't answer. The right behavior is always the same regardless of wording, <em>abstain</em>, so you check a property (&ldquo;did it decline?&rdquo;), not a string. That property is stable under <code>temperature=1</code>: a well-grounded model abstains every time; a model that <em>sometimes</em> abstains and sometimes fabricates is exactly the flakiness you want the gate to catch, not hide. So the trap-set gate is both cheap enough for every commit <em>and</em> the most direct possible test of &ldquo;is the LLM inventing answers?&rdquo;</p>
+  <p style="margin:0">Make the abstention check robust: string-match your sentinel (<code>&quot;I don't have that information&quot;</code>) first; only fall back to a judge call if the sentinel is absent but the answer might still be a decline. Cheap path first, judge as backstop.</p>
+</div>
+
+<p>The split falls straight out of what each half <em>is</em>: retrieval metrics are free, deterministic, cached-fast → <strong>every commit</strong>. The faithfulness judge and abstention band are paid, slow, sampled → <strong>nightly, gating the release</strong>. The trap set is the bridge, it costs a few generation calls but tests the one thing you can't afford to let regress silently, so it earns a place on every commit.</p>
+
+<h2 id="where-guardrails-proper-fit-forward-pointer">Where guardrails proper fit (forward pointer)</h2>
+<p>Everything above defends <em>answer quality</em>. A separate layer defends against <em>adversarial</em> input/output: prompt injection, PII leakage, excessive agency. That's the <a href="https://genai.owasp.org/llm-top-10/">OWASP LLM Top 10</a>, and it gets its own lesson (L10). Don't conflate the two: faithfulness stops the model being <em>wrong</em>; guardrails stop it being <em>abused</em>.</p>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;I can't build a RAG system that's always right, nobody can; honest RAG tops out well under 1.0. So I build one that fails safe and tells me when it's wrong. Grounded prompting and forced abstention turn a retrieval miss into &lsquo;I don't know&rsquo; instead of a fabrication; a faithfulness judge grades every answer against only its context, so an ungrounded claim fails even when it's accidentally true; and a trap set of unanswerable questions gates CI on hallucination count, because generation is non-deterministic, I gate on stable <em>rates</em>, not on the answer text. Every abstention is logged, and that log is the queue of gaps I close in the corpus next.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/09-answer-defense/"><span class="d-k">Experiment 09</span><span class="d-t">Closing the hallucination gap</span><span class="d-m">15/15 &rarr; 0/15 trap hallucinations, prompt only</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="rag-metrics.html">RAG metrics</a></li><li><a href="pipeline-and-cost.html">Pipeline &amp; cost</a></li></ul></div>
+        <div class="doc-seq"><a href="rag-vs-finetune-vs-prompt.html"><span class="s-k">Previous</span>RAG vs fine-tune vs prompt</a><a href="tracing-and-scores.html"><span class="s-k">Next</span>Tracing &amp; scores</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

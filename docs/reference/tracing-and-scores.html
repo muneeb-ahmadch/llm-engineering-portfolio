@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Tracing answer quality: scores, not tags · Muneeb Ahmad</title>
+<meta name="description" content="A trace shows you what happened on one request. A score is what makes whether it was any good queryable, aggregatable, and alertable across all of them.">
+<link rel="canonical" href="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/tracing-and-scores.html">
+<meta name="author" content="Muneeb Ahmad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tracing answer quality: scores, not tags · Muneeb Ahmad">
+<meta property="og:description" content="A trace shows you what happened on one request. A score is what makes whether it was any good queryable, aggregatable, and alertable across all of them.">
+<meta property="og:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta property="og:url" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/reference/tracing-and-scores.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tracing answer quality: scores, not tags · Muneeb Ahmad">
+<meta name="twitter:description" content="A trace shows you what happened on one request. A score is what makes whether it was any good queryable, aggregatable, and alertable across all of them.">
+<meta name="twitter:image" content="https://muneeb-ahmadch.github.io/llm-engineering-portfolio/assets/og.png">
+<meta name="theme-color" content="#fffef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16150f" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search).get("theme");
+    var t = q === "light" || q === "dark" ? q : localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+  } catch (e) {}
+})();
+</script>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="wordmark" href="../index.html">Muneeb Ahmad<span class="wordmark-sub">Applied LLM &amp; RAG engineering</span></a>
+    <nav class="site-nav" aria-label="Site"><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul><details class="nav-menu"><summary>Menu</summary><ul class="nav-list"><li><a href="../index.html#experiments">Experiments</a></li><li><a href="../index.html#pipeline">Pipeline</a></li><li><a href="../index.html#reference" aria-current="page">Reference</a></li><li><a href="../index.html#about">About</a></li></ul></details></nav>
+    <div class="header-tools">
+      <a class="icon-link" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio" aria-label="Repository on GitHub">
+        <svg viewBox="0 0 16 16" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-2.92-.88-2.92-2.9 0-.58.21-1.06.55-1.43-.05-.14-.24-.69.05-1.44 0 0 .56-.18 1.83.68a6.9 6.9 0 0 1 1.67-.22c.57 0 1.14.08 1.67.22 1.27-.87 1.83-.68 1.83-.68.29.75.1 1.3.05 1.44.34.37.55.85.55 1.43 0 2.03-1.15 2.7-2.93 2.9.3.26.56.76.56 1.54 0 1.11-.01 2.01-.01 2.29 0 .21.15.46.55.38A7.99 7.99 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <button class="theme-toggle" type="button" aria-label="Switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20.5 14.6A8.9 8.9 0 0 1 9.4 3.5a8.9 8.9 0 1 0 11.1 11.1Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+<div class="doc container">
+  <div class="doc-grid">
+    <details class="toc" id="toc" open>
+      <summary>On this page</summary>
+      <p class="toc-title">On this page</p>
+      <ol><li><a href="#the-one-distinction-that-matters">The one distinction that matters</a></li><li><a href="#the-sdk-calls-python-v3">The SDK calls (Python v3)</a></li><li><a href="#where-to-attach-it-batch-vs-production">Where to attach it: batch vs production</a></li><li><a href="#what-the-score-then-buys-you">What the score then buys you</a></li><li><a href="#which-verdicts-are-worth-scoring">Which verdicts are worth scoring</a></li><li><a href="#defend-it-in-one-line">Defend it in one line</a></li></ol>
+    </details>
+    <script>(function () { var t = document.getElementById("toc");
+      if (t && window.matchMedia("(max-width: 1099px)").matches) t.removeAttribute("open"); })();</script>
+    <article class="prose">
+      <p class="eyebrow">Reference · RAG · observability</p>
+<h1>Tracing answer quality</h1>
+<p class="standfirst">A trace shows you <em>what happened</em> on one request. A <strong>score</strong> is what makes <em>whether it was any good</em> queryable, aggregatable, and alertable across all of them. Compressed from Lesson 10. Made to be reread the night before.</p>
+
+<h2 id="the-one-distinction-that-matters">The one distinction that matters</h2>
+
+<p>Langfuse gives a trace three places to hang information. They are not interchangeable, pick by <em>what you need to ask later</em>, not by what's easiest to write.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Primitive</th><th>What it's for</th><th>Aggregates into a rate?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Score</strong></td><td>A graded verdict on the run: <code>abstained</code>, <code>faithfulness</code>, a thumbs-up. Numeric / boolean / categorical / text.</td><td class="tag-good">Yes: this is the whole point. Mean over a window = a monitorable rate.</td></tr>
+    <tr><td><strong>Tag</strong></td><td>A coarse label to <em>filter</em> a trace by: <code>prod</code>, <code>rag-eval</code>, <code>model:gpt-5.4-mini</code>.</td><td class="tag-bad">No: filters, doesn't average. Trace-level only.</td></tr>
+    <tr><td><strong>Metadata</strong></td><td>Free-form context for one trace: config, request id, corpus version.</td><td class="tag-bad">No: searchable per-trace, not summable.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">Why abstention is a score</p>
+  <p style="margin:0">The thing you need from abstention is a <strong>rate</strong>, the band from <a href="answer-defense.html">answer-defense</a>: too low means the model is answering things it shouldn't; too high means retrieval is starving it. A rate is a mean over many runs. Among the three primitives, <strong>only a score is averaged</strong>. A tag would tell you <em>which</em> traces abstained but never <em>what fraction</em>; metadata wouldn't even filter cleanly. So the choice isn't stylistic, the question you must answer (&ldquo;is my abstention rate drifting?&rdquo;) has exactly one primitive that answers it.</p>
+</div>
+
+<h2 id="the-sdk-calls-python-v3">The SDK calls (Python v3)</h2>
+
+<p>The OpenTelemetry-based SDK (<code>get_client()</code>, <code>start_as_current_observation</code>) attaches a score at whichever level you name. Verified against the <a href="https://langfuse.com/docs/scores/custom">Langfuse custom-scores docs</a>.</p>
+
+<pre><code># On an observation you already hold (a span):
+span.score(name="abstained", value=1, data_type="BOOLEAN", comment="...")
+span.score_trace(name="abstained", value=1, data_type="BOOLEAN")
+
+# On whatever is currently active, no handle needed:
+langfuse.score_current_span(name="faithfulness", value=4, data_type="NUMERIC")
+langfuse.score_current_trace(name="abstained",   value=0, data_type="BOOLEAN")
+
+# After the fact, by id (e.g. a human label arriving later):
+langfuse.create_score(name="abstained", value=1, data_type="BOOLEAN",
+                      trace_id=tid, observation_id=oid, comment="...")
+</code></pre>
+
+<p><code>data_type</code> is one of <strong>NUMERIC</strong> (float), <strong>BOOLEAN</strong> (0/1), <strong>CATEGORICAL</strong> (string), <strong>TEXT</strong> (1&ndash;500 chars). Scores are batched. Call <code>langfuse.flush()</code> before the process exits or they never leave.</p>
+
+<h2 id="where-to-attach-it-batch-vs-production">Where to attach it: batch vs production</h2>
+
+<p>Same verdict, different level, and the difference <em>is</em> the batch-vs-live distinction:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Setting</th><th>One trace is…</th><th>Attach the score to…</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Eval harness</strong> (<code>--generate --trace</code>)</td><td>the whole run; each question is a child span</td><td>the <code>answer-question</code> <strong>span</strong> → per-question grain: <code>qspan.score(...)</code></td></tr>
+    <tr><td><strong>Live app</strong></td><td>a single user request</td><td>the <strong>trace</strong> → one verdict per request: <code>score_current_trace(...)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="what-the-score-then-buys-you">What the score then buys you</h2>
+
+<ul>
+  <li><strong>The work queue (Control #6).</strong> Filter the trace list to <code>abstained = 1</code> and you have the exact real-user questions your corpus couldn't answer. Each one is a doc to add or a chunk to fix, the gap closes over time instead of sitting constant.</li>
+  <li><strong>The band, monitored.</strong> The mean of <code>abstained</code> over a window is the abstention rate, charted over time. Set an alert on the band edges.</li>
+  <li><strong>Prod regressions CI can't see.</strong> Your CI gate only tests the fixed golden + trap set. A model swap that makes the system start answering things it shouldn't shows up as the live abstention rate <em>dropping</em>, on traffic you never wrote a test for.</li>
+</ul>
+
+<h2 id="which-verdicts-are-worth-scoring">Which verdicts are worth scoring</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Score</th><th>Cost to emit</th><th>Type</th></tr></thead>
+  <tbody>
+    <tr><td><code>abstained</code></td><td>Free: a sentinel string match</td><td>BOOLEAN</td></tr>
+    <tr><td><code>faithfulness</code></td><td>One judge call per answer</td><td>NUMERIC</td></tr>
+    <tr><td><code>retrieval_confidence</code></td><td>Free: top chunk's similarity</td><td>NUMERIC</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Same mechanism for all three: they differ only in what fills <code>value</code>. Start with the free one.</p>
+
+<h2 id="defend-it-in-one-line">Defend it in one line</h2>
+<blockquote>&ldquo;I don't just trace latency and cost, I score answer quality onto the trace. Every request carries an <code>abstained</code> score, so in production I filter to the ones that declined, that's my queue of corpus gaps, and I watch the abstention rate as a band: a sudden drop means the model started answering things it shouldn't, on real traffic my CI golden set never covers. Faithfulness rides the same trace as a numeric score. Scores, not tags, because a tag can't average into a rate.&rdquo;</blockquote>
+
+      <nav class="doc-nav" aria-label="Related reading">
+        <div><h2 id="behind-this-card">The experiment behind this card</h2><a class="doc-exp" href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/10-abstention-trace/"><span class="d-k">Experiment 10</span><span class="d-t">Abstention in production telemetry</span><span class="d-m">1 in 734 chunk behind the one false abstention</span></a></div>
+        <div><h2 id="related-cards">Related cards</h2><ul><li><a href="answer-defense.html">Answer defense</a></li><li><a href="pipeline-and-cost.html">Pipeline &amp; cost</a></li></ul></div>
+        <div class="doc-seq"><a href="answer-defense.html"><span class="s-k">Previous</span>Answer defense</a><a href="agents-vs-workflows.html"><span class="s-k">Next</span>Agents vs workflows</a></div>
+      </nav>
+    </article>
+  </div>
+</div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-who"><strong>Muneeb Ahmad</strong><span>Applied LLM and RAG engineering</span></p>
+    <p class="footer-links">
+      <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+      <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+      <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+    </p>
+    <p class="footer-note">Built by hand: HTML, CSS and about 3 KB of JavaScript. No framework, no tracking,
+    no web fonts. Last updated September 2026.</p>
+  </div>
+</footer>
+
+<script src="../assets/site.js" defer></script>
+</body>
+</html>

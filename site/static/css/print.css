@@ -1,0 +1,15 @@
+/* Print: drop the furniture, black on white, expose link targets in the prose. */
+@media print {
+  :root { --ink: #000; --ink-soft: #333; --ink-faint: #555; --bg: #fff; --bg-panel: #f4f4f4;
+          --rule: #ccc; --accent: #000; }
+  body { font-size: 11pt; }
+  .site-header, .header-tools, .chips, .chips-status, .toc, .cta-row, .site-footer,
+  .teacher-note, .doc-nav { display: none; }
+  .container { max-width: none; padding-inline: 0; }
+  section { padding-top: 1.5rem; }
+  h2 { page-break-after: avoid; }
+  .panel, pre, table, .exp, .stage { page-break-inside: avoid; }
+  .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.75em; color: #555;
+                                  word-break: break-all; }
+  .verdict, .rail, .refgrid, .tiles { border: 0; }
+}
