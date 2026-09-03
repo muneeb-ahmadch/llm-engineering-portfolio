@@ -1,0 +1,126 @@
+{
+  "langgraph": "1.2.11",
+  "langgraph_checkpoint_sqlite": "3.1.1",
+  "model": "gpt-5.6-luna",
+  "max_steps": 3,
+  "config": {
+    "encoder": "bge-small",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "chunker": "fixed",
+    "rerank": true,
+    "pool": 20
+  },
+  "prompt_variant": "hardened",
+  "questions": [
+    {
+      "thread_id": "l15-overfitting",
+      "question": "What is overfitting in a neural network?",
+      "answer": "Overfitting occurs when a model memorizes the training data rather than learning generalizable patterns. A typical sign is that training loss decreases while validation loss increases, leading to poor performance on unseen data.",
+      "steps": 2,
+      "terminated_by": "answer",
+      "searches": [
+        {
+          "step": 1,
+          "query": "Overfitting is when a neural network learns the training data too well and performs poorly on unseen data",
+          "k": 5,
+          "sources": [
+            "day27-deep-learning-2.md",
+            "day23-oss-finetuning.md",
+            "day22-finetuning.md",
+            "day22-finetuning.md",
+            "day23-oss-finetuning.md"
+          ],
+          "n_new_chunks": 3
+        }
+      ],
+      "n_checkpoints": 5,
+      "sources_shown": [
+        "day26-deep-learning.md",
+        "day23-oss-finetuning.md",
+        "day27-deep-learning-2.md",
+        "day26-deep-learning.md",
+        "day26-deep-learning.md",
+        "day22-finetuning.md",
+        "day22-finetuning.md",
+        "day23-oss-finetuning.md"
+      ],
+      "prompt_tokens": 4946,
+      "completion_tokens": 153,
+      "cached_tokens": 1813,
+      "reasoning_tokens": 63,
+      "latency_ms": 8757.555584073998,
+      "cost": 0.0042323,
+      "api_calls": 2
+    },
+    {
+      "thread_id": "l15-reranking",
+      "question": "What does reranking do in a RAG pipeline?",
+      "answer": "Reranking uses an LLM to reorder retrieved chunks by relevance to the question, then keeps the highest-ranked chunks\u2014such as the top 10\u2014for generating the final answer.",
+      "steps": 2,
+      "terminated_by": "answer",
+      "searches": [
+        {
+          "step": 1,
+          "query": "Reranking reorders retrieved chunks by relevance before generating the answer",
+          "k": 5,
+          "sources": [
+            "day16-rag-evals.md",
+            "day16-rag-evals.md",
+            "day16-rag-evals.md",
+            "day16-rag-evals.md",
+            "day16-rag-evals.md"
+          ],
+          "n_new_chunks": 5
+        }
+      ],
+      "n_checkpoints": 5,
+      "sources_shown": [
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md",
+        "day16-rag-evals.md"
+      ],
+      "prompt_tokens": 4846,
+      "completion_tokens": 124,
+      "cached_tokens": 1666,
+      "reasoning_tokens": 47,
+      "latency_ms": 4386.08466705773,
+      "cost": 0.0040906,
+      "api_calls": 2
+    },
+    {
+      "thread_id": "l15-prompt-caching",
+      "question": "What is prompt caching?",
+      "answer": "Prompt caching allows an LLM provider to reuse processing work from the same or similar prompts, saving money.",
+      "steps": 1,
+      "terminated_by": "answer",
+      "searches": [],
+      "n_checkpoints": 3,
+      "sources_shown": [
+        "day13-multimodal.md",
+        "day13-multimodal.md",
+        "day12-llm-apis.md",
+        "day11-llm-intro.md",
+        "day13-multimodal.md"
+      ],
+      "prompt_tokens": 1698,
+      "completion_tokens": 25,
+      "cached_tokens": 0,
+      "reasoning_tokens": 0,
+      "latency_ms": 1240.5805001035333,
+      "cost": 0.001848,
+      "api_calls": 1
+    }
+  ],
+  "total_cost": 0.010171,
+  "api_calls_log_lines": 5,
+  "tool_runs_log_lines": 2
+}

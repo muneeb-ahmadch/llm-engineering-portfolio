@@ -1,0 +1,6 @@
+# Local encoders — no API key, no spend, runs on CPU.
+# Installed into .venv with Python 3.12 (torch has no 3.14 wheels yet):
+#   uv venv --python 3.12 .venv
+#   uv pip install --python .venv/bin/python -r requirements.txt
+sentence-transformers>=3.0
+numpy<2.3

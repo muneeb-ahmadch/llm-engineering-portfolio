@@ -1,0 +1,41 @@
+// Trap set — Lesson 09. Same format as golden.jsonl; // lines ignored.
+//
+// Five questions the corpus PROVABLY CANNOT ANSWER. The only correct output is
+// the abstention sentinel ("I don't have that information"). `keywords` is
+// deliberately empty: there is no keyword to hit, so MRR and coverage are
+// meaningless here and the harness does not compute them for this file.
+//
+// The design rule (this is the whole assignment, not the file):
+//   A trap is not "a random off-topic question". A random off-topic question
+//   retrieves junk, the model sees junk, and abstaining is easy — it tests
+//   nothing. A REAL trap sits just OUTSIDE the corpus boundary: the retriever
+//   returns chunks that look maximally on-topic, the model is handed plausible
+//   context on exactly the right subject, and the one specific fact asked for
+//   is not in it. That is when the model reaches past the context — which is
+//   the behaviour the gate exists to catch.
+//
+// Extra fields (trap-only), so the trap can be audited rather than trusted:
+//   absent_terms   Load-bearing terms that must appear ZERO times in the
+//                  corpus. `check --trap` greps these (word-boundary) and
+//                  fails the trap if any one of them is present. A trap that
+//                  turns out to be answerable is a broken test, and a broken
+//                  test that reports "0 hallucinations" is worse than no test.
+//   adjacent_to    What the corpus DOES cover right next to this question —
+//                  i.e. the on-topic context the retriever will hand over.
+//                  This is the diagnosis; without it you wrote it by effort.
+//   trap_shape     Which kind of boundary this one probes. Five shapes, so a
+//                  pass is five independent pieces of evidence, not one
+//                  repeated five times.
+//
+// Verified absent against corpus/*.md on 2026-07-25 via `check --trap`.
+// Two candidates were CUT by that same check, which is the reason it exists:
+//   - "What does GPT-4o-mini cost per million tokens?" — day11:346 has a
+//     pricing table with $0.15 / $0.60. Answerable. Not a trap.
+//   - "How does a GRU's update gate differ from an LSTM's forget gate?" —
+//     day27:997 has a "#### GRU (Gated Recurrent Unit)" section. Answerable.
+
+{"question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?", "keywords": [], "reference_answer": "ABSTAIN. The corpus's RAG-evaluation material (day16) covers MRR, NDCG, Recall@k and LLM-as-a-Judge, but never defines faithfulness, groundedness or Ragas. Any definition returned is the model's pre-training, not the context.", "category": "trap", "trap_shape": "metric-shaped hole: the eval doc covers its neighbours and skips this one", "adjacent_to": "day16-rag-evals.md — 32 mentions of MRR, 11 of NDCG, 4 of LLM-as-a-Judge. Retrieval will return metric-definition chunks that look exactly right.", "absent_terms": ["faithfulness", "groundedness", "grounded", "Ragas", "entailment", "context precision", "context recall"]}
+{"question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?", "keywords": [], "reference_answer": "ABSTAIN. day15 lists 'Hybrid search (keyword + semantic)' twice as a bare bullet and never explains the mechanism. BM25, TF-IDF and reciprocal rank fusion appear nowhere in the corpus.", "category": "trap", "trap_shape": "listed-as-a-bullet, mechanism never given — the corpus names the what and skips the how", "adjacent_to": "day15-rag-langchain.md:425 and :1178 — 'Hybrid search (keyword + semantic)' in a list of retrieval techniques.", "absent_terms": ["BM25", "Okapi", "TF-IDF", "reciprocal rank fusion", "sparse retrieval", "inverted index"]}
+{"question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?", "keywords": [], "reference_answer": "ABSTAIN. MCP is named in three files but only ever as a one-line blurb ('an open-source way for models to connect and share capabilities'). Tools/resources/prompts, stdio, SSE and JSON-RPC are absent.", "category": "trap", "trap_shape": "named tool, mechanics absent — the corpus knows the name and nothing under it", "adjacent_to": "day17.md:42, day18-agents.md:71-73, day20-deep-research.md:145 — MCP introduced as Anthropic's open protocol, one paragraph each.", "absent_terms": ["stdio", "JSON-RPC", "server-sent", "primitives", "MCP server", "MCP client"]}
+{"question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?", "keywords": [], "reference_answer": "ABSTAIN. Chroma is used throughout day15/day16 as an API, but the corpus never opens the box: no HNSW, no IVF, no ANN index discussion. The single 'approximate nearest' hit is FLANN in a computer-vision feature-matching context (day29), unrelated.", "category": "trap", "trap_shape": "heavily-used tool, internals never opened — usage is covered, implementation is not", "adjacent_to": "day15-rag-langchain.md (21 Chroma mentions) + day16-rag-evals.md (7) — vector-store setup, add, query, persistence.", "absent_terms": ["HNSW", "hierarchical navigable", "IVF", "ANN index", "graph index", "recall@ speed tradeoff"]}
+{"question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?", "keywords": [], "reference_answer": "ABSTAIN. day13 Part 2 is a full section on prompt caching — the discount ratios ('5x less' on OpenAI, '10x cheaper' on Anthropic), the exact-prefix-match rule, the static-content-first rule — and gives no cache lifetime anywhere. The number does not exist in the corpus.", "category": "trap", "trap_shape": "specific number just outside a fully-covered concept — the section answers four adjacent questions and not this one", "adjacent_to": "day13-multimodal.md:76-110 — 'Part 2: Prompt Caching', the single most on-topic passage in the corpus for this question. Retrieval will return it at rank 1.", "absent_terms": ["TTL", "expires", "cache lifetime", "cache window", "cache duration", "evicted"]}

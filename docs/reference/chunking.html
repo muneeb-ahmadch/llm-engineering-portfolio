@@ -1,0 +1,68 @@
+<title>Chunking & Retrieval Misses: Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>Chunking &amp; the three misses</h1>
+<p class="standfirst">How to cut text so answers surface, and how to name a miss before you fix it. Compressed from Lesson 05. Made to be reread the night before.</p>
+
+<h2>When a golden question misses, it is one of three</h2>
+
+<p>Guessing which is the junior move. <strong>Two cheap looks</strong> turn the guess into a diagnosis: <em>read the top-k</em>, then <em>grep the corpus</em>.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Miss</th><th>What&rsquo;s true</th><th>Read top-k?</th><th>Grep corpus?</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bent ruler</strong></td><td>Answer is in the top-k; keyword rule scores it 0.</td><td>Good chunk is there.</td><td>&mdash;</td><td>Judge by meaning: LLM-judge, context precision.</td></tr>
+    <tr><td><strong>Ranking miss</strong></td><td>Answer exists in corpus but not in top-k.</td><td>Nothing good.</td><td>It&rsquo;s there.</td><td>Chunking, reranking, wider net, query rewrite.</td></tr>
+    <tr><td><strong>Content gap</strong></td><td>Answer is nowhere in the corpus.</td><td>Nothing good.</td><td>Empty.</td><td>Add the document, or drop / rewrite the question.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The tell that&rsquo;s easy to miss:</strong> the top-k read alone <em>cannot</em> separate a ranking miss from a content gap &mdash; both look like &ldquo;no good chunk here.&rdquo; Only the grep splits them. Skipping it is how you re-chunk a corpus that has no answer, or delete a question whose answer was there all along.</p>
+
+<h2>Why good answers rank low: dilution</h2>
+
+<p>A chunk&rsquo;s embedding is the <strong>average of everything in it</strong> (cosine ranks by direction &mdash; see Lesson&nbsp;02). One relevant line inside forty lines of code produces a vector pointing at the code, not the line. The answer isn&rsquo;t missing &mdash; it&rsquo;s <em>outvoted</em>. Better boundaries concentrate the signal so the chunk&rsquo;s direction matches the query.</p>
+
+<h2>The splitter ladder &mdash; cheapest first</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Splitter</th><th>Cuts on</th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Fixed-size</strong></td><td>A character / token count.</td><td>A throwaway baseline. Blind to structure &mdash; dilutes.</td></tr>
+    <tr><td><strong>Recursive</strong></td><td>Paragraph &rarr; line &rarr; sentence &rarr; word, until it fits.</td><td>The sane default for prose. Rarely cuts mid-thought.</td></tr>
+    <tr><td><strong>Structure-aware</strong></td><td>The document&rsquo;s own markup: Markdown headings, HTML, code AST.</td><td>Structured docs. Each chunk = one section.</td></tr>
+    <tr><td><strong>Semantic</strong></td><td>Embedding-similarity breakpoints between sentences.</td><td>Unstructured text where topics drift with no headings. Costs embeddings up front.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Overlap</strong> (e.g. 10&ndash;15%) re-includes a few trailing chars/sentences in the next chunk so an answer split across a boundary survives in at least one piece. A patch for blind cutting &mdash; less needed once you cut on structure.</p>
+
+<h2>Keep the heading path as metadata</h2>
+
+<p>When you split on headings, attach the trail &mdash; <code>file &rsaquo; H2 &rsaquo; H3</code> &mdash; to each chunk. Cheap at split time, expensive to reconstruct later. It buys: <strong>citations</strong> (&ldquo;<code>day26 &sect; Monitoring Training</code> says&rdquo; beats &ldquo;the docs say&rdquo;), context for the generator, and metadata filters at query time. LangChain&rsquo;s <code>MarkdownHeaderTextSplitter</code> returns it for free.</p>
+
+<h2>Special cases that break naive chunkers</h2>
+<ul>
+  <li><strong>Tables:</strong> keep whole; a half-table is worse than none. Consider one row-group per chunk with the header row repeated.</li>
+  <li><strong>Code:</strong> split on function / class boundaries, never mid-block.</li>
+  <li><strong>Lists &amp; checklists:</strong> keep the list with its heading &mdash; the item is meaningless without &ldquo;Signs of problems:&rdquo; above it. (This is the exact <code>overfitting</code> failure.)</li>
+</ul>
+
+<h2>Defend it in one line</h2>
+<blockquote>&ldquo;There&rsquo;s no universal chunk size &mdash; it&rsquo;s a measured trade-off. I start with a recursive or structure-aware splitter matched to the document, keep heading metadata for citations, and I let the eval decide the size: a new splitter helps some questions and hurts others, so I ship the one that moves overall MRR, not the one that fixes a single query.&rdquo;</blockquote>
+
+<div class="footer">
+  Lesson 05
+  <a href="rag-metrics.html">Reference: RAG metrics</a>
+  <a href="embeddings-and-retrieval.html">Reference: Embeddings</a>
+  Roadmap
+</div>

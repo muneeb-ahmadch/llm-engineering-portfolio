@@ -1,0 +1,139 @@
+<title>RAG Evaluation Metrics: Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>RAG evaluation metrics</h1>
+<p class="standfirst">Formulas, thresholds, and the mistakes that show. Compressed from Day 16. Made to be reread the night before.</p>
+
+<h2>Retrieval metrics</h2>
+
+<p>These measure the vector search: not the answer. Diagnose here first: <strong>if retrieval missed it, the LLM never had a chance.</strong></p>
+
+<h3>MRR: Mean Reciprocal Rank</h3>
+<p><em>Where does the first relevant chunk land?</em></p>
+<pre><code>score(q) = 1 / rank_of_first_relevant_hit
+         = 0   if no hit within top-k
+
+MRR = mean(score(q) for q in golden_set)</code></pre>
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Position of first hit</th><th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th><th>miss</th></tr></thead>
+  <tbody><tr><td>Score</td><td class="num">1.0</td><td class="num">0.5</td><td class="num">0.33</td><td class="num">0.25</td><td class="num">0.2</td><td class="num">0</td></tr></tbody>
+</table>
+</div>
+<p><strong>Reading it:</strong> 1.0 perfect · 0.5 &asymp; hit lands 2nd on average · 0.25 &asymp; 4th · below 0.2 retrieval is broken.</p>
+<p><strong>Two ways to get it wrong:</strong> dropping misses from the denominator (inflates a system that fails constantly); scoring a miss as <code>1/k</code> instead of <code>0</code>.</p>
+<p><strong>Blind spot:</strong> sees only the <em>first</em> hit. Says nothing about the rest of the set.</p>
+
+<h3>NDCG: Normalized Discounted Cumulative Gain</h3>
+<p><em>Are </em>all<em> the relevant chunks near the top?</em> Reach for this when k &gt; 5 and the whole retrieved set matters.</p>
+<pre><code>DCG  = Σ  relevance(i) / log₂(i + 1)      i = position
+IDCG = DCG of the ideal ordering (all relevant chunks first)
+NDCG = DCG / IDCG</code></pre>
+<p>Worked: 5 retrieved, relevant at positions 1, 2, 5:</p>
+<pre><code>DCG  = 1/log₂(2) + 1/log₂(3) + 1/log₂(6)
+     = 1.0 + 0.63 + 0.39  = 2.02
+IDCG = 1/log₂(2) + 1/log₂(3) + 1/log₂(4)
+     = 1.0 + 0.63 + 0.5   = 2.13
+NDCG = 2.02 / 2.13 = 0.95</code></pre>
+<p><strong>Reading it:</strong> &gt; 0.8 good · &lt; 0.6 relevant chunks are scattered.</p>
+<p>The <code>log₂(i+1)</code> denominator is the &ldquo;discount&rdquo;: a hit at position 10 is worth less than one at position 2, because that's how attention and context actually work.</p>
+
+<h3>Recall@k</h3>
+<p><em>Did we find it at all?</em> The floor. Everything else is decoration if this is low.</p>
+<pre><code>Recall@k = (# questions with ≥1 relevant chunk in top-k) / (# questions)</code></pre>
+<p><strong>Keyword coverage</strong>, the cheap variant, and the one worth having when your golden set carries keywords:</p>
+<pre><code>coverage(q) = |keywords found in retrieved chunks| / |keywords required|
+# "Who won the IoT award?"  keywords [Maxine, Thompson, IoT]
+# retrieved contain [Maxine, IoT]  →  2/3 = 0.67</code></pre>
+
+<div class="panel">
+  <p class="panel-label">Coverage is a proxy &mdash; two blind spots</p>
+  <p style="margin:0">Keyword coverage scores <em>word overlap, not correctness</em>, so it fails both ways. <strong>False negative:</strong> a chunk answers correctly in different words and scores 0 &mdash; the <em>overfitting</em> miss, where real definitions never use the exact phrase &ldquo;validation accuracy.&rdquo; <strong>False positive:</strong> a chunk carries the keywords but the meaning is wrong and still scores 1. Fine as a fast, free smoke test; useless for &ldquo;did it actually <em>answer</em>.&rdquo; When you need meaning, you need a judge &mdash; below.</p>
+</div>
+
+<h3>Precision@k</h3>
+<pre><code>Precision@k = (# relevant chunks retrieved) / k</code></pre>
+<p><strong>Usually not your problem.</strong> LLMs tolerate noise in context well, as long as the answer is <em>in</em> there. Only optimise precision when you're paying for context tokens, when the noise is actively misleading, or when context space is genuinely tight.</p>
+
+<div class="panel">
+  <p class="panel-label">Which metric, when</p>
+  <p style="margin:0"><strong>Default pair:</strong> MRR + keyword coverage. Intuitive, cheap, and they track what users feel.<br>
+  <strong>Add NDCG</strong> when k &gt; 5 and distribution across the set matters.<br>
+  <strong>Add precision</strong> only under cost or context-window pressure.<br>
+  <strong>Broad corpus</strong> (many topics, many ways to miss) → favour <em>recall</em>. <strong>Narrow corpus</strong> (one domain) → favour <em>precision</em>; noise is the bigger risk.</p>
+</div>
+
+<h2>Answer quality: LLM-as-a-judge</h2>
+
+<p>Retrieval metrics don't tell you if the <em>answer</em> was good. Exact string match is too strict (&ldquo;Maxine Thompson won the award&rdquo; &ne; &ldquo;The award was won by Maxine Thompson&rdquo;). Word overlap doesn't understand meaning. So: use a model to judge, on three dimensions, 1&ndash;5 each.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Dimension</th><th>Asks</th><th>Fails when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Accuracy</strong></td><td>Is the information correct?</td><td>Wrong facts. Binary-ish, &ldquo;2016&rdquo; for &ldquo;2015&rdquo; is 1/5, not 4/5.</td></tr>
+    <tr><td><strong>Completeness</strong></td><td>Is anything necessary missing?</td><td>&ldquo;Maxine&rdquo; when the reference says &ldquo;Maxine Thompson&rdquo; → 4/5.</td></tr>
+    <tr><td><strong>Relevance</strong></td><td>Is anything extra padded in?</td><td>Unasked-for detail. &ldquo;…She likes coffee.&rdquo; → 3/5.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>The standard names &mdash; and the one the rubric above misses</h3>
+<p>Accuracy/Completeness/Relevance is a homegrown judge. The industry-standard framing (from <a href="https://docs.ragas.io/en/stable/">Ragas</a>) splits answer quality the same way, but names a dimension the rubric above has no column for:</p>
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Standard name</th><th>Asks</th><th>Maps to</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Context precision / recall</strong></td><td>Did retrieval fetch chunks that <em>contain</em> the answer &mdash; judged by meaning, not keywords?</td><td>the semantic version of recall@k / coverage</td></tr>
+    <tr><td><strong>Answer correctness</strong></td><td>Is the answer factually right vs ground truth?</td><td>Accuracy</td></tr>
+    <tr><td><strong>Answer relevance</strong></td><td>Does it address the question without padding?</td><td>Relevance</td></tr>
+    <tr><td><strong>Faithfulness</strong></td><td>Is every claim <em>grounded in the retrieved context</em> &mdash; or made up?</td><td class="tag-bad">no column above &mdash; the hallucination check</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>Faithfulness is the one to remember.</strong> An answer can be accurate, complete, and relevant while stating a fact that appears in <em>none</em> of the retrieved chunks &mdash; true today because the model knew it from pre-training, wrong tomorrow when it doesn&rsquo;t. Faithfulness grades the answer <em>against its context</em>, so an ungrounded claim fails even when it happens to be correct. It is the metric that catches the hallucination before it costs you.</p>
+
+<p><strong>Rules that keep the judge honest:</strong> use a judge at least as strong as the generator; force structured output so scores parse cleanly; tell it explicitly <em>&ldquo;only give 5/5 for perfect answers&rdquo;</em> or it inflates everything; optionally few-shot it to calibrate.</p>
+
+<p><strong>Cost:</strong> one call per test question. 150 tests on a mini-tier model is roughly $0.02&ndash;0.03. Local open-source judge is free. This is never the expensive part, there is no cost excuse for not evaluating.</p>
+
+<h2>A worked baseline</h2>
+
+<p>Day 16's system, for a feel for what these numbers look like in the wild. 1000-char chunks, MiniLM encoder, top-5:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Metric</th><th>Value</th><th>Reading</th></tr></thead>
+  <tbody>
+    <tr><td>MRR</td><td class="num">0.730</td><td class="tag-bad">hits landing 2nd&ndash;3rd, not 1st</td></tr>
+    <tr><td>NDCG</td><td class="num">0.739</td><td>middling distribution</td></tr>
+    <tr><td>Keyword coverage</td><td class="num">83.8%</td><td>missing ~16% of required terms</td></tr>
+    <tr><td>Accuracy (judge)</td><td class="num">3.99</td><td class="tag-bad">sometimes wrong</td></tr>
+    <tr><td>Completeness (judge)</td><td class="num">3.85</td><td class="tag-bad">leaving things out</td></tr>
+    <tr><td>Relevance (judge)</td><td class="num">4.57</td><td>at least not padding</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>After tuning chunk size (500, top-10) and encoder (<code>text-embedding-3-large</code>): MRR <strong>0.790</strong>, accuracy <strong>4.21</strong>. Note the size of that win. Real, and modest. Anyone claiming RAG metrics near 1.0 is either overfitting the golden set or not measuring what they think.</p>
+
+<h2>The rules underneath all of it</h2>
+
+<blockquote>
+  <p>There is no best technique. Your mileage will vary. Always measure, never assume.</p>
+</blockquote>
+
+<p>RAG is a <em>performance optimisation</em>, a similarity-search shortcut so you don't push the whole corpus through an expensive transformer. It is not a principled solution, which is exactly why it's empirical, why it fails in whack-a-mole fashion, and why the only real answer to &ldquo;why did you choose that?&rdquo; is a number.</p>
+
+<div class="footer">
+  Lesson 01: Why 500 characters?
+  Day 16 source notes
+  Resources
+</div>
+
+</div>

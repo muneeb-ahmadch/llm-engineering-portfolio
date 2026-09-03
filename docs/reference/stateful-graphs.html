@@ -1,0 +1,145 @@
+<title>Stateful graphs: state, nodes, edges, checkpoints</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · LangGraph</p>
+<h1>Stateful graphs</h1>
+<p class="standfirst">The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it. Compressed from Lesson 15. Versions and quotes checked against the docs on 2026-08-10 &mdash; <code>langgraph 1.2.10</code>.</p>
+
+<h2>The one-sentence definition</h2>
+
+<div class="panel">
+  <p style="margin:0"><strong>An agent described as a state graph: one typed state object, nodes that are plain functions returning updates to it, edges that decide what runs next &mdash; and, with a checkpointer attached, the state written down after every node so the run can pause, crash, rewind and resume.</strong> <a href="https://docs.langchain.com/oss/python/langgraph/overview">LangChain&rsquo;s own docs</a>: <em>&ldquo;you don&rsquo;t need to use LangChain to use LangGraph&rdquo;</em>; it is <em>&ldquo;very low-level, and focused entirely on agent orchestration.&rdquo;</em></p>
+</div>
+
+<h2>The four ideas</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Idea</th><th>What it is</th><th>Gotcha</th></tr></thead>
+  <tbody>
+    <tr><td><strong>State</strong></td><td>A <code>TypedDict</code>. Nodes return a <em>partial</em> dict; the runtime merges it.</td><td>Without a reducer, a returned field <strong>overwrites</strong>. <code>Annotated[list, add_messages]</code> is what makes it append.</td></tr>
+    <tr><td><strong>Node</strong></td><td><code>def f(state) -&gt; dict</code>. Ordinary Python; your own SDK calls go straight in.</td><td>No checkpoint exists <em>inside</em> a node. It is the unit of atomicity you get, and the only one.</td></tr>
+    <tr><td><strong>Edge</strong></td><td>Static <code>add_edge(a, b)</code>, or <code>add_conditional_edges(a, router)</code> where the router returns the next node&rsquo;s <em>name</em>.</td><td>The router is where your <code>if tool_calls: … else: break</code> went. The model never sees the graph.</td></tr>
+    <tr><td><strong>Checkpointer<br>+ <code>thread_id</code></strong></td><td>Saves state after every node under a thread id. The only thing here a <code>while</code> loop can&rsquo;t do.</td><td><code>InMemorySaver</code> dies with the process &mdash; useless for the thing you adopted it for. Use a file or a database.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>The minimal graph</h2>
+
+<pre><code>from typing import Annotated, TypedDict
+from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.checkpoint.sqlite import SqliteSaver   # pip install langgraph-checkpoint-sqlite
+import sqlite3
+
+class S(TypedDict):
+    messages: Annotated[list, add_messages]      # reducer: append, don't overwrite
+
+def agent(state: S) -> dict:                     # your existing model call, unchanged
+    reply = client.chat.completions.create(...)
+    return {"messages": [reply]}
+
+def tools(state: S) -> dict:
+    ...
+    return {"messages": [result]}
+
+def route(state: S) -> str:                      # returns a NODE NAME
+    return "tools" if state["messages"][-1].tool_calls else END
+
+b = StateGraph(S)
+b.add_node("agent", agent); b.add_node("tools", tools)
+b.add_edge(START, "agent")
+b.add_conditional_edges("agent", route)
+b.add_edge("tools", "agent")                     # the loop-back arrow
+
+graph = b.compile(checkpointer=SqliteSaver(sqlite3.connect("cp.db", check_same_thread=False)))
+
+cfg = {"configurable": {"thread_id": "ticket-4471"}}
+graph.invoke({"messages": [{"role": "user", "content": q}]}, cfg)
+</code></pre>
+
+<p>Same <code>thread_id</code> &rarr; same run. Different <code>thread_id</code> &rarr; a fresh, unrelated conversation. <strong>You must compile before use.</strong></p>
+
+<h2>What a checkpoint protects &mdash; and what it doesn&rsquo;t</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Situation</th><th>What happens on resume</th></tr></thead>
+  <tbody>
+    <tr><td>A node <strong>completed</strong> before the failure</td><td class="tag-good">Not re-run. Docs: pending writes are stored <em>&ldquo;so that whenever we resume graph execution from that superstep we don&rsquo;t re-run the successful nodes.&rdquo;</em></td></tr>
+    <tr><td>A node was <strong>in flight</strong> &mdash; crashed, or paused at <code>interrupt()</code></td><td class="tag-bad">Re-entered <strong>at line one</strong>. Everything before the interrupt runs again.</td></tr>
+    <tr><td>A side effect (charge, email, <code>INSERT</code>) <strong>before</strong> the interrupt</td><td class="tag-bad">Happens twice. Docs: <em>&ldquo;side effects called before <code>interrupt</code> should (ideally) be idempotent.&rdquo;</em></td></tr>
+    <tr><td>A side effect <strong>after</strong> the interrupt, or in its own node</td><td class="tag-good">Once. This is the fix, and it is design, not configuration.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>&ldquo;Nothing is lost&rdquo; and &ldquo;nothing is repeated&rdquo; are different promises.</strong> The framework makes the first one.</p>
+
+<h2>Human in the loop</h2>
+
+<pre><code>from langgraph.types import interrupt, Command
+
+def approval(state: S) -> dict:
+    ok = interrupt("Approve this action?")       # raises; run is persisted and returns
+    return {"approved": ok}
+
+graph.invoke(Command(resume=True), cfg)          # ok == True, node restarts from the top
+</code></pre>
+
+<ul>
+  <li><strong>A checkpointer is required</strong> &mdash; docs: <em>&ldquo;To use <code>interrupt</code>, you need: 1. A checkpointer to persist the graph state.&rdquo;</em></li>
+  <li>Never wrap <code>interrupt()</code> in a bare <code>try/except</code> &mdash; it works by raising, and the exception must reach the runtime.</li>
+  <li>Multiple interrupts in one node are matched <strong>by index</strong>, so their order must be stable across re-runs.</li>
+</ul>
+
+<h2>Inspecting and rewinding</h2>
+
+<pre><code>graph.get_state(cfg)                  # latest StateSnapshot: values, next, config, metadata
+list(graph.get_state_history(cfg))    # every checkpoint, newest first  → time travel
+</code></pre>
+
+<h2>Checkpointers</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Class</th><th>Import</th><th>Package</th><th>Use for</th></tr></thead>
+  <tbody>
+    <tr><td><code>InMemorySaver</code></td><td><code>langgraph.checkpoint.memory</code></td><td>included</td><td>tests only &mdash; dies with the process</td></tr>
+    <tr><td><code>SqliteSaver</code></td><td><code>langgraph.checkpoint.sqlite</code></td><td><code>langgraph-checkpoint-sqlite</code></td><td>local dev, single machine</td></tr>
+    <tr><td><code>PostgresSaver</code></td><td><code>langgraph.checkpoint.postgres</code></td><td><code>langgraph-checkpoint-postgres</code></td><td>production</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>The decision rule</h2>
+
+<div class="panel">
+  <p class="panel-label">Adopt it for a property, never for the shape</p>
+  <p style="margin:0 0 0.6rem">A graph buys exactly three things, all downstream of the saved state: <strong>resume after failure</strong>, <strong>a human in the middle</strong>, <strong>replay / time travel</strong>. If none of the three is on your list, you have bought a dependency and an abstraction.</p>
+  <p style="margin:0">Same shape as the <a href="agents-vs-workflows.html">agent-or-workflow rule</a>: machinery is a price you pay for something specific. &ldquo;We used a plain loop, because the run is 20 seconds and unattended&rdquo; is a stronger interview answer than the library&rsquo;s name.</p>
+</div>
+
+<h2>Glossary</h2>
+
+<ul>
+  <li><strong>Superstep</strong> &mdash; one round of the graph: everything that runs before the next checkpoint is written.</li>
+  <li><strong>Reducer</strong> &mdash; the function attached to a state field saying how an update merges (append vs overwrite).</li>
+  <li><strong>Thread</strong> &mdash; one run&rsquo;s history, addressed by <code>thread_id</code>. Its checkpoints are its timeline.</li>
+  <li><strong>Checkpoint</strong> &mdash; the saved state after a superstep. <strong>Durable execution</strong> &mdash; the property those checkpoints give you.</li>
+  <li><strong>Time travel</strong> &mdash; resuming from an <em>older</em> checkpoint instead of the newest, to replay or branch.</li>
+</ul>
+
+<div class="footer">
+  &larr; Lesson 15
+  <a href="agents-vs-workflows.html">Agents vs workflows</a>
+  <a href="mcp.html">MCP</a>
+  <a href="orchestration-and-validation.html">Orchestration &amp; validation</a>
+</div>
+
+</div>

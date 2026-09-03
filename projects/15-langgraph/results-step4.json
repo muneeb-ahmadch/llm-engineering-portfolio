@@ -1,0 +1,11 @@
+{
+  "predicted_side_effects": 2,
+  "measured_side_effects": 2,
+  "approvals": 1,
+  "side_effects_before_approval": 1,
+  "agent_api_calls_before": 1,
+  "agent_api_calls_after": 2,
+  "n_checkpoints": 5,
+  "cost_in_state": 0.0025356,
+  "answer": "Overfitting occurs when a model memorizes the training data rather than learning generalizable patterns, resulting in good training performance but poor validation or real-world performance."
+}

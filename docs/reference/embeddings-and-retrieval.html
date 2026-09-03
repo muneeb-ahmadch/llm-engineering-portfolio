@@ -1,0 +1,92 @@
+<title>Embeddings & Semantic Retrieval: Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>Embeddings &amp; semantic retrieval</h1>
+<p class="standfirst">What an encoder is, how retrieval finds a chunk, and the sentences that survive an interview. Compressed from Days 14&ndash;15 and Lesson 02. Made to be reread the night before.</p>
+
+<h2>The vocabulary</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Term</th><th>Is</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Encoder</strong> / embedding model</td><td>A model that turns text into one fixed-length vector representing its meaning. BERT, MiniLM, BGE, OpenAI <code>text-embedding-3-*</code>.</td><td>Not a generator. It does not predict next tokens or &ldquo;read&rdquo; at query time.</td></tr>
+    <tr><td><strong>Embedding</strong> / vector</td><td>A list of numbers &mdash; a point in high-dimensional space. Similar meanings land at nearby points.</td><td>Not tokens. Tokens are input IDs; an embedding is the meaning-laden output.</td></tr>
+    <tr><td><strong>Dimensions</strong></td><td>How many numbers per vector. MiniLM &amp; BGE-small: 384. OpenAI small: 1536. large: 3072.</td><td>Not a quality score. More dims &ne; better retrieval on <em>your</em> corpus.</td></tr>
+    <tr><td><strong>Cosine similarity</strong></td><td>The angle between two vectors. 1 = same direction, 0 = unrelated, &minus;1 = opposite.</td><td>Not distance or word overlap. Ignores vector length entirely.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>How retrieval works: the whole pipeline</h2>
+
+<pre><code># once, offline:
+chunk_vecs = encoder.encode(chunks, normalize=True)   # N points in the space
+
+# per query:
+q_vec  = encoder.encode(query, normalize=True)         # same space
+scores = q_vec @ chunk_vecs.T    # normalized dot product == cosine similarity
+top_k  = argsort(-scores)[:k]    # nearest points win</code></pre>
+
+<p><strong>That is retrieval, in full.</strong> No reasoning, no understanding &mdash; just which stored points sit nearest the query point. Normalizing every vector to length 1 is what makes the dot product equal the cosine; that is the entire trick in the score line.</p>
+
+<blockquote>RAG is a performance shortcut: a similarity search so you don&rsquo;t push the whole corpus through an expensive model. It is empirical precisely because it is <em>not</em> a principled solution &mdash; which is why you measure.</blockquote>
+
+<h2>A miss is geometry</h2>
+
+<p>If a relevant chunk never appears in top-k, the query vector and the answer vector landed <strong>too far apart</strong> in this encoder&rsquo;s arrangement of the space. The answer is in the corpus; retrieval just never went near it.</p>
+
+<p><strong>Diagnose before you fix.</strong> Two misses score 0 identically but need opposite fixes. Read <em>coverage</em>: near-0% = <strong>recall failure</strong> (answer never retrieved) &rarr; <em>widen the net</em> (encoder / hybrid / query rewrite); high coverage but still a miss = <strong>ranking failure</strong> (retrieved but ranked low) &rarr; <em>reorder</em> (rerank). Reranking cannot fix recall &mdash; it only reorders what you already have. The four levers, mapped to the failure each answers:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Lever</th><th>What it changes</th><th>When it&rsquo;s the fix</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Swap the encoder</strong></td><td>Redraws the whole space. Cheap, often the biggest single win.</td><td>Broad misses; a weak baseline encoder. <em>Try first.</em></td></tr>
+    <tr><td><strong>Reranker</strong></td><td>A second, stronger model re-scores the top-N so the best rises to the top.</td><td>Right chunk is retrieved but ranked low.</td></tr>
+    <tr><td><strong>Hybrid / keyword search</strong></td><td>Blends exact-term matching with vectors.</td><td>Rare terms, codes, names the encoder blurs together.</td></tr>
+    <tr><td><strong>Query rewriting</strong></td><td>Rephrases the query nearer the corpus&rsquo;s language before embedding.</td><td>Vocabulary mismatch between how users ask and how docs are written.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Choosing an encoder: honestly</h2>
+
+<p><strong>Public leaderboards (MTEB) rank on other corpora, not yours.</strong> They narrow the shortlist; they do not decide. The decision is your golden set + MRR on <em>your</em> documents. State that out loud &mdash; it is the difference between reading a benchmark and running an evaluation.</p>
+
+<div class="panel">
+  <p class="panel-label">Muneeb&rsquo;s measured baseline (own corpus, 20-question golden set, top-5)</p>
+  <div class="scroll-x">
+  <table>
+    <thead><tr><th>Encoder</th><th>Dims</th><th>Chunk</th><th>MRR</th><th>Misses</th></tr></thead>
+    <tbody>
+      <tr><td><code>minilm</code></td><td class="num">384</td><td class="num">1000</td><td class="num">0.627</td><td class="num">4/20</td></tr>
+      <tr><td><code>bge-small</code></td><td class="num">384</td><td class="num">1000</td><td class="num tag-good">0.754</td><td class="num tag-good">2/20</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="margin:0.4rem 0 0">Same dimensions, +0.128 MRR. The win was training quality, not vector size &mdash; and it was <em>measured</em>, not assumed.</p>
+</div>
+
+<h2>Sentences that survive an interview</h2>
+
+<ul>
+  <li><strong>What&rsquo;s an embedding?</strong> &ldquo;A learned vector &mdash; a point in space where nearby means semantically similar. The encoder places text there; it doesn&rsquo;t generate text.&rdquo;</li>
+  <li><strong>How does semantic search work?</strong> &ldquo;Embed the chunks once, embed the query into the same space, rank by cosine similarity, take the top-k. It&rsquo;s nearest-point search.&rdquo;</li>
+  <li><strong>Why did a different encoder retrieve better?</strong> &ldquo;It arranges the space better for this corpus &mdash; I measured +0.13 MRR. Both were 384-dim, so it wasn&rsquo;t size; it was training.&rdquo;</li>
+  <li><strong>Why did a question fail retrieval?</strong> &ldquo;The query landed too far from its answer in that encoder&rsquo;s space. A miss is geometry, not the LLM&rsquo;s fault.&rdquo;</li>
+</ul>
+
+<div class="footer">
+  Lesson 02: Why did the encoder win?
+  <a href="rag-metrics.html">Reference: RAG metrics</a>
+  Day 15 source notes
+  Resources
+</div>
+
+</div>

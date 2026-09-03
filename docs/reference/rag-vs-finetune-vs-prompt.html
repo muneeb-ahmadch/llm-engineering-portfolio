@@ -1,0 +1,82 @@
+<title>RAG vs fine-tune vs prompt: Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>RAG vs fine-tune vs prompt</h1>
+<p class="standfirst">Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides. Compressed from Lesson 08. Made to be reread the night before.</p>
+
+<h2>Three levers on three different parts of the system</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Tool</th><th>Changes</th><th>Touched when</th><th>Cost shape</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Prompt</strong></td><td>What you <em>say</em>, instructions + examples. Model untouched.</td><td>Inference only. No training.</td><td>Per-query tokens; few-shot examples lengthen every call.</td></tr>
+    <tr><td><strong>RAG</strong></td><td>What the model can <em>see</em>, retrieved knowledge in the prompt. Weights untouched.</td><td>Inference + an index you maintain.</td><td>Per-query context tokens + retrieval infra. No training cost.</td></tr>
+    <tr><td><strong>Fine-tune</strong></td><td>What the model <em>is</em>, its default behaviour, via weight updates.</td><td>Training run up front, then inference.</td><td>Fixed training cost, then cheaper per query (shorter prompts).</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Prompting changes what you say. RAG changes what the model can see. Fine-tuning changes what the model is.</strong></p>
+
+<h2>The distinction that settles it: knowledge vs behaviour</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Gap</th><th>Symptom</th><th>Reach for</th><th>Not the other, because</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Knowledge</strong>, doesn't <em>know</em> a fact</td><td>&ldquo;Answer about our private / fresh / changing docs.&rdquo;</td><td>RAG (or prompt if it fits)</td><td>Fine-tuning is bad at new facts, and facts change → retrain forever.</td></tr>
+    <tr><td><strong>Behaviour</strong>, knows, won't <em>act</em> right</td><td>&ldquo;Always this format / tone / abstain when unsure.&rdquo; Prompt plateaus.</td><td>Fine-tuning (after prompt's ceiling)</td><td>RAG can't help: no missing fact, the <em>form</em> is wrong.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="standfirst" style="font-size:1.05rem"><strong>RAG fixes what the model doesn't know. Fine-tuning fixes how the model behaves.</strong></p>
+
+<h2>Why fine-tuning is bad at facts (the citable part)</h2>
+
+<p>Fine-tuning makes <em>patterns of response</em> more likely: great for format, tone, task-shape. Teaching it a new <em>fact</em> means over-writing weights to memorise one string: models learn new facts slowly under fine-tuning, and learning them correlates with <em>more</em> hallucination nearby (the model generalises &ldquo;confidently state things like this&rdquo;). Paper to name: <a href="https://arxiv.org/abs/2405.05904">Gekhman et al., 2024, &ldquo;Does Fine-Tuning LLMs on New Knowledge Encourage Hallucinations?&rdquo;</a>. RAG sidesteps it: the fact lives in a retrievable, citable, swappable document, nothing memorised, nothing stale.</p>
+
+<h2>They compose: cheapest lever first</h2>
+
+<pre><code>1. Prompt        →  always first. Free, instant. Exhaust it.
+2. + RAG         →  gap is knowledge the model lacks (private / fresh / changing).
+3. + Fine-tune   →  behaviour gap SURVIVES a good prompt AND task is stable + high-volume.</code></pre>
+
+<p>The mature answer names the <em>ladder</em> and where you stop: not one tool. Prompt+RAG is a correct stopping point until a <em>measured</em> behaviour gap justifies rung 3.</p>
+
+<h2>The cost trade</h2>
+
+<pre><code>break-even volume  ≈  training_cost  /  (per-query saving from a shorter prompt)</code></pre>
+
+<p>RAG / prompt = pure per-query cost, context-dominated ($0.002174 in Lesson 07, input was 59% of the bill). Fine-tuning = fixed cost traded for lower variable cost. Pays off at <strong>high volume on a stable task</strong>; a bad deal for <strong>low volume or changing knowledge</strong>, you re-pay the training cost every time the facts move. (Fine-tune prices drift too: pull the current rate the day you need it.)</p>
+
+<h2>The failure each one hides</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Tool</th><th>Hidden failure</th></tr></thead>
+  <tbody>
+    <tr><td>Prompt</td><td>Silent ceiling: accuracy plateaus, no error, no signal you've hit the tool's limit.</td></tr>
+    <tr><td>RAG</td><td>Retrieval miss → hallucination or abstention. Quality capped by retrieval; no parametric fallback on a private corpus.</td></tr>
+    <tr><td>Fine-tune</td><td>Stale fact stated confidently, unattributable, no trace, no citation. You hear it from a user, not a metric.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>Defend it in one line</h2>
+<blockquote>&ldquo;Prompting changes what I say, RAG changes what the model can see, fine-tuning changes what the model is. First question: is the gap knowledge or behaviour? Knowledge, especially private or changing, is RAG, because facts belong in an index I can update and cite, not weights that go stale. Behaviour is fine-tuning, but only after a prompt hits a measured ceiling and only if the task is stable and high-volume enough to earn back the training cost. My RAG system stops at prompt+retrieval on purpose, I haven't measured a behaviour gap that justifies the third rung.&rdquo;</blockquote>
+
+<div class="footer">
+  Lesson 08
+  <a href="pipeline-and-cost.html">Reference: Pipeline &amp; cost</a>
+  <a href="reranking.html">Reference: Reranking</a>
+  Roadmap
+</div>
+
+</div>

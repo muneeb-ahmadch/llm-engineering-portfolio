@@ -1,0 +1,78 @@
+<title>Reranking: Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>Reranking: bi-encoder wide, cross-encoder narrow</h1>
+<p class="standfirst">Two-stage retrieval, the pool-depth trap, and the one line that defends it. Compressed from Lesson 06. Made to be reread the night before.</p>
+
+<h2>The vocabulary</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Term</th><th>Is</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Bi-encoder</strong></td><td>Embeds query and chunk <em>separately</em> into the same vector space; compared by cosine. What your retriever already is (MiniLM, BGE).</td><td>Not query-aware at index time &mdash; chunks are embedded once, offline, before any query exists. That's what makes it cheap.</td></tr>
+    <tr><td><strong>Cross-encoder</strong></td><td>Reads the query and <em>one</em> candidate chunk together, in a single forward pass, and outputs a relevance score directly.</td><td>Not precomputable. Needs the query at scoring time, so it only ever runs on a short list, live.</td></tr>
+    <tr><td><strong>Pool / candidate set</strong></td><td>The top-N chunks retrieved by the bi-encoder, handed to the reranker to re-score. N &gt; final top-k.</td><td>Not the same as top-k. Pool is the reranker's <em>input</em>; top-k is what you keep after it reorders.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>The pipeline</h2>
+
+<pre><code># stage 1: bi-encoder, cheap, wide net
+scores  = query_vec @ chunk_vecs.T
+pool    = top_N_by(scores)                    # e.g. N=20, not 5
+
+# stage 2: cross-encoder, expensive, narrow
+pairs   = [(query, c["text"]) for c in pool]
+rscores = CrossEncoder("cross-encoder/ms-marco-MiniLM-L6-v2").predict(pairs)
+top_k   = [pool[i] for i in argsort(-rscores)][:k]</code></pre>
+
+<p>Stage 1 answers &ldquo;what's roughly relevant?&rdquo; cheaply, at any scale. Stage 2 answers &ldquo;what's <em>actually</em> most relevant?&rdquo; accurately, but only across the handful stage 1 already found. Neither stage alone is both cheap and accurate &mdash; that trade is why the two are chained instead of picking one.</p>
+
+<h2>What it fixes, and what it can't</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Failure</th><th>Signal</th><th>Reranker helps?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Recall failure</strong></td><td>Coverage near 0% &mdash; answer never in the top-k at all.</td><td class="tag-bad">No.</td> </tr>
+    <tr><td><strong>Ranking failure, in the pool</strong></td><td>High coverage, still a miss; full-corpus rank &le; pool size.</td><td class="tag-good">Yes &mdash; this is the target case.</td></tr>
+    <tr><td><strong>Ranking failure, outside the pool</strong></td><td>Answer exists, but full-corpus rank &gt; pool size.</td><td class="tag-bad">No &mdash; a recall failure at the pool stage.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The trap:</strong> row three looks identical to row one from the outside &mdash; &ldquo;I added a reranker and nothing changed.&rdquo; It isn't the same failure. Before concluding a reranker didn't help, check the candidate's full-corpus rank against your pool size. A reranker that never receives a candidate can't be blamed for not surfacing it.</p>
+
+<h2>Choosing pool depth &mdash; honestly</h2>
+
+<p>Pick the pool size <em>before</em> you know where the answer landed, for a stated reason (a common default, a latency budget) &mdash; not after, by reverse-engineering it from a miss you already diagnosed. Picking the pool to fit a known answer isn't a design decision, it's answer-shopping, and it won't generalize to the next miss.</p>
+
+<ul>
+  <li><strong>Cost of widening the pool:</strong> one extra cross-encoder forward pass per extra candidate, per query &mdash; linear, and cheap in absolute terms for a MiniLM-class reranker on CPU (dozens to low hundreds of pairs is seconds, not minutes).</li>
+  <li><strong>Cost of narrowing it:</strong> real candidates fall outside the reranker's reach, silently. Narrower pools look faster in a benchmark and can be quietly wrong on exactly the long-tail question you'll be asked about in an interview.</li>
+</ul>
+
+<h2>Model choice</h2>
+
+<p><code>cross-encoder/ms-marco-MiniLM-L6-v2</code> &mdash; 6 transformer layers, trained on MS MARCO query-passage relevance. The standard lightweight default: a fraction of a point of NDCG@10 behind the larger MS MARCO cross-encoders, for roughly double the throughput. Right call on CPU, on a golden set sized in the tens.</p>
+
+<p><strong>Score scale, a common trap:</strong> cross-encoder scores are <em>not</em> cosine similarity. They aren't bounded to &minus;1..1 and aren't comparable across models or directly to a bi-encoder's score &mdash; use them only to <em>rank</em> the pool, never to compare against a cosine threshold from stage 1.</p>
+
+<h2>Defend it in one line</h2>
+<blockquote>&ldquo;A reranker is a second stage: cheap bi-encoder retrieval widens the net, then a cross-encoder that reads the query and each candidate together re-scores that shortlist. It only fixes ranking failures, never recall &mdash; and I treat pool depth as its own recall boundary, checking a candidate's full-corpus rank before I trust a &lsquo;reranking didn't help&rsquo; result.&rdquo;</blockquote>
+
+<div class="footer">
+  Lesson 06
+  <a href="embeddings-and-retrieval.html">Reference: Embeddings &amp; retrieval</a>
+  <a href="chunking.html">Reference: Chunking</a>
+  Roadmap
+</div>
+
+</div>

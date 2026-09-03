@@ -1,0 +1,105 @@
+{
+  "encoder": "bge-small",
+  "model": "BAAI/bge-small-en-v1.5",
+  "chunker": "fixed",
+  "chunk_size": 1000,
+  "overlap": 50,
+  "top_k": 5,
+  "relevance": "all",
+  "rerank": true,
+  "pool": 20,
+  "n_chunks": 734,
+  "n_questions": 1,
+  "question_set": "golden.jsonl",
+  "trap": false,
+  "mrr": 0.0,
+  "keyword_coverage": 0.3333333333333333,
+  "misses": 1,
+  "embed_secs": null,
+  "generate": true,
+  "agent": true,
+  "api": "responses",
+  "prompt_variant": "hardened",
+  "per_question": [
+    {
+      "question": "What is overfitting in a neural network?",
+      "top_source": "day26-deep-learning.md",
+      "rr": 0.0,
+      "coverage": 0.3333333333333333,
+      "n_context_chunks": 8,
+      "answer": "Overfitting occurs when a model memorizes the training data rather than learning patterns that generalize. A warning sign is when training loss decreases while validation loss increases.",
+      "steps": 2,
+      "terminated_by": "answer",
+      "searches": [
+        {
+          "step": 1,
+          "query": "Overfitting is when a neural network learns the training data too well and performs poorly on new unseen data",
+          "k": 5,
+          "sources": [
+            "day27-deep-learning-2.md",
+            "day23-oss-finetuning.md",
+            "day22-finetuning.md",
+            "day23-oss-finetuning.md",
+            "day22-finetuning.md"
+          ],
+          "n_new_chunks": 3
+        }
+      ],
+      "n_searches": 1,
+      "prompt_tokens": 4997,
+      "completion_tokens": 141,
+      "cached_tokens": 1813,
+      "reasoning_tokens": 57,
+      "latency_ms": 4882.299290999072,
+      "cost": 0.0042113,
+      "abstained": false
+    }
+  ],
+  "gen_model": "gpt-5.6-luna",
+  "price_per_million": {
+    "input": 1.0,
+    "cached_input": 0.1,
+    "output": 6.0
+  },
+  "temperature": "default(1)",
+  "total_prompt_tokens": 4997,
+  "total_completion_tokens": 141,
+  "total_reasoning_tokens": 57,
+  "total_cached_tokens": 1813,
+  "total_cost": 0.0042113,
+  "cost_per_query": 0.0042113,
+  "mean_latency_ms": 4882.299290999072,
+  "max_latency_ms": 4882.299290999072,
+  "trace_url": null,
+  "n_abstained": 0,
+  "abstention_rate": 0.0,
+  "max_steps_cap": 3,
+  "mean_steps": 2.0,
+  "max_steps_observed": 2,
+  "n_terminated_cap": 0,
+  "pct_terminated_cap": 0.0,
+  "n_searched": 1,
+  "total_searches": 1,
+  "queries": [
+    {
+      "question": "What is overfitting in a neural network?",
+      "steps": 2,
+      "terminated_by": "answer",
+      "searches": [
+        {
+          "step": 1,
+          "query": "Overfitting is when a neural network learns the training data too well and performs poorly on new unseen data",
+          "k": 5,
+          "sources": [
+            "day27-deep-learning-2.md",
+            "day23-oss-finetuning.md",
+            "day22-finetuning.md",
+            "day23-oss-finetuning.md",
+            "day22-finetuning.md"
+          ],
+          "n_new_chunks": 3
+        }
+      ]
+    }
+  ]
+}

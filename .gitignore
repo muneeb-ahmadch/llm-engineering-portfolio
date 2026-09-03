@@ -1,0 +1,16 @@
+# secrets
+.env
+.env.local
+
+# environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# embedding cache (regenerated on first run, ~12 MB)
+**/results/.cache/
+.cache/
+
+# os
+.DS_Store

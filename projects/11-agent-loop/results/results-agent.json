@@ -1,0 +1,5251 @@
+{
+  "config": {
+    "encoder": "bge-small",
+    "chunk_size": 1000,
+    "top_k": 5,
+    "overlap": 50,
+    "mode": "all",
+    "chunker": "fixed",
+    "rerank": true,
+    "pool": 20,
+    "generate": true,
+    "model": "gpt-5.6-luna",
+    "prompt_variant": "hardened"
+  },
+  "arms": {
+    "shipped": {
+      "agent": false,
+      "api": "chat"
+    },
+    "control": {
+      "agent": false,
+      "api": "responses"
+    },
+    "agent": {
+      "agent": true,
+      "api": "responses"
+    }
+  },
+  "judge_model": "gpt-5.6-terra",
+  "repeats": 3,
+  "max_steps": 3,
+  "request_timeout_s": 240,
+  "prices_verified": "see PRICES in rag_eval.py \u2014 re-verified on run day",
+  "Q_shipped": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 1716.9520409952383,
+          "prompt_tokens": 1492,
+          "completion_tokens": 63,
+          "cached_tokens": 0,
+          "reasoning_tokens": 48,
+          "cost": 0.0018700000000000001,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 0,
+            "latency_ms": 1072.8036250075093,
+            "cost": 0.0046375
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 63,
+      "total_reasoning_tokens": 48,
+      "total_cached_tokens": 0,
+      "total_cost": 0.0018700000000000001,
+      "cost_per_query": 0.0018700000000000001,
+      "mean_latency_ms": 1716.9520409952383,
+      "max_latency_ms": 1716.9520409952383,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0046375,
+      "judge_mean_latency_ms": 1072.8036250075093,
+      "total_cost_with_judge": 0.0065075
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 1359.723749992554,
+          "prompt_tokens": 1492,
+          "completion_tokens": 66,
+          "cached_tokens": 1489,
+          "reasoning_tokens": 51,
+          "cost": 0.0005479,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 1684,
+            "latency_ms": 968.6776250018738,
+            "cost": 0.0008485000000000001
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 66,
+      "total_reasoning_tokens": 51,
+      "total_cached_tokens": 1489,
+      "total_cost": 0.0005479,
+      "cost_per_query": 0.0005479,
+      "mean_latency_ms": 1359.723749992554,
+      "max_latency_ms": 1359.723749992554,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0008485000000000001,
+      "judge_mean_latency_ms": 968.6776250018738,
+      "total_cost_with_judge": 0.0013964000000000001
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 1025.770124993869,
+          "prompt_tokens": 1492,
+          "completion_tokens": 9,
+          "cached_tokens": 1489,
+          "reasoning_tokens": 0,
+          "cost": 0.00020590000000000002,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 1684,
+            "latency_ms": 923.2904579985188,
+            "cost": 0.0008485000000000001
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 9,
+      "total_reasoning_tokens": 0,
+      "total_cached_tokens": 1489,
+      "total_cost": 0.00020590000000000002,
+      "cost_per_query": 0.00020590000000000002,
+      "mean_latency_ms": 1025.770124993869,
+      "max_latency_ms": 1025.770124993869,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0008485000000000001,
+      "judge_mean_latency_ms": 923.2904579985188,
+      "total_cost_with_judge": 0.0010544
+    }
+  ],
+  "wall_secs": 654.6,
+  "total_spend": 0.580705,
+  "Q_control": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 930.8165830007056,
+          "prompt_tokens": 1492,
+          "completion_tokens": 10,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.001552,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 1684,
+            "latency_ms": 1040.943125000922,
+            "cost": 0.0008485000000000001
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 10,
+      "total_reasoning_tokens": 0,
+      "total_cached_tokens": 0,
+      "total_cost": 0.001552,
+      "cost_per_query": 0.001552,
+      "mean_latency_ms": 930.8165830007056,
+      "max_latency_ms": 930.8165830007056,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0008485000000000001,
+      "judge_mean_latency_ms": 1040.943125000922,
+      "total_cost_with_judge": 0.0024005
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 945.2123749942984,
+          "prompt_tokens": 1492,
+          "completion_tokens": 10,
+          "cached_tokens": 1489,
+          "reasoning_tokens": 0,
+          "cost": 0.0002119,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 1684,
+            "latency_ms": 928.1331670063082,
+            "cost": 0.0008485000000000001
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 10,
+      "total_reasoning_tokens": 0,
+      "total_cached_tokens": 1489,
+      "total_cost": 0.0002119,
+      "cost_per_query": 0.0002119,
+      "mean_latency_ms": 945.2123749942984,
+      "max_latency_ms": 945.2123749942984,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0008485000000000001,
+      "judge_mean_latency_ms": 928.1331670063082,
+      "total_cost_with_judge": 0.0010604
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "answer": "I don't have that information.",
+          "latency_ms": 1277.5697089964524,
+          "prompt_tokens": 1492,
+          "completion_tokens": 54,
+          "cached_tokens": 1489,
+          "reasoning_tokens": 42,
+          "cost": 0.00047589999999999997,
+          "abstained": true,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 0,
+            "total_claims": 0,
+            "claims": [],
+            "prompt_tokens": 1687,
+            "completion_tokens": 28,
+            "cached_tokens": 1684,
+            "latency_ms": 940.9913339914056,
+            "cost": 0.0008485000000000001
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 1492,
+      "total_completion_tokens": 54,
+      "total_reasoning_tokens": 42,
+      "total_cached_tokens": 1489,
+      "total_cost": 0.00047589999999999997,
+      "cost_per_query": 0.00047589999999999997,
+      "mean_latency_ms": 1277.5697089964524,
+      "max_latency_ms": 1277.5697089964524,
+      "trace_url": null,
+      "n_abstained": 1,
+      "abstention_rate": 1.0,
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 0,
+      "n_zero_claim": 1,
+      "mean_faithfulness": null,
+      "min_faithfulness": null,
+      "claim_groundedness": null,
+      "grounded_claims": 0,
+      "total_claims": 0,
+      "judge_cost": 0.0008485000000000001,
+      "judge_mean_latency_ms": 940.9913339914056,
+      "total_cost_with_judge": 0.0013244
+    }
+  ],
+  "Q_agent": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "n_context_chunks": 8,
+          "answer": "Overfitting occurs when a neural network memorizes the training data rather than learning patterns that generalize to new data.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting occurs when a neural network memorizes the training data and performs poorly on new unseen data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md",
+                "day24-finetuning-showdown.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 5085,
+          "completion_tokens": 146,
+          "cached_tokens": 1813,
+          "reasoning_tokens": 72,
+          "latency_ms": 3536.1622079944937,
+          "cost": 0.0043293,
+          "abstained": false,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 1,
+            "total_claims": 1,
+            "claims": [
+              {
+                "claim": "Overfitting occurs when a neural network memorizes training data rather than learning patterns that generalize to new data.",
+                "grounded": true,
+                "why": "The context states that overfitting can cause a model to memorize training data rather than learn generalizable patterns, and describes poor real-world results despite good training metrics."
+              }
+            ],
+            "prompt_tokens": 2553,
+            "completion_tokens": 124,
+            "cached_tokens": 0,
+            "latency_ms": 1818.2331249990966,
+            "cost": 0.0082425
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 5085,
+      "total_completion_tokens": 146,
+      "total_reasoning_tokens": 72,
+      "total_cached_tokens": 1813,
+      "total_cost": 0.0043293,
+      "cost_per_query": 0.0043293,
+      "mean_latency_ms": 3536.1622079944937,
+      "max_latency_ms": 3536.1622079944937,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.0,
+      "max_steps_observed": 2,
+      "n_terminated_cap": 0,
+      "pct_terminated_cap": 0.0,
+      "n_searched": 1,
+      "total_searches": 1,
+      "queries": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting occurs when a neural network memorizes the training data and performs poorly on new unseen data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md",
+                "day24-finetuning-showdown.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        }
+      ],
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 1,
+      "n_zero_claim": 0,
+      "mean_faithfulness": 5.0,
+      "min_faithfulness": 5,
+      "claim_groundedness": 1.0,
+      "grounded_claims": 1,
+      "total_claims": 1,
+      "judge_cost": 0.0082425,
+      "judge_mean_latency_ms": 1818.2331249990966,
+      "total_cost_with_judge": 0.012571800000000001
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "n_context_chunks": 8,
+          "answer": "Overfitting occurs when a model memorizes the training data rather than learning generalizable patterns. Its training loss decreases while its validation loss increases, indicating poorer performance on unseen data.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting is when a neural network learns the training data too well, including noise, and performs poorly on new unseen data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day23-oss-finetuning.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 5003,
+          "completion_tokens": 150,
+          "cached_tokens": 3626,
+          "reasoning_tokens": 58,
+          "latency_ms": 4932.459999006824,
+          "cost": 0.0026395999999999998,
+          "abstained": false,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 3,
+            "total_claims": 3,
+            "claims": [
+              {
+                "claim": "Overfitting occurs when a model memorizes the training data rather than learning generalizable patterns.",
+                "grounded": true,
+                "why": "The context states that multiple passes can cause a model to memorize training data rather than learn generalizable patterns, and describes overfitting as a training issue to prevent."
+              },
+              {
+                "claim": "During overfitting, training loss decreases while validation loss increases.",
+                "grounded": true,
+                "why": "The context explicitly labels this pattern as overfitting."
+              },
+              {
+                "claim": "This pattern indicates poorer performance on unseen data.",
+                "grounded": true,
+                "why": "The context says validation loss is calculated on held-out validation data and is a more reliable indicator of true performance that shows how well the model generalizes."
+              }
+            ],
+            "prompt_tokens": 2481,
+            "completion_tokens": 223,
+            "cached_tokens": 0,
+            "latency_ms": 2645.484625012614,
+            "cost": 0.0095475
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 5003,
+      "total_completion_tokens": 150,
+      "total_reasoning_tokens": 58,
+      "total_cached_tokens": 3626,
+      "total_cost": 0.0026395999999999998,
+      "cost_per_query": 0.0026395999999999998,
+      "mean_latency_ms": 4932.459999006824,
+      "max_latency_ms": 4932.459999006824,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.0,
+      "max_steps_observed": 2,
+      "n_terminated_cap": 0,
+      "pct_terminated_cap": 0.0,
+      "n_searched": 1,
+      "total_searches": 1,
+      "queries": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting is when a neural network learns the training data too well, including noise, and performs poorly on new unseen data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day23-oss-finetuning.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        }
+      ],
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 1,
+      "n_zero_claim": 0,
+      "mean_faithfulness": 5.0,
+      "min_faithfulness": 5,
+      "claim_groundedness": 1.0,
+      "grounded_claims": 3,
+      "total_claims": 3,
+      "judge_cost": 0.0095475,
+      "judge_mean_latency_ms": 2645.484625012614,
+      "total_cost_with_judge": 0.0121871
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 1,
+      "question_set": "golden.jsonl",
+      "trap": false,
+      "mrr": 0.0,
+      "keyword_coverage": 0.3333333333333333,
+      "misses": 1,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "top_source": "day26-deep-learning.md",
+          "rr": 0.0,
+          "coverage": 0.3333333333333333,
+          "n_context_chunks": 8,
+          "answer": "Overfitting occurs when training loss decreases while validation loss increases, meaning the model fits the training data but performs poorly on unseen data.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting is when a neural network learns the training data too well and performs poorly on unseen validation or test data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md",
+                "day23-oss-finetuning.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4949,
+          "completion_tokens": 271,
+          "cached_tokens": 3626,
+          "reasoning_tokens": 191,
+          "latency_ms": 3561.7398750036955,
+          "cost": 0.0033115999999999996,
+          "abstained": false,
+          "judge": {
+            "score": 5,
+            "grounded_claims": 2,
+            "total_claims": 2,
+            "claims": [
+              {
+                "claim": "Overfitting occurs when training loss decreases while validation loss increases.",
+                "grounded": true,
+                "why": "The context explicitly labels this pattern as overfitting."
+              },
+              {
+                "claim": "This pattern means the model fits the training data but performs poorly on unseen data.",
+                "grounded": true,
+                "why": "The context describes validation loss as an indicator of generalization on held-out validation data and identifies the stated loss pattern as overfitting."
+              }
+            ],
+            "prompt_tokens": 2419,
+            "completion_tokens": 156,
+            "cached_tokens": 0,
+            "latency_ms": 2504.920792009216,
+            "cost": 0.0083875
+          }
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 4949,
+      "total_completion_tokens": 271,
+      "total_reasoning_tokens": 191,
+      "total_cached_tokens": 3626,
+      "total_cost": 0.0033115999999999996,
+      "cost_per_query": 0.0033115999999999996,
+      "mean_latency_ms": 3561.7398750036955,
+      "max_latency_ms": 3561.7398750036955,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.0,
+      "max_steps_observed": 2,
+      "n_terminated_cap": 0,
+      "pct_terminated_cap": 0.0,
+      "n_searched": 1,
+      "total_searches": 1,
+      "queries": [
+        {
+          "question": "What is overfitting in a neural network?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Overfitting is when a neural network learns the training data too well and performs poorly on unseen validation or test data.",
+              "k": 5,
+              "sources": [
+                "day27-deep-learning-2.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day23-oss-finetuning.md",
+                "day23-oss-finetuning.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        }
+      ],
+      "judge_model": "gpt-5.6-terra",
+      "judge_price_per_million": {
+        "input": 2.5,
+        "cached_input": 0.25,
+        "output": 15.0
+      },
+      "n_judged_scored": 1,
+      "n_zero_claim": 0,
+      "mean_faithfulness": 5.0,
+      "min_faithfulness": 5,
+      "claim_groundedness": 1.0,
+      "grounded_claims": 2,
+      "total_claims": 2,
+      "judge_cost": 0.0083875,
+      "judge_mean_latency_ms": 2504.920792009216,
+      "total_cost_with_judge": 0.0116991
+    }
+  ],
+  "G_shipped": {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "rerank": true,
+    "pool": 20,
+    "n_chunks": 734,
+    "n_questions": 20,
+    "question_set": "golden.jsonl",
+    "trap": false,
+    "mrr": 0.7849999999999999,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 2,
+    "embed_secs": null,
+    "generate": true,
+    "agent": false,
+    "api": "chat",
+    "prompt_variant": "hardened",
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "answer": "NDCG considers how **all relevant chunks** are distributed in the retrieved results, while MRR only considers the position of the **first relevant chunk**.",
+        "latency_ms": 1217.8991660039173,
+        "prompt_tokens": 1649,
+        "completion_tokens": 35,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001859,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "NDCG considers how all relevant chunks are distributed in the retrieved results.",
+              "grounded": true,
+              "why": "The context states that NDCG considers all relevant chunks and measures how they are distributed in retrieved results."
+            },
+            {
+              "claim": "MRR only considers the position of the first relevant chunk.",
+              "grounded": true,
+              "why": "The context explicitly contrasts NDCG with MRR, stating that MRR only looks at the first hit."
+            }
+          ],
+          "prompt_tokens": 1868,
+          "completion_tokens": 138,
+          "cached_tokens": 0,
+          "latency_ms": 1946.3327079865849,
+          "cost": 0.00674
+        }
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "IoU = Area of Overlap / Area of Union.",
+        "latency_ms": 915.0674580014311,
+        "prompt_tokens": 1629,
+        "completion_tokens": 15,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001719,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "IoU equals the area of overlap divided by the area of union.",
+              "grounded": true,
+              "why": "The context explicitly states: \u201cIoU = Area of Overlap / Area of Union.\u201d"
+            }
+          ],
+          "prompt_tokens": 1829,
+          "completion_tokens": 71,
+          "cached_tokens": 0,
+          "latency_ms": 1407.7137079875683,
+          "cost": 0.0056375
+        }
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LoRA stands for Low Rank Adapters.",
+        "latency_ms": 780.5096249940107,
+        "prompt_tokens": 1392,
+        "completion_tokens": 12,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001464,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LoRA stands for Low Rank Adapters.",
+              "grounded": true,
+              "why": "The context explicitly states: \u201cLoRA stands for Low Rank Adapters.\u201d"
+            }
+          ],
+          "prompt_tokens": 1593,
+          "completion_tokens": 63,
+          "cached_tokens": 0,
+          "latency_ms": 1354.0132920024917,
+          "cost": 0.0049275
+        }
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangSmith.",
+        "latency_ms": 803.5102910071146,
+        "prompt_tokens": 1272,
+        "completion_tokens": 6,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001308,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LangSmith is the referenced item.",
+              "grounded": true,
+              "why": "The context explicitly identifies LangSmith as a monitoring and observability tool in the LangChain ecosystem."
+            }
+          ],
+          "prompt_tokens": 1462,
+          "completion_tokens": 158,
+          "cached_tokens": 0,
+          "latency_ms": 2841.7537079949398,
+          "cost": 0.006024999999999999
+        }
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "RAG optimization is described as \u201cwhack-a-mole\u201d because fixing one failure\u2014such as chunking that separates a person\u2019s name from award information\u2014can cause a different question to fail, requiring repeated adjustments.",
+        "latency_ms": 1111.3330420048442,
+        "prompt_tokens": 1316,
+        "completion_tokens": 47,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0015979999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "RAG optimization is described as \u201cwhack-a-mole\u201d because fixing one failure, such as chunking that separates a person's name from award information, can cause a different question to fail and require repeated adjustments.",
+              "grounded": true,
+              "why": "The context explicitly says this is the \u201cwhack-a-mole\u201d nature of RAG optimization: adjusting chunking fixes a split-name/award failure, but another question then fails and further fixes lead to new issues."
+            }
+          ],
+          "prompt_tokens": 1546,
+          "completion_tokens": 143,
+          "cached_tokens": 0,
+          "latency_ms": 2097.070125004393,
+          "cost": 0.006010000000000001
+        }
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "The Chat Completions API is a standard way to interact with LLMs by providing a conversation or chat history. The model predicts and completes what should come next.",
+        "latency_ms": 1262.0304160082014,
+        "prompt_tokens": 1392,
+        "completion_tokens": 37,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001614,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "The Chat Completions API is a standard way to interact with LLMs by providing a conversation or chat history.",
+              "grounded": true,
+              "why": "The context explicitly describes it as the standard way to interact with LLMs and says users provide a conversation (chat history)."
+            },
+            {
+              "claim": "The model predicts and completes what should come next.",
+              "grounded": true,
+              "why": "The context explicitly states that completions means the model predicts what should come next and completes the chat."
+            }
+          ],
+          "prompt_tokens": 1616,
+          "completion_tokens": 146,
+          "cached_tokens": 0,
+          "latency_ms": 1926.6648750053719,
+          "cost": 0.00623
+        }
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "Chat models are fast, creative, and good for general conversation and interactive use. Reasoning models think through problems step by step before responding, making them better for complex problem-solving, math, logic, and coding, but they tend to be slower and may be less effective at creative content.",
+        "latency_ms": 1320.3975840006024,
+        "prompt_tokens": 1355,
+        "completion_tokens": 61,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001721,
+        "abstained": false,
+        "judge": {
+          "score": 4,
+          "grounded_claims": 5,
+          "total_claims": 6,
+          "claims": [
+            {
+              "claim": "Chat models are fast, creative, and good for general conversation and interactive use.",
+              "grounded": true,
+              "why": "The context describes chat models as fast, creative, good for general conversation, and good for interactive use."
+            },
+            {
+              "claim": "Reasoning models think through problems step by step before responding.",
+              "grounded": true,
+              "why": "The context says reasoning models generate a thinking trace, work through problems step by step, and then respond."
+            },
+            {
+              "claim": "Reasoning models are better for complex problem-solving.",
+              "grounded": true,
+              "why": "The context explicitly describes reasoning models as better at complex problem-solving."
+            },
+            {
+              "claim": "Reasoning models are better for math, logic, and coding.",
+              "grounded": false,
+              "why": "The context says specific O1/O3-mini reasoning models are excellent for math, logic, and coding, but does not establish this as a general property of all reasoning models."
+            },
+            {
+              "claim": "Reasoning models tend to be slower.",
+              "grounded": true,
+              "why": "The context explicitly states that reasoning models tend to be slower."
+            },
+            {
+              "claim": "Reasoning models may be less effective at creative content.",
+              "grounded": true,
+              "why": "The context states that reasoning models may not be as good at generating creative content."
+            }
+          ],
+          "prompt_tokens": 1603,
+          "completion_tokens": 452,
+          "cached_tokens": 0,
+          "latency_ms": 4177.586000005249,
+          "cost": 0.010787499999999998
+        }
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangChain is a comprehensive, heavyweight framework for building complex LLM applications, offering features such as chains, agents, memory management, RAG, tools, and document processing.\n\nLiteLLM is lightweight and focused mainly on providing a simple, consistent interface for calling different LLM providers.",
+        "latency_ms": 1631.454375004978,
+        "prompt_tokens": 1278,
+        "completion_tokens": 109,
+        "cached_tokens": 0,
+        "reasoning_tokens": 43,
+        "cost": 0.0019320000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "LangChain is a comprehensive, heavyweight framework for building complex LLM applications.",
+              "grounded": true,
+              "why": "The context describes LangChain as powerful with many features but heavyweight, and says it is excellent for complex applications."
+            },
+            {
+              "claim": "LangChain offers features including chains, agents, memory management, RAG, tools, and document processing.",
+              "grounded": true,
+              "why": "The context explicitly mentions chains, agents, memory management, RAG, tool abstractions, and document loaders/processing-related tooling."
+            },
+            {
+              "claim": "LiteLLM is lightweight and focused mainly on providing a simple, consistent interface for calling different LLM providers.",
+              "grounded": true,
+              "why": "The context calls LiteLLM lightweight and states that it provides a simple, consistent way to call any LLM provider."
+            }
+          ],
+          "prompt_tokens": 1524,
+          "completion_tokens": 246,
+          "cached_tokens": 0,
+          "latency_ms": 2658.972833000007,
+          "cost": 0.0075
+        }
+      },
+      {
+        "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Prompt caching allows an LLM provider to reuse processing work for repeated or similar prompts, saving money.",
+        "latency_ms": 991.1619579943363,
+        "prompt_tokens": 1371,
+        "completion_tokens": 23,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001509,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Prompt caching allows an LLM provider to reuse processing work for repeated or similar prompts.",
+              "grounded": true,
+              "why": "The context states that when the same or similar prompts are sent repeatedly, prompt caching lets the provider reuse some processing work."
+            },
+            {
+              "claim": "Prompt caching saves money.",
+              "grounded": true,
+              "why": "The context explicitly says that reusing processing work saves money."
+            }
+          ],
+          "prompt_tokens": 1585,
+          "completion_tokens": 107,
+          "cached_tokens": 0,
+          "latency_ms": 1492.078458002652,
+          "cost": 0.0055674999999999995
+        }
+      },
+      {
+        "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Computer Vision is the field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+        "latency_ms": 982.6250830083154,
+        "prompt_tokens": 1226,
+        "completion_tokens": 30,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0014060000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Computer Vision is a field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+              "grounded": true,
+              "why": "This is stated directly in Section 1.1 of the context."
+            }
+          ],
+          "prompt_tokens": 1447,
+          "completion_tokens": 96,
+          "cached_tokens": 0,
+          "latency_ms": 1845.416459007538,
+          "cost": 0.0050575
+        }
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "RecursiveCharacterTextSplitter tries to split at natural boundaries\u2014paragraphs, line breaks, sentences, and finally words\u2014while CharacterTextSplitter simply splits by character count without understanding content structure.",
+        "latency_ms": 966.6062920005061,
+        "prompt_tokens": 1388,
+        "completion_tokens": 40,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0016279999999999999,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "RecursiveCharacterTextSplitter tries to split at natural boundaries: paragraphs, line breaks, sentences, and finally words.",
+              "grounded": true,
+              "why": "The context explicitly gives this splitting hierarchy: double newlines (paragraph breaks), single newlines (line breaks), sentences, then words."
+            },
+            {
+              "claim": "CharacterTextSplitter simply splits by character count without understanding content structure.",
+              "grounded": true,
+              "why": "The context describes CharacterTextSplitter as splitting by character count with no intelligence about content structure."
+            }
+          ],
+          "prompt_tokens": 1611,
+          "completion_tokens": 155,
+          "cached_tokens": 0,
+          "latency_ms": 2031.6534580051666,
+          "cost": 0.0063525
+        }
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "An LSTM uses a **cell state**, a long-term memory pathway that runs through time steps with minimal modification. Its **forget, input, and output gates** control what information is removed, stored, and emitted. Because information and gradients can flow through the cell state largely unchanged, LSTMs reduce the vanishing gradient problem and can learn long-range dependencies.",
+        "latency_ms": 1184.6614160022,
+        "prompt_tokens": 1566,
+        "completion_tokens": 76,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.002022,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "An LSTM uses a cell state, a long-term memory pathway that runs through time steps with minimal modification.",
+              "grounded": true,
+              "why": "The context describes the cell state as a highway that runs through all time steps with minimal modification and as long-term memory."
+            },
+            {
+              "claim": "Its forget, input, and output gates control what information is removed, stored, and emitted.",
+              "grounded": true,
+              "why": "The context states that the forget gate decides what to remove, the input gate what new information to add/store, and the output gate what to output."
+            },
+            {
+              "claim": "Because information and gradients can flow through the cell state largely unchanged, LSTMs reduce the vanishing gradient problem and can learn long-range dependencies.",
+              "grounded": true,
+              "why": "The context says information can flow through the cell state unchanged, solving the vanishing-gradient problem; this directly supports the stated reduction and ability to handle long-range dependencies."
+            }
+          ],
+          "prompt_tokens": 1826,
+          "completion_tokens": 254,
+          "cached_tokens": 0,
+          "latency_ms": 2505.430791003164,
+          "cost": 0.008375
+        }
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Skip connections solve the degradation problem: deeper networks could perform worse than shallower ones even on training data. They also help gradients flow directly, reducing vanishing-gradient issues and making it easier for layers to learn identity mappings.",
+        "latency_ms": 1503.1264999997802,
+        "prompt_tokens": 1471,
+        "completion_tokens": 47,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001753,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Skip connections solve the degradation problem, in which deeper networks could perform worse than shallower ones even on training data.",
+              "grounded": true,
+              "why": "The context describes this exact degradation problem and presents skip connections as the ResNet solution."
+            },
+            {
+              "claim": "Skip connections help gradients flow directly, reducing vanishing-gradient issues.",
+              "grounded": true,
+              "why": "The context states that gradients flow directly through skip connections, with no vanishing."
+            },
+            {
+              "claim": "Skip connections make it easier for layers to learn identity mappings.",
+              "grounded": true,
+              "why": "The context explains that when the optimal mapping is close to identity, the residual only needs to be close to zero, which is easy."
+            }
+          ],
+          "prompt_tokens": 1704,
+          "completion_tokens": 211,
+          "cached_tokens": 0,
+          "latency_ms": 2394.1697499976726,
+          "cost": 0.007425
+        }
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "mAP measures overall detection quality across all classes.",
+        "latency_ms": 827.6920409989543,
+        "prompt_tokens": 1395,
+        "completion_tokens": 13,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001473,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "mAP measures overall detection quality across all classes.",
+              "grounded": true,
+              "why": "The context's detection-metrics table defines mAP (Mean Average Precision) as 'Overall detection quality across all classes.'"
+            }
+          ],
+          "prompt_tokens": 1595,
+          "completion_tokens": 89,
+          "cached_tokens": 0,
+          "latency_ms": 1547.148042009212,
+          "cost": 0.005322499999999999
+        }
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Reranking reorders retrieved chunks so the most relevant information appears first, often using an LLM.",
+        "latency_ms": 1849.4956250069663,
+        "prompt_tokens": 1344,
+        "completion_tokens": 108,
+        "cached_tokens": 0,
+        "reasoning_tokens": 78,
+        "cost": 0.001992,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Reranking reorders retrieved chunks so the most relevant information appears first.",
+              "grounded": true,
+              "why": "The context's reranking example shows a chunk about Jessica Liu's education moved to the top after reranking, ahead of less relevant chunks."
+            },
+            {
+              "claim": "Reranking often uses an LLM.",
+              "grounded": true,
+              "why": "The context states that reranking costs one LLM call per question and gives GPT-4o-nano as an example."
+            }
+          ],
+          "prompt_tokens": 1553,
+          "completion_tokens": 225,
+          "cached_tokens": 0,
+          "latency_ms": 2710.710792001919,
+          "cost": 0.0072575
+        }
+      },
+      {
+        "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+        "latency_ms": 1036.2909170071362,
+        "prompt_tokens": 1325,
+        "completion_tokens": 23,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0014629999999999999,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+              "grounded": true,
+              "why": "The context describes Gradio as a Python library for creating web interfaces without frontend code and says it makes it easy to build UIs for machine learning applications."
+            }
+          ],
+          "prompt_tokens": 1537,
+          "completion_tokens": 132,
+          "cached_tokens": 0,
+          "latency_ms": 1777.0656250067987,
+          "cost": 0.0058224999999999996
+        }
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Async IO is Python\u2019s lightweight approach to concurrency. It uses `async` and `await`, an event loop, and cooperative multitasking, allowing coroutines to yield control while waiting\u2014especially useful for I/O-bound tasks such as API calls\u2014without using OS-level threads or multiple processes.",
+        "latency_ms": 1319.2495419934858,
+        "prompt_tokens": 1211,
+        "completion_tokens": 98,
+        "cached_tokens": 0,
+        "reasoning_tokens": 31,
+        "cost": 0.001799,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 5,
+          "total_claims": 5,
+          "claims": [
+            {
+              "claim": "Async IO is Python's lightweight approach to concurrency.",
+              "grounded": true,
+              "why": "The context describes Async IO as Python's lightweight alternative to multithreading or multiprocessing and says it provides concurrency."
+            },
+            {
+              "claim": "Async IO uses `async` and `await`, an event loop, and cooperative multitasking.",
+              "grounded": true,
+              "why": "The context explicitly lists special Python keywords (`async` and `await`), an event loop, and cooperative multitasking as Async IO's approach."
+            },
+            {
+              "claim": "Async IO allows coroutines to yield control while waiting.",
+              "grounded": true,
+              "why": "The context states that cooperative multitasking means coroutines voluntarily yield control and notes that the event loop switches between coroutines when they are waiting."
+            },
+            {
+              "claim": "Async IO is especially useful for I/O-bound tasks such as API calls.",
+              "grounded": true,
+              "why": "The context says Async IO is perfect for I/O-bound operations like API calls."
+            },
+            {
+              "claim": "Async IO operates without using OS-level threads or multiple processes.",
+              "grounded": true,
+              "why": "The context explicitly says Async IO provides concurrency without using OS-level threads or multiple processes."
+            }
+          ],
+          "prompt_tokens": 1461,
+          "completion_tokens": 300,
+          "cached_tokens": 0,
+          "latency_ms": 2950.7600420038216,
+          "cost": 0.0081525
+        }
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "I don't have that information.",
+        "latency_ms": 1042.0665830024518,
+        "prompt_tokens": 1492,
+        "completion_tokens": 49,
+        "cached_tokens": 1489,
+        "reasoning_tokens": 34,
+        "cost": 0.0004459,
+        "abstained": true,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 0,
+          "total_claims": 0,
+          "claims": [],
+          "prompt_tokens": 1687,
+          "completion_tokens": 28,
+          "cached_tokens": 1684,
+          "latency_ms": 959.6792090014787,
+          "cost": 0.0008485000000000001
+        }
+      },
+      {
+        "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Backpropagation is the process of calculating gradients and updating a neural network\u2019s weights to minimize prediction error. It uses the chain rule to determine how much each weight contributed to the error, then adjusts the weights\u2014typically with an optimizer such as gradient descent or Adam.",
+        "latency_ms": 1172.1075410023332,
+        "prompt_tokens": 1401,
+        "completion_tokens": 56,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0017369999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Backpropagation calculates gradients and updates a neural network\u2019s weights to minimize prediction error.",
+              "grounded": true,
+              "why": "The context defines backprop as updating weights to minimize prediction error and describes calculating gradients and updating weights."
+            },
+            {
+              "claim": "It uses the chain rule to determine how much each weight contributed to the error.",
+              "grounded": true,
+              "why": "The context explicitly says to use calculus (chain rule) to find derivatives and calculate how much each weight contributed to the error."
+            },
+            {
+              "claim": "Weights are adjusted with an optimizer such as gradient descent or Adam.",
+              "grounded": true,
+              "why": "The context lists Gradient Descent and Adam as example optimizers used to update weights."
+            }
+          ],
+          "prompt_tokens": 1647,
+          "completion_tokens": 199,
+          "cached_tokens": 0,
+          "latency_ms": 2177.05174999719,
+          "cost": 0.0071024999999999994
+        }
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Non-Maximum Suppression (NMS) removes duplicate detections by keeping only the highest-confidence bounding box for each object.",
+        "latency_ms": 1002.9978749953443,
+        "prompt_tokens": 1394,
+        "completion_tokens": 28,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001562,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Non-Maximum Suppression (NMS) removes duplicate detections by keeping only the highest-confidence bounding box for each object.",
+              "grounded": true,
+              "why": "The context states that NMS keeps only the highest-confidence box for each object and removes duplicate detections."
+            }
+          ],
+          "prompt_tokens": 1607,
+          "completion_tokens": 103,
+          "cached_tokens": 0,
+          "latency_ms": 1501.9575000042096,
+          "cost": 0.0055625
+        }
+      }
+    ],
+    "gen_model": "gpt-5.6-luna",
+    "price_per_million": {
+      "input": 1.0,
+      "cached_input": 0.1,
+      "output": 6.0
+    },
+    "temperature": "default(1)",
+    "total_prompt_tokens": 27867,
+    "total_completion_tokens": 913,
+    "total_reasoning_tokens": 186,
+    "total_cached_tokens": 1489,
+    "total_cost": 0.0320049,
+    "cost_per_query": 0.0016002450000000001,
+    "mean_latency_ms": 1146.0141665018455,
+    "max_latency_ms": 1849.4956250069663,
+    "trace_url": null,
+    "n_abstained": 1,
+    "abstention_rate": 0.05,
+    "judge_model": "gpt-5.6-terra",
+    "judge_price_per_million": {
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15.0
+    },
+    "n_judged_scored": 19,
+    "n_zero_claim": 1,
+    "mean_faithfulness": 4.947368421052632,
+    "min_faithfulness": 4,
+    "claim_groundedness": 0.975609756097561,
+    "grounded_claims": 40,
+    "total_claims": 41,
+    "judge_cost": 0.1267035,
+    "judge_mean_latency_ms": 2115.1614562513714,
+    "total_cost_with_judge": 0.1587084
+  },
+  "G_control": {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "rerank": true,
+    "pool": 20,
+    "n_chunks": 734,
+    "n_questions": 20,
+    "question_set": "golden.jsonl",
+    "trap": false,
+    "mrr": 0.7849999999999999,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 2,
+    "embed_secs": null,
+    "generate": true,
+    "agent": false,
+    "api": "responses",
+    "prompt_variant": "hardened",
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "answer": "NDCG considers **all relevant chunks and how they are distributed throughout the retrieved results**, whereas MRR only considers the position of the **first relevant chunk**.",
+        "latency_ms": 1645.4557919932995,
+        "prompt_tokens": 1649,
+        "completion_tokens": 37,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001871,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "NDCG considers all relevant chunks and how they are distributed throughout the retrieved results.",
+              "grounded": true,
+              "why": "The context states that, unlike MRR, NDCG considers all relevant chunks and measures how well they are distributed in retrieved results."
+            },
+            {
+              "claim": "MRR only considers the position of the first relevant chunk.",
+              "grounded": true,
+              "why": "The context explicitly says MRR only looks at the first hit and illustrates it using the position of the first relevant chunk."
+            }
+          ],
+          "prompt_tokens": 1869,
+          "completion_tokens": 149,
+          "cached_tokens": 0,
+          "latency_ms": 2058.1624589976855,
+          "cost": 0.0069075
+        }
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "IoU = Area of Overlap / Area of Union.",
+        "latency_ms": 1173.4277089999523,
+        "prompt_tokens": 1629,
+        "completion_tokens": 16,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001725,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "IoU equals the area of overlap divided by the area of union.",
+              "grounded": true,
+              "why": "The context explicitly states: \"IoU = Area of Overlap / Area of Union.\""
+            }
+          ],
+          "prompt_tokens": 1829,
+          "completion_tokens": 71,
+          "cached_tokens": 1826,
+          "latency_ms": 1409.533291007392,
+          "cost": 0.001529
+        }
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LoRA stands for Low Rank Adapters.",
+        "latency_ms": 762.6703330024611,
+        "prompt_tokens": 1392,
+        "completion_tokens": 13,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.00147,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LoRA stands for Low Rank Adapters.",
+              "grounded": true,
+              "why": "The context explicitly states that \u201cLoRA stands for Low Rank Adapters.\u201d"
+            }
+          ],
+          "prompt_tokens": 1593,
+          "completion_tokens": 63,
+          "cached_tokens": 1590,
+          "latency_ms": 1413.492583000334,
+          "cost": 0.00135
+        }
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangSmith.",
+        "latency_ms": 1151.6298339993227,
+        "prompt_tokens": 1272,
+        "completion_tokens": 7,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0013139999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 0,
+          "total_claims": 0,
+          "claims": [],
+          "prompt_tokens": 1462,
+          "completion_tokens": 104,
+          "cached_tokens": 1459,
+          "latency_ms": 1949.105874999077,
+          "cost": 0.00193225
+        }
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Because fixing one RAG failure\u2014such as changing chunking to keep a person\u2019s full name with an award\u2014can cause a different question to fail, leading to repeated cycles of fixing new issues.",
+        "latency_ms": 1088.3920830092393,
+        "prompt_tokens": 1316,
+        "completion_tokens": 44,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0015799999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Fixing one RAG failure by changing chunking to keep a person's full name with award information can cause a different question to fail.",
+              "grounded": true,
+              "why": "The context describes adjusting chunking after a name and award were split, followed by a different question failing."
+            },
+            {
+              "claim": "This can lead to repeated cycles of fixing newly arising issues.",
+              "grounded": true,
+              "why": "The context explicitly calls this the 'whack-a-mole' nature of RAG optimization, where fixing one issue leads to another."
+            }
+          ],
+          "prompt_tokens": 1542,
+          "completion_tokens": 168,
+          "cached_tokens": 0,
+          "latency_ms": 1993.9616250048857,
+          "cost": 0.006375
+        }
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "The Chat Completions API is a standard way to interact with LLMs by providing a conversation or chat history. The model then predicts and generates what should come next, completing the chat.",
+        "latency_ms": 1302.0639169990318,
+        "prompt_tokens": 1392,
+        "completion_tokens": 43,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.00165,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "The Chat Completions API is a standard way to interact with LLMs by providing a conversation or chat history.",
+              "grounded": true,
+              "why": "The context explicitly calls it the standard way to interact with LLMs and says users provide a conversation/chat history."
+            },
+            {
+              "claim": "The model predicts and generates what should come next, completing the chat.",
+              "grounded": true,
+              "why": "The context explicitly states that the model predicts what should come next, i.e., completes the chat."
+            }
+          ],
+          "prompt_tokens": 1621,
+          "completion_tokens": 156,
+          "cached_tokens": 0,
+          "latency_ms": 1916.6607079969253,
+          "cost": 0.006392500000000001
+        }
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "Chat models are fast, creative, and suited to general conversation and interactive use. Reasoning models generate a thinking trace and work through problems step by step before answering; they are better for complex problem-solving but tend to be slower and may be less effective for creative content.",
+        "latency_ms": 1237.0841249939986,
+        "prompt_tokens": 1355,
+        "completion_tokens": 58,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001703,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Chat models are fast, creative, and suited to general conversation and interactive use.",
+              "grounded": true,
+              "why": "The context states that chat models are fast, creative, good for general conversation, and good for interactive use."
+            },
+            {
+              "claim": "Reasoning models generate a thinking trace and work through problems step by step before answering.",
+              "grounded": true,
+              "why": "The context says reasoning models generate a 'thinking trace' first, work through the problem step by step, and then answer."
+            },
+            {
+              "claim": "Reasoning models are better for complex problem-solving but tend to be slower and may be less effective for creative content.",
+              "grounded": true,
+              "why": "The context describes reasoning models as better at complex problem-solving, slower, and potentially not as good at generating creative content."
+            }
+          ],
+          "prompt_tokens": 1599,
+          "completion_tokens": 212,
+          "cached_tokens": 0,
+          "latency_ms": 2143.4220829978585,
+          "cost": 0.0071775
+        }
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangChain is a comprehensive, heavyweight framework for building complex LLM applications, with features such as chains, agents, memory management, RAG, prompt templates, and tool abstractions.\n\nLiteLLM is lightweight and focused on providing a simple, consistent interface for calling different LLM providers.",
+        "latency_ms": 1793.3937079942552,
+        "prompt_tokens": 1278,
+        "completion_tokens": 115,
+        "cached_tokens": 0,
+        "reasoning_tokens": 51,
+        "cost": 0.001968,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "LangChain is a comprehensive, heavyweight framework for building complex LLM applications, with features such as chains, agents, memory management, RAG, prompt templates, and tool abstractions.",
+              "grounded": true,
+              "why": "The context describes LangChain as powerful but heavyweight, excellent for complex applications, and explicitly lists chains, agents, memory management, RAG, prompt templates, and tool abstractions among its capabilities."
+            },
+            {
+              "claim": "LiteLLM is lightweight and focused on providing a simple, consistent interface for calling different LLM providers.",
+              "grounded": true,
+              "why": "The context explicitly calls LiteLLM a lightweight framework that provides a simple, consistent way to call any LLM provider."
+            }
+          ],
+          "prompt_tokens": 1525,
+          "completion_tokens": 223,
+          "cached_tokens": 0,
+          "latency_ms": 2557.3641669907374,
+          "cost": 0.007157500000000001
+        }
+      },
+      {
+        "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Prompt caching allows an LLM provider to reuse processing work for the same or similar prompts sent repeatedly, saving money.",
+        "latency_ms": 1036.93299999577,
+        "prompt_tokens": 1371,
+        "completion_tokens": 27,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001533,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Prompt caching allows an LLM provider to reuse processing work for the same or similar prompts sent repeatedly.",
+              "grounded": true,
+              "why": "The context states that when the same or similar prompts are sent repeatedly, prompt caching allows the provider to reuse some processing work."
+            },
+            {
+              "claim": "Prompt caching saves money.",
+              "grounded": true,
+              "why": "The context explicitly says that reusing processing work through prompt caching saves money."
+            }
+          ],
+          "prompt_tokens": 1588,
+          "completion_tokens": 136,
+          "cached_tokens": 0,
+          "latency_ms": 1847.9481249960372,
+          "cost": 0.00601
+        }
+      },
+      {
+        "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Computer Vision is the field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+        "latency_ms": 1027.7908330026548,
+        "prompt_tokens": 1226,
+        "completion_tokens": 31,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001412,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Computer Vision is a field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+              "grounded": true,
+              "why": "The context states this definition directly in Section 1.1."
+            }
+          ],
+          "prompt_tokens": 1447,
+          "completion_tokens": 95,
+          "cached_tokens": 1444,
+          "latency_ms": 1879.3414999963716,
+          "cost": 0.0017935
+        }
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "RecursiveCharacterTextSplitter tries to split at natural boundaries\u2014paragraphs, line breaks, sentences, and finally words\u2014while CharacterTextSplitter simply splits by character count without considering content structure.",
+        "latency_ms": 1079.374207998626,
+        "prompt_tokens": 1388,
+        "completion_tokens": 41,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001634,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "RecursiveCharacterTextSplitter tries to split at natural boundaries: paragraphs, line breaks, sentences, and finally words.",
+              "grounded": true,
+              "why": "The context explicitly gives this hierarchy: double newlines (paragraph breaks), single newlines (line breaks), sentences, and finally words."
+            },
+            {
+              "claim": "CharacterTextSplitter splits by character count without considering content structure.",
+              "grounded": true,
+              "why": "The context describes CharacterTextSplitter as splitting by character count with no intelligence about content structure."
+            }
+          ],
+          "prompt_tokens": 1611,
+          "completion_tokens": 155,
+          "cached_tokens": 0,
+          "latency_ms": 1920.1788749924162,
+          "cost": 0.0063525
+        }
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "LSTMs use a **cell state**, or long-term memory highway, that passes through time steps with minimal modification. Their **forget, input, and output gates** control what information is removed, stored, and output, allowing information and gradients to flow through many time steps without becoming extremely small.",
+        "latency_ms": 4237.749959007488,
+        "prompt_tokens": 1566,
+        "completion_tokens": 64,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.00195,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "LSTMs use a cell state, described as a long-term memory highway, that passes through time steps with minimal modification.",
+              "grounded": true,
+              "why": "The context states that the cell state is a highway running through all time steps with minimal modification and calls it long-term memory."
+            },
+            {
+              "claim": "LSTMs have forget, input, and output gates that control what information is removed, stored, and output.",
+              "grounded": true,
+              "why": "The context explicitly gives these three gates and their respective purposes."
+            },
+            {
+              "claim": "These mechanisms allow information and gradients to flow through many time steps without becoming extremely small.",
+              "grounded": true,
+              "why": "The context says information can flow unchanged through the cell state, solving the vanishing-gradient problem, which is described as gradients becoming extremely small over many time steps."
+            }
+          ],
+          "prompt_tokens": 1813,
+          "completion_tokens": 233,
+          "cached_tokens": 0,
+          "latency_ms": 2619.695416011382,
+          "cost": 0.0080275
+        }
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Skip connections solve the degradation problem: very deep networks could perform worse than shallow ones even on training data because gradient-based training struggled to learn identity mappings. They help gradients flow directly and let layers learn residuals close to zero when the identity mapping is optimal.",
+        "latency_ms": 3662.876166010392,
+        "prompt_tokens": 1471,
+        "completion_tokens": 55,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001801,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Skip connections solve the degradation problem in which very deep networks can perform worse than shallow networks even on training data because gradient-based training struggles to learn identity mappings.",
+              "grounded": true,
+              "why": "The context describes the degradation problem, notes that deeper networks performed worse even on training data, and explains that gradient-based training could not achieve the identity-function behavior needed for extra layers."
+            },
+            {
+              "claim": "Skip connections help gradients flow directly.",
+              "grounded": true,
+              "why": "The context explicitly states that gradients flow directly through skip connections."
+            },
+            {
+              "claim": "Skip connections let layers learn residuals close to zero when the identity mapping is optimal.",
+              "grounded": true,
+              "why": "The context states that if the optimal mapping is close to identity, the residual F(x) only needs to be close to zero."
+            }
+          ],
+          "prompt_tokens": 1711,
+          "completion_tokens": 254,
+          "cached_tokens": 0,
+          "latency_ms": 2669.505957994261,
+          "cost": 0.008087500000000001
+        }
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Overall detection quality across all classes.",
+        "latency_ms": 943.4990829904564,
+        "prompt_tokens": 1395,
+        "completion_tokens": 11,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001461,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "mAP measures overall detection quality across all classes.",
+              "grounded": true,
+              "why": "The context's detection-metrics table defines mAP (Mean Average Precision) as \"Overall detection quality across all classes.\""
+            }
+          ],
+          "prompt_tokens": 1592,
+          "completion_tokens": 104,
+          "cached_tokens": 0,
+          "latency_ms": 1617.2437919885851,
+          "cost": 0.00554
+        }
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Reranking reorders retrieved chunks by relevance, moving the most relevant information to the top before generating an answer.",
+        "latency_ms": 1730.7477079884848,
+        "prompt_tokens": 1344,
+        "completion_tokens": 101,
+        "cached_tokens": 0,
+        "reasoning_tokens": 72,
+        "cost": 0.00195,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Reranking reorders retrieved chunks by relevance, moving the most relevant information to the top before generating an answer.",
+              "grounded": true,
+              "why": "The context's reranking example explicitly shows a chunk about Jessica Liu's education being moved to the top after reranking, supporting that reranking reorders retrieved chunks to prioritize relevance. The context describes this within the RAG query pipeline, which entails answer generation after retrieval/reranking."
+            }
+          ],
+          "prompt_tokens": 1555,
+          "completion_tokens": 165,
+          "cached_tokens": 0,
+          "latency_ms": 2435.2937920048134,
+          "cost": 0.0063625
+        }
+      },
+      {
+        "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+        "latency_ms": 795.6919580028625,
+        "prompt_tokens": 1325,
+        "completion_tokens": 24,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001469,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Gradio is used to create web interfaces for machine learning applications using Python.",
+              "grounded": true,
+              "why": "The context describes Gradio as a Python library for creating web interfaces and says it makes it easy to build user interfaces for machine learning applications."
+            },
+            {
+              "claim": "Gradio can be used without needing frontend code.",
+              "grounded": true,
+              "why": "The context explicitly states that Gradio lets users create web interfaces without knowing frontend code."
+            }
+          ],
+          "prompt_tokens": 1537,
+          "completion_tokens": 175,
+          "cached_tokens": 1534,
+          "latency_ms": 2475.001875005546,
+          "cost": 0.003016
+        }
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Async IO is Python\u2019s lightweight approach to concurrency without OS-level threads or multiple processes. It uses the `async` and `await` keywords, an event loop, and cooperative multitasking, where coroutines voluntarily yield control\u2014making it efficient for I/O-bound operations such as API calls.",
+        "latency_ms": 1153.2130419946043,
+        "prompt_tokens": 1211,
+        "completion_tokens": 62,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.0015830000000000002,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "Async IO is Python\u2019s lightweight approach to concurrency without OS-level threads or multiple processes.",
+              "grounded": true,
+              "why": "The context states that Async IO provides concurrency without using OS-level threads or multiple processes and describes it as lightweight."
+            },
+            {
+              "claim": "Async IO uses the `async` and `await` keywords, an event loop, and cooperative multitasking.",
+              "grounded": true,
+              "why": "The context explicitly lists special Python keywords (`async` and `await`), an event loop, and cooperative multitasking as Async IO's components."
+            },
+            {
+              "claim": "In cooperative multitasking, coroutines voluntarily yield control.",
+              "grounded": true,
+              "why": "The context explicitly defines cooperative multitasking as coroutines voluntarily yielding control."
+            },
+            {
+              "claim": "Async IO is efficient for I/O-bound operations such as API calls.",
+              "grounded": true,
+              "why": "The context describes Async IO as lightweight and efficient and says it is perfect for I/O-bound operations like API calls."
+            }
+          ],
+          "prompt_tokens": 1461,
+          "completion_tokens": 274,
+          "cached_tokens": 0,
+          "latency_ms": 2502.7263749943813,
+          "cost": 0.0077625
+        }
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Overfitting occurs when a neural network learns the training data too specifically, including noise, so it performs poorly on new, unseen data.",
+        "latency_ms": 997.4038749933243,
+        "prompt_tokens": 1492,
+        "completion_tokens": 32,
+        "cached_tokens": 1489,
+        "reasoning_tokens": 0,
+        "cost": 0.0003439,
+        "abstained": false,
+        "judge": {
+          "score": 2,
+          "grounded_claims": 0,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Overfitting occurs when a neural network learns the training data too specifically, including noise.",
+              "grounded": false,
+              "why": "The context mentions overfitting and methods to prevent it, but does not define it as learning training data too specifically or including noise."
+            },
+            {
+              "claim": "Overfitting causes poor performance on new, unseen data.",
+              "grounded": false,
+              "why": "The context does not state that overfitting leads to poor performance on unseen data."
+            }
+          ],
+          "prompt_tokens": 1709,
+          "completion_tokens": 225,
+          "cached_tokens": 0,
+          "latency_ms": 2745.655666993116,
+          "cost": 0.0076475
+        }
+      },
+      {
+        "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Backpropagation is the process of calculating gradients and updating a neural network\u2019s weights to minimize prediction error. It uses the chain rule to determine how each weight contributed to the loss, then adjusts the weights with an optimizer such as gradient descent or Adam.",
+        "latency_ms": 1122.9252089979127,
+        "prompt_tokens": 1401,
+        "completion_tokens": 54,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001725,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Backpropagation is the process of calculating gradients and updating a neural network\u2019s weights to minimize prediction error.",
+              "grounded": true,
+              "why": "The context defines backward propagation as updating weights to minimize prediction error and describes computing gradients and updating weights."
+            },
+            {
+              "claim": "It uses the chain rule to determine how each weight contributed to the loss.",
+              "grounded": true,
+              "why": "The context states that gradients calculate how much each weight contributed to error and use calculus, specifically the chain rule, to find derivatives."
+            },
+            {
+              "claim": "It adjusts the weights with an optimizer such as gradient descent or Adam.",
+              "grounded": true,
+              "why": "The context says to use an optimizer, giving Gradient Descent and Adam as examples, to adjust weights."
+            }
+          ],
+          "prompt_tokens": 1644,
+          "completion_tokens": 176,
+          "cached_tokens": 0,
+          "latency_ms": 1916.1581249936717,
+          "cost": 0.00675
+        }
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Non-Maximum Suppression (NMS) removes duplicate detections when multiple cells detect the same object. It keeps only the highest-confidence bounding box for each object.",
+        "latency_ms": 1166.1212909966707,
+        "prompt_tokens": 1394,
+        "completion_tokens": 37,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "cost": 0.001616,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Non-Maximum Suppression (NMS) removes duplicate detections when multiple cells detect the same object.",
+              "grounded": true,
+              "why": "The context states that multiple cells may detect the same object and that NMS removes duplicate detections."
+            },
+            {
+              "claim": "NMS keeps only the highest-confidence bounding box for each object.",
+              "grounded": true,
+              "why": "The context explicitly says NMS keeps only the highest-confidence box for each object."
+            }
+          ],
+          "prompt_tokens": 1615,
+          "completion_tokens": 119,
+          "cached_tokens": 0,
+          "latency_ms": 1515.2203329926124,
+          "cost": 0.0058224999999999996
+        }
+      }
+    ],
+    "gen_model": "gpt-5.6-luna",
+    "price_per_million": {
+      "input": 1.0,
+      "cached_input": 0.1,
+      "output": 6.0
+    },
+    "temperature": "default(1)",
+    "total_prompt_tokens": 27867,
+    "total_completion_tokens": 872,
+    "total_reasoning_tokens": 123,
+    "total_cached_tokens": 1489,
+    "total_cost": 0.0317589,
+    "cost_per_query": 0.001587945,
+    "mean_latency_ms": 1455.4221916485403,
+    "max_latency_ms": 4237.749959007488,
+    "trace_url": null,
+    "n_abstained": 0,
+    "abstention_rate": 0.0,
+    "judge_model": "gpt-5.6-terra",
+    "judge_price_per_million": {
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15.0
+    },
+    "n_judged_scored": 19,
+    "n_zero_claim": 1,
+    "mean_faithfulness": 4.842105263157895,
+    "min_faithfulness": 2,
+    "claim_groundedness": 0.9487179487179487,
+    "grounded_claims": 37,
+    "total_claims": 39,
+    "judge_cost": 0.11199325,
+    "judge_mean_latency_ms": 2079.2836311979045,
+    "total_cost_with_judge": 0.14375215
+  },
+  "G_agent": {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "rerank": true,
+    "pool": 20,
+    "n_chunks": 734,
+    "n_questions": 20,
+    "question_set": "golden.jsonl",
+    "trap": false,
+    "mrr": 0.7849999999999999,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 2,
+    "embed_secs": null,
+    "generate": true,
+    "agent": true,
+    "api": "responses",
+    "prompt_variant": "hardened",
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "NDCG considers all relevant chunks and how they are distributed throughout the retrieved results, whereas MRR only considers the first relevant chunk.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1974,
+        "completion_tokens": 31,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1107.9335419926792,
+        "cost": 0.00216,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "NDCG considers all relevant chunks and how they are distributed throughout the retrieved results.",
+              "grounded": true,
+              "why": "The context states that NDCG considers all relevant chunks and measures how they are distributed in retrieved results."
+            },
+            {
+              "claim": "MRR only considers the first relevant chunk.",
+              "grounded": true,
+              "why": "The context explicitly contrasts NDCG with MRR, stating that MRR only looks at the first hit."
+            }
+          ],
+          "prompt_tokens": 1863,
+          "completion_tokens": 137,
+          "cached_tokens": 0,
+          "latency_ms": 1737.2487079992425,
+          "cost": 0.0067125
+        }
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "IoU = Area of Overlap / Area of Union.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1954,
+        "completion_tokens": 16,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 3028.2627920096274,
+        "cost": 0.00205,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "IoU equals Area of Overlap divided by Area of Union.",
+              "grounded": true,
+              "why": "The context explicitly states: \u201cIoU = Area of Overlap / Area of Union.\u201d"
+            }
+          ],
+          "prompt_tokens": 1829,
+          "completion_tokens": 87,
+          "cached_tokens": 1826,
+          "latency_ms": 1589.9961670074845,
+          "cost": 0.001769
+        }
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "LoRA stands for Low Rank Adapters.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1716,
+        "completion_tokens": 13,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1017.947959000594,
+        "cost": 0.001794,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LoRA stands for Low Rank Adapters.",
+              "grounded": true,
+              "why": "The context explicitly states that \u201cLoRA stands for Low Rank Adapters.\u201d"
+            }
+          ],
+          "prompt_tokens": 1593,
+          "completion_tokens": 79,
+          "cached_tokens": 1590,
+          "latency_ms": 1426.3143339921953,
+          "cost": 0.0015899999999999998
+        }
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "LangSmith.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1591,
+        "completion_tokens": 7,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1278.5756249941187,
+        "cost": 0.001633,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LangSmith.",
+              "grounded": true,
+              "why": "LangSmith is explicitly described in the context as the monitoring and observability tool for the LangChain ecosystem."
+            }
+          ],
+          "prompt_tokens": 1462,
+          "completion_tokens": 158,
+          "cached_tokens": 1459,
+          "latency_ms": 2393.277291994309,
+          "cost": 0.00274225
+        }
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Because fixing one RAG failure often causes a different question to fail, leading to repeated cycles of adjustments and new problems.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1641,
+        "completion_tokens": 28,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1316.678540999419,
+        "cost": 0.001809,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Fixing one RAG failure can cause a different question to fail, resulting in repeated cycles of adjustments and new problems.",
+              "grounded": true,
+              "why": "The context explicitly describes adjusting chunking to fix one problem, then a different question failing, followed by another issue after that ('whack-a-mole' optimization)."
+            }
+          ],
+          "prompt_tokens": 1526,
+          "completion_tokens": 131,
+          "cached_tokens": 0,
+          "latency_ms": 2023.805959004676,
+          "cost": 0.00578
+        }
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "The Chat Completions API is the standard way to interact with LLMs: you provide a conversation or chat history, and the model predicts what should come next to complete the chat.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1722,
+        "completion_tokens": 42,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 2859.4905420031864,
+        "cost": 0.001974,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "The Chat Completions API is the standard way to interact with LLMs.",
+              "grounded": true,
+              "why": "The context explicitly states this in the section defining the Chat Completions API."
+            },
+            {
+              "claim": "With the Chat Completions API, you provide a conversation or chat history and the model predicts what should come next to complete the chat.",
+              "grounded": true,
+              "why": "The context explicitly explains that 'Chat' means providing a conversation/chat history and 'Completions' means predicting what comes next."
+            }
+          ],
+          "prompt_tokens": 1620,
+          "completion_tokens": 164,
+          "cached_tokens": 0,
+          "latency_ms": 1871.335709001869,
+          "cost": 0.00651
+        }
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Chat models are fast, creative, and good for general conversation. Reasoning models think through problems step by step, making them better for complex problem-solving, but they tend to be slower and may be less suited to creative content.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1678,
+        "completion_tokens": 50,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1305.473542000982,
+        "cost": 0.001978,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "Chat models are fast, creative, and good for general conversation.",
+              "grounded": true,
+              "why": "The context describes chat models as fast, creative, and good for general conversation."
+            },
+            {
+              "claim": "Reasoning models think through problems step by step.",
+              "grounded": true,
+              "why": "The context states that reasoning models generate a thinking trace and work through problems step by step."
+            },
+            {
+              "claim": "Reasoning models are better for complex problem-solving.",
+              "grounded": true,
+              "why": "The context says reasoning models are better at complex problem-solving and can think through complex problems."
+            },
+            {
+              "claim": "Reasoning models tend to be slower and may be less suited to creative content.",
+              "grounded": true,
+              "why": "The context says reasoning models tend to be slower and may not be as good at generating creative content."
+            }
+          ],
+          "prompt_tokens": 1591,
+          "completion_tokens": 240,
+          "cached_tokens": 0,
+          "latency_ms": 2219.4448340014787,
+          "cost": 0.0075775
+        }
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "LangChain is a feature-rich but heavyweight framework for building complex LLM applications, including chains, agents, and memory management. LiteLLM is lightweight and focused on providing a simple, consistent interface for calling different LLM providers.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1599,
+        "completion_tokens": 87,
+        "cached_tokens": 0,
+        "reasoning_tokens": 35,
+        "latency_ms": 1397.5557089870563,
+        "cost": 0.002121,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "LangChain is a feature-rich but heavyweight framework for building complex LLM applications.",
+              "grounded": true,
+              "why": "The context describes LangChain as powerful with many features, quite heavyweight, and excellent for complex applications."
+            },
+            {
+              "claim": "LangChain supports chains, agents, and memory management.",
+              "grounded": true,
+              "why": "The context explicitly lists chains, agents, and memory management as advanced LangChain features."
+            },
+            {
+              "claim": "LiteLLM is lightweight and focused on providing a simple, consistent interface for calling different LLM providers.",
+              "grounded": true,
+              "why": "The context explicitly describes LiteLLM as lightweight and as providing a simple, consistent way to call any LLM provider."
+            }
+          ],
+          "prompt_tokens": 1513,
+          "completion_tokens": 212,
+          "cached_tokens": 0,
+          "latency_ms": 2507.280207995791,
+          "cost": 0.0069625
+        }
+      },
+      {
+        "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Prompt caching allows an LLM provider to reuse processing work when the same or similar prompts are sent repeatedly, saving money.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1698,
+        "completion_tokens": 43,
+        "cached_tokens": 0,
+        "reasoning_tokens": 13,
+        "latency_ms": 1211.9816660124343,
+        "cost": 0.0019560000000000003,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Prompt caching allows an LLM provider to reuse processing work when the same or similar prompts are sent repeatedly, saving money.",
+              "grounded": true,
+              "why": "The context states that prompt caching lets the provider reuse some processing work when the same or similar prompts are repeatedly sent, which saves money."
+            }
+          ],
+          "prompt_tokens": 1589,
+          "completion_tokens": 106,
+          "cached_tokens": 0,
+          "latency_ms": 1990.7802499947138,
+          "cost": 0.0055625
+        }
+      },
+      {
+        "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Computer vision is the field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1541,
+        "completion_tokens": 31,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 872.1655410045059,
+        "cost": 0.001727,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Computer vision is a field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+              "grounded": true,
+              "why": "The context explicitly gives this as the simple definition of computer vision."
+            }
+          ],
+          "prompt_tokens": 1447,
+          "completion_tokens": 95,
+          "cached_tokens": 0,
+          "latency_ms": 1444.506999992882,
+          "cost": 0.0050425
+        }
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "RecursiveCharacterTextSplitter tries to split at natural boundaries\u2014paragraphs, lines, sentences, and finally words\u2014while a plain CharacterTextSplitter simply splits by character count without understanding content structure.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1713,
+        "completion_tokens": 72,
+        "cached_tokens": 0,
+        "reasoning_tokens": 28,
+        "latency_ms": 4336.71725000022,
+        "cost": 0.0021449999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "RecursiveCharacterTextSplitter tries to split at natural boundaries: paragraphs, lines, sentences, and finally words.",
+              "grounded": true,
+              "why": "The context explicitly gives this hierarchy: double newlines/paragraph breaks, single newlines/line breaks, sentences, and finally words."
+            },
+            {
+              "claim": "CharacterTextSplitter splits by character count without understanding content structure.",
+              "grounded": true,
+              "why": "The context describes CharacterTextSplitter as splitting by character count with no intelligence about content structure."
+            }
+          ],
+          "prompt_tokens": 1612,
+          "completion_tokens": 158,
+          "cached_tokens": 0,
+          "latency_ms": 2094.9683750077384,
+          "cost": 0.0063999999999999994
+        }
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "An LSTM uses a **cell state**, or long-term memory highway, that passes through time steps with minimal modification. Its **forget, input, and output gates** control what information is removed, stored, and output, allowing gradients and important information to flow through long sequences without vanishing.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1892,
+        "completion_tokens": 63,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 1361.3231659983285,
+        "cost": 0.00227,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "An LSTM uses a cell state, described as a long-term memory highway, that passes through time steps with minimal modification.",
+              "grounded": true,
+              "why": "The context states that the cell state is a highway running through all time steps with minimal modification and calls it long-term memory."
+            },
+            {
+              "claim": "The forget, input, and output gates control what information is removed, stored, and output.",
+              "grounded": true,
+              "why": "The context explicitly defines the forget gate as deciding what to remove, the input gate as deciding what new information to add, and the output gate as deciding what to output."
+            },
+            {
+              "claim": "This mechanism allows gradients and important information to flow through long sequences without vanishing.",
+              "grounded": true,
+              "why": "The context says information can flow through the cell state unchanged, solving the vanishing-gradient problem, and that LSTMs solve this problem via their gating mechanism."
+            }
+          ],
+          "prompt_tokens": 1812,
+          "completion_tokens": 279,
+          "cached_tokens": 0,
+          "latency_ms": 2840.6153749965597,
+          "cost": 0.008715
+        }
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Skip connections solve the degradation problem: very deep networks could perform worse than shallow ones, even on training data. They also help gradients flow directly through the network, reducing vanishing-gradient issues.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1796,
+        "completion_tokens": 42,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 2157.309833011823,
+        "cost": 0.002048,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Skip connections solve the degradation problem, where very deep networks could perform worse than shallow ones even on training data.",
+              "grounded": true,
+              "why": "The context describes the degradation problem as deeper networks performing worse than shallow ones even on training data, and presents skip connections as the ResNet solution."
+            },
+            {
+              "claim": "Skip connections help gradients flow directly through the network, reducing vanishing-gradient issues.",
+              "grounded": true,
+              "why": "The context explicitly states that gradients flow directly through skip connections, with 'no vanishing.'"
+            }
+          ],
+          "prompt_tokens": 1698,
+          "completion_tokens": 194,
+          "cached_tokens": 0,
+          "latency_ms": 2571.611999999732,
+          "cost": 0.007155
+        }
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "mAP (Mean Average Precision) measures overall detection quality across all classes.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1722,
+        "completion_tokens": 19,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 3051.0540419927565,
+        "cost": 0.001836,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "mAP (Mean Average Precision) measures overall detection quality across all classes.",
+              "grounded": true,
+              "why": "The context's detection metrics table defines mAP as \"Overall detection quality across all classes.\""
+            }
+          ],
+          "prompt_tokens": 1600,
+          "completion_tokens": 90,
+          "cached_tokens": 0,
+          "latency_ms": 1417.8092500078492,
+          "cost": 0.005350000000000001
+        }
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "n_context_chunks": 10,
+        "answer": "Reranking uses an LLM to reorder retrieved chunks by relevance to the question. The pipeline retrieves many chunks, ranks them, reorders them, and keeps the most relevant ones\u2014typically the top 10\u2014for the final answer.",
+        "steps": 2,
+        "terminated_by": "answer",
+        "searches": [
+          {
+            "step": 1,
+            "query": "Reranking reorders retrieved chunks by relevance before passing them to the language model",
+            "k": 5,
+            "sources": [
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md"
+            ],
+            "n_new_chunks": 5
+          }
+        ],
+        "n_searches": 1,
+        "prompt_tokens": 4806,
+        "completion_tokens": 124,
+        "cached_tokens": 1666,
+        "reasoning_tokens": 33,
+        "latency_ms": 2463.7344169896096,
+        "cost": 0.0040506,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Reranking uses an LLM to reorder retrieved chunks by relevance to the question.",
+              "grounded": true,
+              "why": "The context explicitly defines reranking as using an LLM to reorder retrieved chunks by relevance."
+            },
+            {
+              "claim": "The pipeline retrieves many chunks, ranks them, reorders them, and keeps the most relevant ones for the final answer.",
+              "grounded": true,
+              "why": "The context describes retrieving many chunks, asking an LLM to rank them, reordering them, and retaining the highest-ranked chunks for the final answer."
+            },
+            {
+              "claim": "The pipeline typically keeps the top 10 chunks for the final answer.",
+              "grounded": true,
+              "why": "The reranking process explicitly says to keep the top 10, and the advanced query pipeline returns reranked[:10]."
+            }
+          ],
+          "prompt_tokens": 2918,
+          "completion_tokens": 236,
+          "cached_tokens": 0,
+          "latency_ms": 2347.087708010804,
+          "cost": 0.010835000000000001
+        }
+      },
+      {
+        "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1644,
+        "completion_tokens": 24,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 753.4729589970084,
+        "cost": 0.001788,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+              "grounded": true,
+              "why": "The context describes Gradio as a Python library for creating web interfaces without frontend code and says it makes it easy to build user interfaces for machine learning applications."
+            }
+          ],
+          "prompt_tokens": 1537,
+          "completion_tokens": 127,
+          "cached_tokens": 1534,
+          "latency_ms": 2213.964875001693,
+          "cost": 0.002296
+        }
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Async IO is Python\u2019s lightweight approach to concurrency. It uses `async` and `await`, an event loop, and cooperative multitasking, allowing coroutines to yield control while waiting\u2014especially useful for I/O-bound tasks such as API calls.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1516,
+        "completion_tokens": 86,
+        "cached_tokens": 0,
+        "reasoning_tokens": 31,
+        "latency_ms": 1316.5171250002459,
+        "cost": 0.002032,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "Async IO is Python\u2019s lightweight approach to concurrency.",
+              "grounded": true,
+              "why": "The context describes Async IO as Python's lightweight alternative for concurrency and says it is extremely lightweight."
+            },
+            {
+              "claim": "Async IO uses `async` and `await`, an event loop, and cooperative multitasking.",
+              "grounded": true,
+              "why": "The context explicitly lists special Python keywords (`async` and `await`), an event loop, and cooperative multitasking as Async IO's approach."
+            },
+            {
+              "claim": "Async IO allows coroutines to yield control while waiting.",
+              "grounded": true,
+              "why": "The context states that cooperative multitasking means coroutines voluntarily yield control and notes that the event loop switches between coroutines when they are waiting."
+            },
+            {
+              "claim": "Async IO is especially useful for I/O-bound tasks such as API calls.",
+              "grounded": true,
+              "why": "The context says Async IO is perfect for I/O-bound operations like API calls."
+            }
+          ],
+          "prompt_tokens": 1452,
+          "completion_tokens": 248,
+          "cached_tokens": 0,
+          "latency_ms": 2409.7563749965047,
+          "cost": 0.007350000000000001
+        }
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "n_context_chunks": 8,
+        "answer": "Overfitting occurs when training loss decreases while validation loss increases, meaning the model performs well on training data but poorly on unseen data.",
+        "steps": 2,
+        "terminated_by": "answer",
+        "searches": [
+          {
+            "step": 1,
+            "query": "Overfitting is when a neural network learns the training data too well and performs poorly on unseen validation or test data",
+            "k": 5,
+            "sources": [
+              "day27-deep-learning-2.md",
+              "day22-finetuning.md",
+              "day22-finetuning.md",
+              "day23-oss-finetuning.md",
+              "day23-oss-finetuning.md"
+            ],
+            "n_new_chunks": 3
+          }
+        ],
+        "n_searches": 1,
+        "prompt_tokens": 4947,
+        "completion_tokens": 107,
+        "cached_tokens": 3626,
+        "reasoning_tokens": 29,
+        "latency_ms": 2498.713124979986,
+        "cost": 0.0023255999999999997,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Overfitting occurs when training loss decreases while validation loss increases.",
+              "grounded": true,
+              "why": "The context explicitly labels the pattern of decreasing training loss and increasing validation loss as overfitting."
+            },
+            {
+              "claim": "In this situation, the model performs well on training data but poorly on unseen data.",
+              "grounded": true,
+              "why": "The context explains that validation loss is calculated on held-out validation data and indicates generalization; it also describes overfitting as good training metrics with poor real-world/test performance."
+            }
+          ],
+          "prompt_tokens": 2419,
+          "completion_tokens": 174,
+          "cached_tokens": 0,
+          "latency_ms": 2504.8678330058465,
+          "cost": 0.0086575
+        }
+      },
+      {
+        "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Backpropagation is the process of updating a neural network\u2019s weights to minimize prediction error. It calculates gradients using the chain rule, then uses an optimizer to adjust the weights in the direction that reduces loss.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1721,
+        "completion_tokens": 45,
+        "cached_tokens": 0,
+        "reasoning_tokens": 0,
+        "latency_ms": 988.8948339939816,
+        "cost": 0.001991,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Backpropagation updates a neural network's weights to minimize prediction error.",
+              "grounded": true,
+              "why": "The context defines backward propagation as updating weights to minimize prediction error."
+            },
+            {
+              "claim": "Backpropagation calculates gradients using the chain rule.",
+              "grounded": true,
+              "why": "The context says gradients are computed using calculus, specifically the chain rule."
+            },
+            {
+              "claim": "An optimizer adjusts weights in the direction that reduces loss.",
+              "grounded": true,
+              "why": "The context states that an optimizer adjusts weights in the direction that reduces loss."
+            }
+          ],
+          "prompt_tokens": 1635,
+          "completion_tokens": 162,
+          "cached_tokens": 0,
+          "latency_ms": 1802.3276669991901,
+          "cost": 0.006517500000000001
+        }
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "n_context_chunks": 5,
+        "answer": "Non-Maximum Suppression (NMS) removes duplicate detections by keeping only the highest-confidence bounding box for each object.",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": [],
+        "n_searches": 0,
+        "prompt_tokens": 1720,
+        "completion_tokens": 64,
+        "cached_tokens": 0,
+        "reasoning_tokens": 33,
+        "latency_ms": 1189.6990419918438,
+        "cost": 0.002104,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Non-Maximum Suppression (NMS) removes duplicate detections by keeping only the highest-confidence bounding box for each object.",
+              "grounded": true,
+              "why": "The context states that NMS keeps only the highest-confidence box for each object and removes duplicate detections."
+            }
+          ],
+          "prompt_tokens": 1607,
+          "completion_tokens": 106,
+          "cached_tokens": 1604,
+          "latency_ms": 1451.454416004708,
+          "cost": 0.0019985000000000003
+        }
+      }
+    ],
+    "gen_model": "gpt-5.6-luna",
+    "price_per_million": {
+      "input": 1.0,
+      "cached_input": 0.1,
+      "output": 6.0
+    },
+    "temperature": "default(1)",
+    "total_prompt_tokens": 40591,
+    "total_completion_tokens": 994,
+    "total_reasoning_tokens": 202,
+    "total_cached_tokens": 5292,
+    "total_cost": 0.0417922,
+    "cost_per_query": 0.00208961,
+    "mean_latency_ms": 1775.6750625980203,
+    "max_latency_ms": 4336.71725000022,
+    "trace_url": "https://cloud.langfuse.com/project/cmrvxaxqt01kxad0jvhtb8dlm/traces/4f6da1a37a12161b48bafa4bcdfc624b",
+    "n_abstained": 0,
+    "abstention_rate": 0.0,
+    "max_steps_cap": 3,
+    "mean_steps": 1.1,
+    "max_steps_observed": 2,
+    "n_terminated_cap": 0,
+    "pct_terminated_cap": 0.0,
+    "n_searched": 2,
+    "total_searches": 2,
+    "queries": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is prompt caching?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is computer vision?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "steps": 2,
+        "terminated_by": "answer",
+        "searches": [
+          {
+            "step": 1,
+            "query": "Reranking reorders retrieved chunks by relevance before passing them to the language model",
+            "k": 5,
+            "sources": [
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md",
+              "day16-rag-evals.md"
+            ],
+            "n_new_chunks": 5
+          }
+        ]
+      },
+      {
+        "question": "What is Gradio used for?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "steps": 2,
+        "terminated_by": "answer",
+        "searches": [
+          {
+            "step": 1,
+            "query": "Overfitting is when a neural network learns the training data too well and performs poorly on unseen validation or test data",
+            "k": 5,
+            "sources": [
+              "day27-deep-learning-2.md",
+              "day22-finetuning.md",
+              "day22-finetuning.md",
+              "day23-oss-finetuning.md",
+              "day23-oss-finetuning.md"
+            ],
+            "n_new_chunks": 3
+          }
+        ]
+      },
+      {
+        "question": "What is backpropagation?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "steps": 1,
+        "terminated_by": "answer",
+        "searches": []
+      }
+    ],
+    "judge_model": "gpt-5.6-terra",
+    "judge_price_per_million": {
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15.0
+    },
+    "n_judged_scored": 20,
+    "n_zero_claim": 0,
+    "mean_faithfulness": 5.0,
+    "min_faithfulness": 5,
+    "claim_groundedness": 1.0,
+    "grounded_claims": 39,
+    "total_claims": 39,
+    "judge_cost": 0.11552325000000001,
+    "judge_mean_latency_ms": 2042.9227167507634,
+    "total_cost_with_judge": 0.15731545000000002
+  },
+  "T_shipped": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1005.9862500056624,
+          "prompt_tokens": 1394,
+          "completion_tokens": 45,
+          "cached_tokens": 0,
+          "reasoning_tokens": 30,
+          "cost": 0.0016640000000000001,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 647.0929579954827,
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.001463,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 696.6684999933932,
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.001352,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 669.2557920032414,
+          "prompt_tokens": 1406,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.00146,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 645.7249590021092,
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.00158,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 81,
+      "total_reasoning_tokens": 30,
+      "total_cached_tokens": 0,
+      "total_cost": 0.007519,
+      "cost_per_query": 0.0015038,
+      "mean_latency_ms": 732.9456917999778,
+      "max_latency_ms": 1005.9862500056624,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 990.1671249972424,
+          "prompt_tokens": 1394,
+          "completion_tokens": 39,
+          "cached_tokens": 1391,
+          "reasoning_tokens": 24,
+          "cost": 0.0003761,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 723.1113750021905,
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 1406,
+          "reasoning_tokens": 0,
+          "cost": 0.00019759999999999998,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 666.0682910005562,
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 1295,
+          "reasoning_tokens": 0,
+          "cost": 0.00018649999999999998,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1159.4571250025183,
+          "prompt_tokens": 1406,
+          "completion_tokens": 36,
+          "cached_tokens": 1403,
+          "reasoning_tokens": 21,
+          "cost": 0.0003593,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 745.6220000021858,
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 1523,
+          "reasoning_tokens": 0,
+          "cost": 0.0002093,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 102,
+      "total_reasoning_tokens": 45,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0013288,
+      "cost_per_query": 0.00026576,
+      "mean_latency_ms": 856.8851832009386,
+      "max_latency_ms": 1159.4571250025183,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "chat",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 905.0640000059502,
+          "prompt_tokens": 1394,
+          "completion_tokens": 27,
+          "cached_tokens": 1391,
+          "reasoning_tokens": 12,
+          "cost": 0.00030409999999999996,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 819.4590839993907,
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 1406,
+          "reasoning_tokens": 0,
+          "cost": 0.00019759999999999998,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 694.9122919904767,
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 1295,
+          "reasoning_tokens": 0,
+          "cost": 0.00018649999999999998,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 964.5476669975324,
+          "prompt_tokens": 1406,
+          "completion_tokens": 38,
+          "cached_tokens": 1403,
+          "reasoning_tokens": 23,
+          "cost": 0.00037129999999999997,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 689.9800410028547,
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 1523,
+          "reasoning_tokens": 0,
+          "cost": 0.0002093,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 92,
+      "total_reasoning_tokens": 35,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0012687999999999998,
+      "cost_per_query": 0.00025375999999999996,
+      "mean_latency_ms": 814.7926167992409,
+      "max_latency_ms": 964.5476669975324,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    }
+  ],
+  "T_control": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 986.9130000006407,
+          "prompt_tokens": 1394,
+          "completion_tokens": 28,
+          "cached_tokens": 0,
+          "reasoning_tokens": 16,
+          "cost": 0.001562,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 791.0964580078144,
+          "prompt_tokens": 1409,
+          "completion_tokens": 10,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.001469,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 887.939665990416,
+          "prompt_tokens": 1298,
+          "completion_tokens": 10,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.0013579999999999998,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 788.9184160012519,
+          "prompt_tokens": 1406,
+          "completion_tokens": 10,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.0014659999999999999,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 743.9072919951286,
+          "prompt_tokens": 1526,
+          "completion_tokens": 10,
+          "cached_tokens": 0,
+          "reasoning_tokens": 0,
+          "cost": 0.001586,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 68,
+      "total_reasoning_tokens": 16,
+      "total_cached_tokens": 0,
+      "total_cost": 0.007441,
+      "cost_per_query": 0.0014881999999999999,
+      "mean_latency_ms": 839.7549663990503,
+      "max_latency_ms": 986.9130000006407,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1090.753542011953,
+          "prompt_tokens": 1394,
+          "completion_tokens": 29,
+          "cached_tokens": 1391,
+          "reasoning_tokens": 17,
+          "cost": 0.00031610000000000004,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 807.8583750029793,
+          "prompt_tokens": 1409,
+          "completion_tokens": 10,
+          "cached_tokens": 1406,
+          "reasoning_tokens": 0,
+          "cost": 0.00020360000000000002,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1069.4760409969604,
+          "prompt_tokens": 1298,
+          "completion_tokens": 29,
+          "cached_tokens": 1295,
+          "reasoning_tokens": 17,
+          "cost": 0.0003065,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 795.6834170036018,
+          "prompt_tokens": 1406,
+          "completion_tokens": 10,
+          "cached_tokens": 1403,
+          "reasoning_tokens": 0,
+          "cost": 0.0002033,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 786.5894580027089,
+          "prompt_tokens": 1526,
+          "completion_tokens": 10,
+          "cached_tokens": 1523,
+          "reasoning_tokens": 0,
+          "cost": 0.00021530000000000003,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 88,
+      "total_reasoning_tokens": 34,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0012448000000000001,
+      "cost_per_query": 0.00024896,
+      "mean_latency_ms": 910.0721666036407,
+      "max_latency_ms": 1090.753542011953,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": false,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1124.5080420048907,
+          "prompt_tokens": 1394,
+          "completion_tokens": 29,
+          "cached_tokens": 1391,
+          "reasoning_tokens": 17,
+          "cost": 0.00031610000000000004,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 762.3385409970069,
+          "prompt_tokens": 1409,
+          "completion_tokens": 10,
+          "cached_tokens": 1406,
+          "reasoning_tokens": 0,
+          "cost": 0.00020360000000000002,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 840.5672499939101,
+          "prompt_tokens": 1298,
+          "completion_tokens": 10,
+          "cached_tokens": 1295,
+          "reasoning_tokens": 0,
+          "cost": 0.00019250000000000002,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 723.2852500019362,
+          "prompt_tokens": 1406,
+          "completion_tokens": 10,
+          "cached_tokens": 1403,
+          "reasoning_tokens": 0,
+          "cost": 0.0002033,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "latency_ms": 1698.319957999047,
+          "prompt_tokens": 1526,
+          "completion_tokens": 10,
+          "cached_tokens": 1523,
+          "reasoning_tokens": 0,
+          "cost": 0.00021530000000000003,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 69,
+      "total_reasoning_tokens": 17,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0011308000000000002,
+      "cost_per_query": 0.00022616000000000004,
+      "mean_latency_ms": 1029.8038081993582,
+      "max_latency_ms": 1698.319957999047,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    }
+  ],
+  "T_agent": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "n_context_chunks": 8,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the generated answer is supported by the retrieved context, calculated as the proportion of claims supported by the context",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4734,
+          "completion_tokens": 73,
+          "cached_tokens": 1716,
+          "reasoning_tokens": 15,
+          "latency_ms": 2323.1342509971,
+          "cost": 0.0036276,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 12,
+          "answer": "I don't have that information.",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring combines keyword relevance scores with vector similarity scores using reciprocal rank fusion or weighted score fusion in hybrid search.",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            },
+            {
+              "step": 2,
+              "query": "BM25 calculates keyword-based relevance from term frequency, inverse document frequency, and document length normalization; hybrid search combines BM25 and vector scores.",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day14-prompt-context.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 4
+            }
+          ],
+          "n_searches": 2,
+          "prompt_tokens": 9484,
+          "completion_tokens": 154,
+          "cached_tokens": 4848,
+          "reasoning_tokens": 47,
+          "latency_ms": 3714.298624006915,
+          "cost": 0.0060448,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "n_context_chunks": 10,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes resources, prompts, and tools to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP",
+              "k": 5,
+              "sources": [
+                "day12-llm-apis.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md"
+              ],
+              "n_new_chunks": 5
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4528,
+          "completion_tokens": 76,
+          "cached_tokens": 1610,
+          "reasoning_tokens": 13,
+          "latency_ms": 2091.0877080023056,
+          "cost": 0.003535,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 8,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest neighbour index under the hood and HNSW trades recall for speed",
+              "k": 5,
+              "sources": [
+                "day29-cv-2.md",
+                "day30-cv-3.md",
+                "day15-rag-langchain.md",
+                "day30-cv-3.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4769,
+          "completion_tokens": 72,
+          "cached_tokens": 1728,
+          "reasoning_tokens": 17,
+          "latency_ms": 2238.6657089955406,
+          "cost": 0.0036458,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "n_context_chunks": 7,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI cached prompt prefix remains valid expires cache duration TTL cached tokens",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day12-llm-apis.md",
+                "day16-rag-evals.md",
+                "day11-llm-intro.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 5054,
+          "completion_tokens": 60,
+          "cached_tokens": 1849,
+          "reasoning_tokens": 13,
+          "latency_ms": 2261.676833993988,
+          "cost": 0.0037499,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 28569,
+      "total_completion_tokens": 435,
+      "total_reasoning_tokens": 105,
+      "total_cached_tokens": 11751,
+      "total_cost": 0.0206031,
+      "cost_per_query": 0.00412062,
+      "mean_latency_ms": 2525.77262519917,
+      "max_latency_ms": 3714.298624006915,
+      "trace_url": "https://cloud.langfuse.com/project/cmrvxaxqt01kxad0jvhtb8dlm/traces/97742625d82f0079c2339f5342c9d698",
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.2,
+      "max_steps_observed": 3,
+      "n_terminated_cap": 1,
+      "pct_terminated_cap": 0.2,
+      "n_searched": 5,
+      "total_searches": 6,
+      "queries": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the generated answer is supported by the retrieved context, calculated as the proportion of claims supported by the context",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring combines keyword relevance scores with vector similarity scores using reciprocal rank fusion or weighted score fusion in hybrid search.",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            },
+            {
+              "step": 2,
+              "query": "BM25 calculates keyword-based relevance from term frequency, inverse document frequency, and document length normalization; hybrid search combines BM25 and vector scores.",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day14-prompt-context.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 4
+            }
+          ]
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes resources, prompts, and tools to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP",
+              "k": 5,
+              "sources": [
+                "day12-llm-apis.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md"
+              ],
+              "n_new_chunks": 5
+            }
+          ]
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest neighbour index under the hood and HNSW trades recall for speed",
+              "k": 5,
+              "sources": [
+                "day29-cv-2.md",
+                "day30-cv-3.md",
+                "day15-rag-langchain.md",
+                "day30-cv-3.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI cached prompt prefix remains valid expires cache duration TTL cached tokens",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day12-llm-apis.md",
+                "day16-rag-evals.md",
+                "day11-llm-intro.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ]
+        }
+      ],
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "n_context_chunks": 8,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the answer is supported by the retrieved context, calculated as the proportion of claims in the answer that are supported by the context.",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4762,
+          "completion_tokens": 95,
+          "cached_tokens": 3432,
+          "reasoning_tokens": 31,
+          "latency_ms": 2465.427000002819,
+          "cost": 0.0022432,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 6,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring formula and fusion of BM25 scores with vector similarity scores in hybrid search",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day14-prompt-context.md",
+                "day14-prompt-context.md",
+                "day14-prompt-context.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4823,
+          "completion_tokens": 65,
+          "cached_tokens": 1728,
+          "reasoning_tokens": 14,
+          "latency_ms": 1837.3736240027938,
+          "cost": 0.0036578,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "n_context_chunks": 17,
+          "answer": "I don't have that information.",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes resources, prompts, and tools to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP.",
+              "k": 5,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md",
+                "day12-llm-apis.md"
+              ],
+              "n_new_chunks": 5
+            },
+            {
+              "step": 2,
+              "query": "MCP server primitives resources tools prompts transport stdio SSE JSON-RPC",
+              "k": 10,
+              "sources": [
+                "day12-llm-apis.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day19.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day18-agents.md",
+                "day17.md",
+                "day21-langgraph.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 7
+            }
+          ],
+          "n_searches": 2,
+          "prompt_tokens": 9903,
+          "completion_tokens": 162,
+          "cached_tokens": 6061,
+          "reasoning_tokens": 59,
+          "latency_ms": 5065.316749998601,
+          "cost": 0.0054201,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 6,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest-neighbour index and HNSW trades recall for speed",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md",
+                "day23-oss-finetuning.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4822,
+          "completion_tokens": 69,
+          "cached_tokens": 3456,
+          "reasoning_tokens": 16,
+          "latency_ms": 1882.2581249987707,
+          "cost": 0.0021256,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "n_context_chunks": 7,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI prompt caching cached prefix expiration how long cache remains valid expires",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day13-multimodal.md",
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day24-finetuning-showdown.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 5123,
+          "completion_tokens": 64,
+          "cached_tokens": 3698,
+          "reasoning_tokens": 17,
+          "latency_ms": 2257.6724999962607,
+          "cost": 0.0021788,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 29433,
+      "total_completion_tokens": 455,
+      "total_reasoning_tokens": 137,
+      "total_cached_tokens": 18375,
+      "total_cost": 0.0156255,
+      "cost_per_query": 0.0031251,
+      "mean_latency_ms": 2701.609599799849,
+      "max_latency_ms": 5065.316749998601,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.2,
+      "max_steps_observed": 3,
+      "n_terminated_cap": 1,
+      "pct_terminated_cap": 0.2,
+      "n_searched": 5,
+      "total_searches": 6,
+      "queries": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the answer is supported by the retrieved context, calculated as the proportion of claims in the answer that are supported by the context.",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring formula and fusion of BM25 scores with vector similarity scores in hybrid search",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day14-prompt-context.md",
+                "day14-prompt-context.md",
+                "day14-prompt-context.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ]
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes resources, prompts, and tools to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP.",
+              "k": 5,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md",
+                "day12-llm-apis.md"
+              ],
+              "n_new_chunks": 5
+            },
+            {
+              "step": 2,
+              "query": "MCP server primitives resources tools prompts transport stdio SSE JSON-RPC",
+              "k": 10,
+              "sources": [
+                "day12-llm-apis.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day19.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day18-agents.md",
+                "day17.md",
+                "day21-langgraph.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 7
+            }
+          ]
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest-neighbour index and HNSW trades recall for speed",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md",
+                "day23-oss-finetuning.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ]
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI prompt caching cached prefix expiration how long cache remains valid expires",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day13-multimodal.md",
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day24-finetuning-showdown.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ]
+        }
+      ],
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "agent": true,
+      "api": "responses",
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "n_context_chunks": 8,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the generated answer is supported by the retrieved context, calculated as the proportion of claims supported by the context",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4736,
+          "completion_tokens": 90,
+          "cached_tokens": 3432,
+          "reasoning_tokens": 30,
+          "latency_ms": 2025.4770409956109,
+          "cost": 0.0021872000000000003,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 7,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring combines keyword relevance with vector similarity scores using reciprocal rank fusion or weighted score fusion in hybrid search",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day16-rag-evals.md",
+                "day14-prompt-context.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4899,
+          "completion_tokens": 102,
+          "cached_tokens": 3456,
+          "reasoning_tokens": 45,
+          "latency_ms": 2399.8958750016754,
+          "cost": 0.0024006,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "n_context_chunks": 16,
+          "answer": "I don't have that information.",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes tools resources and prompts to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP with SSE.",
+              "k": 5,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md"
+              ],
+              "n_new_chunks": 5
+            },
+            {
+              "step": 2,
+              "query": "MCP server primitives tools resources prompts transport JSON-RPC stdio Server-Sent Events",
+              "k": 10,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day18-agents.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day13-multimodal.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day18-agents.md"
+              ],
+              "n_new_chunks": 6
+            }
+          ],
+          "n_searches": 2,
+          "prompt_tokens": 9950,
+          "completion_tokens": 193,
+          "cached_tokens": 6060,
+          "reasoning_tokens": 87,
+          "latency_ms": 4640.200709007331,
+          "cost": 0.005654,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "n_context_chunks": 7,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest-neighbour index and HNSW trades recall for speed by adjusting search parameters",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md",
+                "day23-oss-finetuning.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 4814,
+          "completion_tokens": 70,
+          "cached_tokens": 3456,
+          "reasoning_tokens": 13,
+          "latency_ms": 2297.9781239992008,
+          "cost": 0.0021236,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "n_context_chunks": 6,
+          "answer": "I don't have that information.",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI cached prompt prefix remains valid for how long before it expires cache expiration",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day22-finetuning.md",
+                "day17.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ],
+          "n_searches": 1,
+          "prompt_tokens": 5126,
+          "completion_tokens": 67,
+          "cached_tokens": 3698,
+          "reasoning_tokens": 18,
+          "latency_ms": 3465.8993750053924,
+          "cost": 0.0021998,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 29525,
+      "total_completion_tokens": 522,
+      "total_reasoning_tokens": 193,
+      "total_cached_tokens": 20102,
+      "total_cost": 0.0145652,
+      "cost_per_query": 0.00291304,
+      "mean_latency_ms": 2965.890224801842,
+      "max_latency_ms": 4640.200709007331,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "max_steps_cap": 3,
+      "mean_steps": 2.2,
+      "max_steps_observed": 3,
+      "n_terminated_cap": 1,
+      "pct_terminated_cap": 0.2,
+      "n_searched": 5,
+      "total_searches": 6,
+      "queries": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Faithfulness measures whether the generated answer is supported by the retrieved context, calculated as the proportion of claims supported by the context",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md"
+              ],
+              "n_new_chunks": 3
+            }
+          ]
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "BM25 scoring combines keyword relevance with vector similarity scores using reciprocal rank fusion or weighted score fusion in hybrid search",
+              "k": 5,
+              "sources": [
+                "day15-rag-langchain.md",
+                "day15-rag-langchain.md",
+                "day16-rag-evals.md",
+                "day14-prompt-context.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ]
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "steps": 3,
+          "terminated_by": "cap",
+          "searches": [
+            {
+              "step": 1,
+              "query": "An MCP server exposes tools resources and prompts to clients, and the protocol uses JSON-RPC over a transport such as stdio or HTTP with SSE.",
+              "k": 5,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day20-deep-research.md"
+              ],
+              "n_new_chunks": 5
+            },
+            {
+              "step": 2,
+              "query": "MCP server primitives tools resources prompts transport JSON-RPC stdio Server-Sent Events",
+              "k": 10,
+              "sources": [
+                "day19.md",
+                "day12-llm-apis.md",
+                "day12-llm-apis.md",
+                "day18-agents.md",
+                "day19.md",
+                "day12-llm-apis.md",
+                "day13-multimodal.md",
+                "day22-finetuning.md",
+                "day22-finetuning.md",
+                "day18-agents.md"
+              ],
+              "n_new_chunks": 6
+            }
+          ]
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "Chroma uses HNSW approximate nearest-neighbour index and HNSW trades recall for speed by adjusting search parameters",
+              "k": 5,
+              "sources": [
+                "day16-rag-evals.md",
+                "day15-rag-langchain.md",
+                "day23-oss-finetuning.md",
+                "day16-rag-evals.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 2
+            }
+          ]
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "steps": 2,
+          "terminated_by": "answer",
+          "searches": [
+            {
+              "step": 1,
+              "query": "OpenAI cached prompt prefix remains valid for how long before it expires cache expiration",
+              "k": 5,
+              "sources": [
+                "day13-multimodal.md",
+                "day11-llm-intro.md",
+                "day22-finetuning.md",
+                "day17.md",
+                "day16-rag-evals.md"
+              ],
+              "n_new_chunks": 1
+            }
+          ]
+        }
+      ],
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    }
+  ]
+}

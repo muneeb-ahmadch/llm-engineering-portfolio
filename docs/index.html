@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Engineering Portfolio · Muneeb Ahmad</title>
+<meta name="description" content="Thirteen measured experiments on one RAG pipeline: retrieval evaluation, hallucination defense, prompt injection, MCP, and stateful agents. Every number produced by code in the repository.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">Applied LLM &amp; RAG engineering</p>
+  <h1>Thirteen experiments on one RAG pipeline</h1>
+  <p class="standfirst">Every figure on this site was produced by code in the repository, run against
+  the corpus in the repository, on the date printed beside it. Nothing is quoted from a lecture slide,
+  estimated, or rounded up. Where a result contradicted what I predicted, the prediction is still
+  committed next to the result.</p>
+  <p class="contact">
+    <strong>Muneeb Ahmad</strong>
+    <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">Repository</a>
+    <a href="https://github.com/muneeb-ahmadch">GitHub</a>
+    <a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a>
+  </p>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="n">13</span><span class="l">experiments</span></div>
+  <div class="stat"><span class="n">6,390</span><span class="l">lines of Python</span></div>
+  <div class="stat"><span class="n">15/15 → 0/15</span><span class="l">trap hallucinations</span></div>
+  <div class="stat"><span class="n">8/18 → 1/18</span><span class="l">injection obedience</span></div>
+  <div class="stat"><span class="n">$4.95</span><span class="l">total API spend</span></div>
+  <div class="stat"><span class="n">5 of 13</span><span class="l">disproved my own thesis</span></div>
+</div>
+
+<h2>What this is</h2>
+
+<p>I built one evaluation harness, <a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/rag_eval.py"><code>rag_eval.py</code></a>
+(2,187 lines, four commands), and then spent thirteen sessions trying to break the pipeline it measures.
+The interesting results are mostly the negative ones. The guardrail I trusted most turned out to endorse
+the attack that beat it; the obvious fix for that attack catches none of it; and the library that promises
+durable execution loses a paid API call on its default setting.</p>
+
+<div class="flow"><pre>corpus (21 markdown files, 712 KB)
+  → chunker         fixed 1000 / 50 overlap, or heading aware
+  → encoder         bge-small-en-v1.5, local, CPU, no API cost
+  → retrieval       cosine top-k over an in-memory index
+  → reranker        cross-encoder/ms-marco-MiniLM-L6-v2, pool 20
+  → context         per-request nonce delimiter around every chunk
+  → generator       gpt-5.6-luna, hardened system prompt
+  → agent loop      one search_corpus tool, MAX_STEPS 3, trigger gated
+  → judge           gpt-5.6-terra, segregated context
+  → validator       pure Python citation check, 19 unit tests
+  → tracing         Langfuse spans, abstained / needle_in_context scores</pre></div>
+
+<p class="note">Shipping configuration, unchanged since experiment 06 because nothing since has beaten it:
+<code>bge-small · chunk 1000 · fixed · top-5 · rerank pool=20 · hardened prompt</code>.</p>
+
+<h2>The experiments</h2>
+
+<div class="cards">
+
+<div class="card"><span class="num">01</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/01-chunking/">The evaluation harness</a></h3>
+  <p class="q">Chunk size or encoder: which lever matters?</p>
+  <p class="f">The encoder. <strong>bge-small over minilm bought +0.128 MRR</strong> (0.627 → 0.754) at zero
+  extra cost. Halving the chunk size hurt <em>both</em> encoders. At n=20 one question is worth 0.05 MRR,
+  so the encoder gain clears the noise floor and the 0.015 gaps do not.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/results/results.md">Sweep</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/rag_eval.py">Code</a></p>
+</div>
+
+<div class="card"><span class="num">04</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/04-answer-quality/">Reading the chunks by hand</a></h3>
+  <p class="q">Where does the keyword ruler disagree with a human?</p>
+  <p class="f">On the question I had already written off. Reading the retrieved text
+  <strong>overturned my own earlier verdict</strong> and reclassified the miss from a coverage
+  problem to a ranking problem, which is what pointed experiment 06 at a cross encoder.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/04-answer-quality/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/04-answer-quality/report.md">Chunks</a></p>
+</div>
+
+<div class="card"><span class="num">05</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/05-heading-chunker/">Heading aware chunking</a></h3>
+  <p class="q">Does splitting on headings rescue a known miss?</p>
+  <p class="f">No. The target chunk fell from full corpus <strong>rank #8 to #67</strong>. Cleaner chunks
+  helped it, and helped 66 competitors more. Aggregate MRR rose 0.013 while the question I was fixing
+  went backwards, which is the argument for per-question diffs.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/05-heading-chunker/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/05-heading-chunker/results.md">Results</a></p>
+</div>
+
+<div class="card"><span class="num">06</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/06-reranking/">Retrieve wide, then rerank</a></h3>
+  <p class="q">Can a cross encoder rescue the two misses?</p>
+  <p class="f">One of two. LSTM flipped to a hit at pool 20. Overfitting stayed a miss at
+  <strong>every pool size from 5 to 30</strong>, scoring −9.01, so being in the pool was necessary
+  and not sufficient. A scoring decision, not a recall problem.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/06-reranking/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/06-reranking/results.md">Results</a></p>
+</div>
+
+<div class="card"><span class="num">07</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/07-generation/">What an answer costs</a></h3>
+  <p class="q">Cost, latency, and what new failure mode did I buy?</p>
+  <p class="f"><strong>$0.002174 per query, 2.1 s mean latency</strong>, input 59% of the bill. A live
+  price check overruled my own memory, which had the model down as fiction. And a probe returned
+  "Paris, the capital of France" from context that never mentioned it.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/07-generation/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/07-generation/report.md">Report</a></p>
+</div>
+
+<div class="card"><span class="num">08</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/08-rag-vs-finetune/">RAG, fine-tune, or prompt</a></h3>
+  <p class="q">Which tool fits which problem, with a number?</p>
+  <p class="f">Four scenarios sorted on knowledge versus behaviour, with the break-even written out:
+  <strong>~$72.47/day saved</strong> means a small-model fine-tune pays back in days. Stability lets a
+  one-time cost amortise; churn kills it.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/08-rag-vs-finetune/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/08-rag-vs-finetune/decision.md">Decision doc</a></p>
+</div>
+
+<div class="card"><span class="num">09</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/09-answer-defense/">Closing the hallucination gap</a></h3>
+  <p class="q">Will it answer questions the corpus cannot support?</p>
+  <p class="f">The prompt I had been shipping hallucinated on <strong>15 of 15</strong> trap runs. Not a
+  flicker, a flatline. A better prompt alone took it to <strong>0 of 15</strong>, faithfulness 3.90 → 4.80,
+  groundedness 66.9% → 95.6%. Plus a CI gate that exits non-zero.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/09-answer-defense/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/09-answer-defense/report.md">Report</a><a href="reference/answer-defense.html">Reference card</a></p>
+</div>
+
+<div class="card"><span class="num">10</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/10-abstention-trace/">Abstention in production telemetry</a></h3>
+  <p class="q">There is no test set in production. How would I know?</p>
+  <p class="f">A boolean score on every span. Traps <strong>5/5</strong>, golden <strong>1/20</strong>.
+  The one false abstention traced to <strong>one chunk in 734</strong>, so a chunking defect rather than
+  a timid model. Band set at 0 &lt; rate ≤ 0.10, because never abstaining is the failure of experiment 09.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/10-abstention-trace/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/10-abstention-trace/report.md">Report</a><a href="reference/tracing-and-scores.html">Reference card</a></p>
+</div>
+
+<div class="card"><span class="num">11</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/11-agent-loop/">Is a search loop worth it?</a></h3>
+  <p class="q">Does letting the model search again fix anything?</p>
+  <p class="f"><strong>Four of five preregistered hypotheses were wrong.</strong> The loop closed a defect
+  that had survived five experiments, 3/3 at 5/5 faithfulness. It fired on 2 questions in 20, zero false
+  fires, <strong>1.32× cost</strong>. Ship behind a trigger, not by default.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/results.md">Results</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/hypothesis.md">Preregistration</a></p>
+</div>
+
+<div class="card"><span class="num">12</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/12-injection/">The attack that scores grounded</a></h3>
+  <p class="q">What if someone can write into my corpus?</p>
+  <p class="f"><strong>1,820 bytes, 0.255% of the corpus, obeyed 8 of 18 runs.</strong> My own faithfulness
+  judge scored the most successful attack <strong>5/5, fully grounded, 3/3</strong>. A nonce delimiter cut
+  obedience to 1/18 at zero quality cost and 1.68× money. The injection that issues no order still walks through.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/results.md">Results</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/threat-model.md">Threat model</a><a href="reference/prompt-injection-and-guardrails.html">Reference card</a></p>
+</div>
+
+<div class="card"><span class="num">13</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/13-citation-validation/">The stage that cannot be argued with</a></h3>
+  <p class="q">Does forcing citations stop the attack?</p>
+  <p class="f">No. It catches <strong>none of the eight attacks that landed</strong>, because the attacker's
+  method is to make the citation true. Segregating the judge did work: correct answers wrongly punished went
+  <strong>4 to 0</strong>. And my own validator blocked two correct answers, from a prose contract with two readings.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/results.md">Results</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/decidability.md">Decidability</a></p>
+</div>
+
+<div class="card"><span class="num">14</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/14-mcp/">Serving the retriever over MCP</a></h3>
+  <p class="q">Can I expose my index as an MCP server?</p>
+  <p class="f">Built to the 2026-07-28 spec and verified three ways, including <strong>Claude Code
+  discovering and calling it unprompted</strong>. A poisoned tool description got 0/3 compliance but
+  <strong>1/3 contamination</strong>: the model reasoned about a tool it never called.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/results.md">Results</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/server.py">Server</a><a href="reference/mcp.html">Reference card</a></p>
+</div>
+
+<div class="card"><span class="num">15</span>
+  <h3><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/15-langgraph/">Kill it, then resume it</a></h3>
+  <p class="q">Does LangGraph durability survive a crash?</p>
+  <p class="f">Only on a flag that is not the default. With <code>durability="async"</code>, a
+  <code>kill -9</code> <strong>lost a model call I had already paid for</strong>. <code>sync</code> fixes it.
+  Verdict: keep my own loop, and the condition that would change that is written down.</p>
+  <p class="links"><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/15-langgraph/README.md">README</a><a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/15-langgraph/results.md">Results</a><a href="reference/stateful-graphs.html">Reference card</a></p>
+</div>
+
+</div>
+
+<h2>Reference cards</h2>
+<p>Thirteen pages compressing each topic to what is worth remembering. Written to be reread
+the night before an interview.</p>
+<ul class="reflist">
+  <li><a href="reference/chunking.html">Chunking</a></li>
+  <li><a href="reference/embeddings-and-retrieval.html">Embeddings &amp; retrieval</a></li>
+  <li><a href="reference/rag-metrics.html">RAG metrics</a></li>
+  <li><a href="reference/reranking.html">Reranking</a></li>
+  <li><a href="reference/pipeline-and-cost.html">Pipeline &amp; cost</a></li>
+  <li><a href="reference/rag-vs-finetune-vs-prompt.html">RAG vs fine-tune vs prompt</a></li>
+  <li><a href="reference/answer-defense.html">Answer defense</a></li>
+  <li><a href="reference/tracing-and-scores.html">Tracing &amp; scores</a></li>
+  <li><a href="reference/agents-vs-workflows.html">Agents vs workflows</a></li>
+  <li><a href="reference/prompt-injection-and-guardrails.html">Injection &amp; guardrails</a></li>
+  <li><a href="reference/orchestration-and-validation.html">Orchestration &amp; validation</a></li>
+  <li><a href="reference/mcp.html">MCP</a></li>
+  <li><a href="reference/stateful-graphs.html">Stateful graphs</a></li>
+</ul>
+
+<h2>Scope, stated plainly</h2>
+<p>This is applied LLM and RAG engineering, built on four years of Python, FastAPI, Docker and CI/CD
+backend work. It is not deep learning research, reinforcement learning, or MLOps at scale, and nothing
+here claims otherwise. One piece is deliberately unfinished and labelled as such: task 2 of experiment 04,
+the false positive hunt, was left blank rather than filled in after the fact.</p>
+
+<p class="footer">Muneeb Ahmad ·
+<a href="https://github.com/muneeb-ahmadch/llm-engineering-portfolio">github.com/muneeb-ahmadch/llm-engineering-portfolio</a> ·
+<a href="mailto:muneebahmad.ch1@gmail.com">muneebahmad.ch1@gmail.com</a></p>
+
+</div>
+</body>
+</html>

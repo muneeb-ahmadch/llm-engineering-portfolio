@@ -1,0 +1,84 @@
+
+Q · the overfitting question alone, x3 per arm (+judge)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6353.75it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5961.85it/s]
+    [shipped] Q run 1/3: abstained=1 faith=5/5 (0/0 claims) 1717ms $0.001870
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 15570.10it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5629.36it/s]
+    [shipped] Q run 2/3: abstained=1 faith=5/5 (0/0 claims) 1360ms $0.000548
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 12215.94it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 10847.34it/s]
+    [shipped] Q run 3/3: abstained=1 faith=5/5 (0/0 claims) 1026ms $0.000206
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11499.48it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 12707.44it/s]
+    [control] Q run 1/3: abstained=1 faith=5/5 (0/0 claims) 931ms $0.001552
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 12810.47it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 10509.53it/s]
+    [control] Q run 2/3: abstained=1 faith=5/5 (0/0 claims) 945ms $0.000212
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 11342.12it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5883.95it/s]
+    [control] Q run 3/3: abstained=1 faith=5/5 (0/0 claims) 1278ms $0.000476
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6518.79it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 9641.02it/s]
+    [agent] Q run 1/3: abstained=0 faith=5/5 (1/1 claims) 3536ms $0.004329 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting occurs when a neural network memorizes the training data and performs poorly on new unseen data.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 12524.44it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6145.37it/s]
+    [agent] Q run 2/3: abstained=0 faith=5/5 (3/3 claims) 4932ms $0.002640 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting is when a neural network learns the training data too well, including noise, and performs poorly on new unseen data.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6609.13it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 7076.43it/s]
+    [agent] Q run 3/3: abstained=0 faith=5/5 (2/2 claims) 3562ms $0.003312 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting is when a neural network learns the training data too well and performs poorly on unseen validation or test data.
+
+G · the golden set (20 questions), once per arm (+judge)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6886.06it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5948.64it/s]
+    [shipped] golden: faith 4.95/5 · abstention 5.0% · $0.001600/q · 1146ms
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6525.62it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 7058.85it/s]
+    [control] golden: faith 4.84/5 · abstention 0.0% · $0.001588/q · 1455ms
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6127.57it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6152.58it/s]
+    [agent] golden: faith 5.00/5 · abstention 0.0% · $0.002090/q · 1776ms · steps 1.10 (max 2, cap 0%)
+        trace: https://cloud.langfuse.com/project/cmrvxaxqt01kxad0jvhtb8dlm/traces/4f6da1a37a12161b48bafa4bcdfc624b
+
+T · the trap set (5 questions), x3 per arm — the hypothesis test
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6007.56it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5318.54it/s]
+Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+    [shipped] trap run 1/3: 0/5 hallucinations $0.007519
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6106.05it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6304.43it/s]
+Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+    [shipped] trap run 2/3: 0/5 hallucinations $0.001329
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6669.76it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6686.53it/s]
+Error code: 400 - {'error': {'message': "Unsupported value: 'temperature' does not support 0 with this model. Only the default (1) value is supported.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': 'unsupported_value'}}
+    [shipped] trap run 3/3: 0/5 hallucinations $0.001269
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 7025.87it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6574.34it/s]
+Error code: 400 - {'error': {'message': "Unsupported parameter: 'temperature' is not supported with this model.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': None}}
+    [control] trap run 1/3: 0/5 hallucinations $0.007441
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5619.40it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6874.83it/s]
+Error code: 400 - {'error': {'message': "Unsupported parameter: 'temperature' is not supported with this model.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': None}}
+    [control] trap run 2/3: 0/5 hallucinations $0.001245
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5695.63it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6476.31it/s]
+Error code: 400 - {'error': {'message': "Unsupported parameter: 'temperature' is not supported with this model.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': None}}
+    [control] trap run 3/3: 0/5 hallucinations $0.001131
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6834.69it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6871.83it/s]
+    [agent] trap run 1/3: 0/5 hallucinations $0.020603 · steps 2.20 (max 3, cap 20%)
+        trace: https://cloud.langfuse.com/project/cmrvxaxqt01kxad0jvhtb8dlm/traces/97742625d82f0079c2339f5342c9d698
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5087.69it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 4480.64it/s]
+Error code: 400 - {'error': {'message': "Unsupported parameter: 'temperature' is not supported with this model.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': None}}
+    [agent] trap run 2/3: 0/5 hallucinations $0.015626 · steps 2.20 (max 3, cap 20%)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5973.08it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6410.32it/s]
+Error code: 400 - {'error': {'message': "Unsupported parameter: 'temperature' is not supported with this model.", 'type': 'invalid_request_error', 'param': 'temperature', 'code': None}}
+    [agent] trap run 3/3: 0/5 hallucinations $0.014565 · steps 2.20 (max 3, cap 20%)
+
+Wrote /Users/apple/Documents/AI Bootcamp/The Great Learning/practice/lesson-011-agent-loop/results/results-agent.json  (654.6s, $0.5807 of API spend)

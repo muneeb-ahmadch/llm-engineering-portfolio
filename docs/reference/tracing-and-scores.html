@@ -1,0 +1,97 @@
+<title>Tracing answer quality: scores, not tags</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG · observability</p>
+<h1>Tracing answer quality</h1>
+<p class="standfirst">A trace shows you <em>what happened</em> on one request. A <strong>score</strong> is what makes <em>whether it was any good</em> queryable, aggregatable, and alertable across all of them. Compressed from Lesson 10. Made to be reread the night before.</p>
+
+<h2>The one distinction that matters</h2>
+
+<p>Langfuse gives a trace three places to hang information. They are not interchangeable, pick by <em>what you need to ask later</em>, not by what's easiest to write.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Primitive</th><th>What it's for</th><th>Aggregates into a rate?</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Score</strong></td><td>A graded verdict on the run: <code>abstained</code>, <code>faithfulness</code>, a thumbs-up. Numeric / boolean / categorical / text.</td><td class="tag-good">Yes: this is the whole point. Mean over a window = a monitorable rate.</td></tr>
+    <tr><td><strong>Tag</strong></td><td>A coarse label to <em>filter</em> a trace by: <code>prod</code>, <code>rag-eval</code>, <code>model:gpt-5.4-mini</code>.</td><td class="tag-bad">No: filters, doesn't average. Trace-level only.</td></tr>
+    <tr><td><strong>Metadata</strong></td><td>Free-form context for one trace: config, request id, corpus version.</td><td class="tag-bad">No: searchable per-trace, not summable.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">Why abstention is a score</p>
+  <p style="margin:0">The thing you need from abstention is a <strong>rate</strong>, the band from <a href="answer-defense.html">answer-defense</a>: too low means the model is answering things it shouldn't; too high means retrieval is starving it. A rate is a mean over many runs. Among the three primitives, <strong>only a score is averaged</strong>. A tag would tell you <em>which</em> traces abstained but never <em>what fraction</em>; metadata wouldn't even filter cleanly. So the choice isn't stylistic, the question you must answer (&ldquo;is my abstention rate drifting?&rdquo;) has exactly one primitive that answers it.</p>
+</div>
+
+<h2>The SDK calls (Python v3)</h2>
+
+<p>The OpenTelemetry-based SDK (<code>get_client()</code>, <code>start_as_current_observation</code>) attaches a score at whichever level you name. Verified against the <a href="https://langfuse.com/docs/scores/custom">Langfuse custom-scores docs</a>.</p>
+
+<pre><code># On an observation you already hold (a span):
+span.score(name="abstained", value=1, data_type="BOOLEAN", comment="...")
+span.score_trace(name="abstained", value=1, data_type="BOOLEAN")
+
+# On whatever is currently active, no handle needed:
+langfuse.score_current_span(name="faithfulness", value=4, data_type="NUMERIC")
+langfuse.score_current_trace(name="abstained",   value=0, data_type="BOOLEAN")
+
+# After the fact, by id (e.g. a human label arriving later):
+langfuse.create_score(name="abstained", value=1, data_type="BOOLEAN",
+                      trace_id=tid, observation_id=oid, comment="...")
+</code></pre>
+
+<p><code>data_type</code> is one of <strong>NUMERIC</strong> (float), <strong>BOOLEAN</strong> (0/1), <strong>CATEGORICAL</strong> (string), <strong>TEXT</strong> (1&ndash;500 chars). Scores are batched. Call <code>langfuse.flush()</code> before the process exits or they never leave.</p>
+
+<h2>Where to attach it: batch vs production</h2>
+
+<p>Same verdict, different level, and the difference <em>is</em> the batch-vs-live distinction:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Setting</th><th>One trace is…</th><th>Attach the score to…</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Eval harness</strong> (<code>--generate --trace</code>)</td><td>the whole run; each question is a child span</td><td>the <code>answer-question</code> <strong>span</strong> → per-question grain: <code>qspan.score(...)</code></td></tr>
+    <tr><td><strong>Live app</strong></td><td>a single user request</td><td>the <strong>trace</strong> → one verdict per request: <code>score_current_trace(...)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>What the score then buys you</h2>
+
+<ul>
+  <li><strong>The work queue (Control #6).</strong> Filter the trace list to <code>abstained = 1</code> and you have the exact real-user questions your corpus couldn't answer. Each one is a doc to add or a chunk to fix, the gap closes over time instead of sitting constant.</li>
+  <li><strong>The band, monitored.</strong> The mean of <code>abstained</code> over a window is the abstention rate, charted over time. Set an alert on the band edges.</li>
+  <li><strong>Prod regressions CI can't see.</strong> Your CI gate only tests the fixed golden + trap set. A model swap that makes the system start answering things it shouldn't shows up as the live abstention rate <em>dropping</em>, on traffic you never wrote a test for.</li>
+</ul>
+
+<h2>Which verdicts are worth scoring</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Score</th><th>Cost to emit</th><th>Type</th></tr></thead>
+  <tbody>
+    <tr><td><code>abstained</code></td><td>Free: a sentinel string match</td><td>BOOLEAN</td></tr>
+    <tr><td><code>faithfulness</code></td><td>One judge call per answer</td><td>NUMERIC</td></tr>
+    <tr><td><code>retrieval_confidence</code></td><td>Free: top chunk's similarity</td><td>NUMERIC</td></tr>
+  </tbody>
+</table>
+</div>
+<p>Same mechanism for all three: they differ only in what fills <code>value</code>. Start with the free one.</p>
+
+<h2>Defend it in one line</h2>
+<blockquote>&ldquo;I don't just trace latency and cost, I score answer quality onto the trace. Every request carries an <code>abstained</code> score, so in production I filter to the ones that declined, that's my queue of corpus gaps, and I watch the abstention rate as a band: a sudden drop means the model started answering things it shouldn't, on real traffic my CI golden set never covers. Faithfulness rides the same trace as a numeric score. Scores, not tags, because a tag can't average into a rate.&rdquo;</blockquote>
+
+<div class="footer">
+  Lesson 10: Catch abstention in the trace
+  <a href="answer-defense.html">Reference: Closing the answer gap</a>
+  <a href="pipeline-and-cost.html">Reference: Pipeline &amp; cost</a>
+  Roadmap
+</div>
+
+</div>

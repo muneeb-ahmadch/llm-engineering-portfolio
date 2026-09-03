@@ -1,0 +1,140 @@
+<title>Orchestration &amp; the deterministic check</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · Agents · Orchestration</p>
+<h1>Orchestration &amp; the deterministic check</h1>
+<p class="standfirst">A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check, and what a check is actually able to decide. Compressed from Lesson 13. Made to be reread the night before an interview.</p>
+
+<h2>The stage map: do this before you defend anything</h2>
+
+<p>One row per stage. The two columns that matter are the last two, and most people never fill them in.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Stage</th><th>Code or model</th><th>Reads untrusted text?</th><th>An attacker can make it&hellip;</th></tr></thead>
+  <tbody>
+    <tr><td>retrieve / rerank</td><td>code + local model</td><td>yes</td><td class="tag-good">&hellip;return their chunk. Not <em>behave</em> differently: similarity has no instructions to hijack.</td></tr>
+    <tr><td>build context</td><td>code</td><td>yes (passes it through)</td><td class="tag-good">&hellip;nothing, unless the format itself is forgeable, hence a per-request nonce.</td></tr>
+    <tr><td>generate</td><td class="tag-bad">model</td><td>yes</td><td class="tag-bad">&hellip;answer their way, skip a tool, refuse a question it could answer.</td></tr>
+    <tr><td>judge / guard</td><td class="tag-bad">model</td><td>yes</td><td class="tag-bad">&hellip;pass an attack, or <em>punish the answers that resisted it.</em></td></tr>
+    <tr><td>scores / gate</td><td>code</td><td>no (reads verdicts)</td><td class="tag-good">&hellip;nothing directly, but it inherits whatever the stage above it decided.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The one durable idea</p>
+  <p style="margin:0"><strong>Every guard that is a model can be argued out of its verdict.</strong> Stacking a second model on top moves the target, it does not remove it, and now there are two. The only stage an attacker cannot argue with is <strong>the stage that isn&rsquo;t a model.</strong> Orchestration&rsquo;s real question is not &ldquo;how many agents?&rdquo; but <em>which stages have to be models at all.</em></p>
+</div>
+
+<h2>Code stage vs model stage</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Deterministic (code)</th><th>Probabilistic (a model)</th></tr></thead>
+  <tbody>
+    <tr><td>Same input twice</td><td>Same output, always</td><td>Different wording; in a loop, a different <em>path</em></td></tr>
+    <tr><td>Attack surface</td><td>Its inputs only</td><td>Its inputs <em>and</em> its instructions: the text it reads is text it can obey</td></tr>
+    <tr><td>Assurance available</td><td class="tag-good">Proof. Read the branch.</td><td class="tag-bad">Measurement only. &ldquo;A measured absence of the failure, not proof of its impossibility.&rdquo;</td></tr>
+    <tr><td>Cost</td><td class="tag-good"><code>$0</code>, microseconds</td><td>Tokens + latency; an LLM guard often costs more than what it guards</td></tr>
+    <tr><td>Good at</td><td>Relations, formats, set membership, counts, thresholds</td><td>Meaning, paraphrase, judgement, open-ended text</td></tr>
+  </tbody>
+</table>
+</div>
+
+<blockquote><p>&ldquo;Orchestrating via code makes tasks more deterministic and predictable, in terms of speed, cost and performance.&rdquo;, <a href="https://openai.github.io/openai-agents-python/multi_agent/">OpenAI Agents SDK</a></p></blockquote>
+
+<h2>Structured output: what it does and doesn&rsquo;t buy</h2>
+
+<p>Prose gives code nothing to check. A schema gives it fields. That is the whole reason structured output is a <em>security</em> control (OWASP LLM01 #2) and not just a parsing convenience.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Endpoint</th><th>Key</th></tr></thead>
+  <tbody>
+    <tr><td>Chat Completions</td><td><code>chat.completions.create</code></td><td><code>response_format: {type:"json_schema", json_schema:{name, strict:true, schema}}</code></td></tr>
+    <tr><td>Responses</td><td><code>responses.create</code></td><td><code>text: {format: {type:"json_schema", strict:true, schema}}</code></td></tr>
+    <tr><td>Agents SDK</td><td><code>Agent(&hellip;)</code></td><td><code>output_type=PydanticModel</code>, &ldquo;tells the model to use structured outputs instead of regular plain text&rdquo;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Schema rules that bite: every field must be in <code>required</code>, every object needs <code>additionalProperties: false</code>, and <code>allOf</code> / <code>not</code> / <code>if&ndash;then&ndash;else</code> are unsupported.</p>
+
+<div class="panel">
+  <p class="panel-label">The limit, verbatim</p>
+  <p style="margin:0 0 0.6rem">&ldquo;The model will always generate responses that adhere to your supplied JSON Schema&rdquo; &mdash; <em>but</em> &ldquo;<strong>Structured Outputs can still contain mistakes</strong>&rdquo; and &ldquo;the model will always try to adhere to the provided schema, which can result in hallucinations if the input is completely unrelated to the schema&rdquo; (<a href="https://developers.openai.com/api/docs/guides/structured-outputs">OpenAI</a>).</p>
+  <p style="margin:0"><strong>The shape is guaranteed; the values are not.</strong> So the check must decide a property of <em>relations you control</em>, never a property of the content the model wrote.</p>
+</div>
+
+<h2>The decidability ladder: pick the property before writing the check</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Check</th><th>Decidable</th><th>Catches</th><th>Blind to</th></tr></thead>
+  <tbody>
+    <tr><td>Every claim carries a citation id</td><td class="tag-good">production</td><td>Uncited assertions: parametric rescue</td><td>Anything the model will cite</td></tr>
+    <tr><td>The id is in <em>this request&rsquo;s</em> retrieved set</td><td class="tag-good">production</td><td>Invented or smuggled ids</td><td>A truthful citation of a poisoned chunk</td></tr>
+    <tr><td>The cited chunk supports the claim</td><td>heuristic only</td><td>Citation drift</td><td>Paraphrase; has its own false-positive rate</td></tr>
+    <tr><td>The cited chunk is not poisoned</td><td class="tag-bad">CI only</td><td>Every planted injection, deterministically</td><td>Production: you don&rsquo;t have the poison list at runtime</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The trap to avoid saying out loud:</strong> &ldquo;citation validation defends against prompt injection.&rdquo; It does not. In an adversarial suite the poison list makes it a perfect oracle, because <em>you wrote the poison.</em> In production, if you knew which chunk was poisoned you would have deleted it. What rows 1&ndash;2 genuinely buy in production is a control against <em>uncited and invented</em> content. Injection is defended upstream, segregation, and above that corpus provenance.</p>
+
+<h2>Guardrails as tripwires: where a check may sit</h2>
+
+<pre><code>@input_guardrail    # runs only if this is the FIRST agent
+@output_guardrail   # runs only if this is the LAST  agent
+
+def guard(...) -&gt; GuardrailFunctionOutput:
+    return GuardrailFunctionOutput(output_info=..., tripwire_triggered=True)
+    # → raises InputGuardrailTripwireTriggered / OutputGuardrailTripwireTriggered
+</code></pre>
+
+<ul>
+  <li>A tripwire <strong>halts the run</strong> and shows on the trace. It is a boolean, not a score, the same score-vs-tag distinction from L10, one level up.</li>
+  <li>Guardrails sit at <strong>boundaries, not mid-loop</strong>. Segregate on entry, validate on exit. There is no legal place to stand between a tool result and the model reading it, which is exactly where a poisoned chunk enters.</li>
+  <li>Input guardrails run <em>in parallel</em> with the agent by default (latency); <code>run_in_parallel=False</code> blocks first and spends no tokens when the tripwire fires. Cost versus safety, as a flag.</li>
+</ul>
+
+<h2>Orchestration patterns: the vocabulary</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Pattern</th><th>Shape</th><th>Reach for it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Single agent + tools</strong></td><td>One loop, N tools</td><td>The default. Add tools before you add agents.</td></tr>
+    <tr><td><strong>Agents as tools</strong></td><td>Specialist called like a function; control returns</td><td>&ldquo;a specialist should help with a bounded subtask but should not take over the user-facing conversation&rdquo;</td></tr>
+    <tr><td><strong>Handoff</strong></td><td>Control transfers and stays</td><td>&ldquo;routing itself is part of the workflow and you want the chosen specialist to own the next part&rdquo;</td></tr>
+    <tr><td><strong>Chaining</strong></td><td>Output of one is input to the next</td><td>Decomposable work: retrieve &rarr; generate &rarr; judge</td></tr>
+    <tr><td><strong>Evaluator loop</strong></td><td>Generate &rarr; grade &rarr; regenerate until it passes</td><td>Quality has a checkable criterion and a retry is cheaper than a wrong answer</td></tr>
+    <tr><td><strong>Parallel</strong></td><td><code>asyncio.gather</code> over independent stages</td><td>Speed, when nothing downstream depends on the others</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two things worth saying in an interview: a <strong>judge is an evaluator that was never put in a loop</strong>, closing that arrow is the evaluator-optimizer pattern, and it multiplies a bill that is often already larger than generation. And <strong>a second model call is not a second agent</strong>: only the loop-back arrow changes the category.</p>
+
+<h2>The honest interview answer</h2>
+
+<blockquote>
+<p>&ldquo;My grader was an LLM reading the same untrusted corpus as the generator, so a poisoned chunk could make it punish the answers that resisted the attack, I have the transcript. Adding a second grader would have had the same exposure, so I moved the check out of the model: structured output with per-claim citations, and a Python validator that every cited id is one I actually put in the context. It decides <em>uncited</em> and <em>invented</em>, deterministically and for free. It does not decide <em>poisoned</em>, that needs the poison list, which only exists in my test suite.&rdquo;</p>
+</blockquote>
+
+<p>The weak version stops at &ldquo;we validate the output.&rdquo; The strong one names what the check can decide <em>and what it can&rsquo;t</em>, which is the same move as reporting the regression next to the win.</p>
+
+<div class="footer">
+  Lesson 13
+  <a href="prompt-injection-and-guardrails.html">Injection &amp; guardrails</a>
+  <a href="agents-vs-workflows.html">Agent or workflow?</a>
+  <a href="answer-defense.html">Closing the answer gap</a>
+  <a href="tracing-and-scores.html">Tracing answer quality</a>
+</div>
+
+</div>

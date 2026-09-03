@@ -1,0 +1,122 @@
+<title>Agent or workflow?, the decision, the loop, the guardrails</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · Agents</p>
+<h1>Agent or workflow?</h1>
+<p class="standfirst">The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once. Compressed from Lesson 11. Made to be reread the night before.</p>
+
+<h2>The split</h2>
+
+<p>Both are &ldquo;agentic systems.&rdquo; The distinction that matters is <strong>who chooses the next step</strong>, and it is a spectrum, not a binary. Definitions verbatim from <a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, Building Effective Agents</a>.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Definition</th><th>Next step chosen by</th><th>Step count</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Workflow</strong></td><td>LLMs and tools orchestrated through <strong>predefined code paths</strong>.</td><td>You, at write time</td><td class="tag-good">Known before the request</td></tr>
+    <tr><td><strong>Agent</strong></td><td>LLMs <strong>dynamically direct their own processes</strong> and tool usage, maintaining control over how they accomplish tasks.</td><td>The model, at run time</td><td class="tag-bad">Unknown until it finishes</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The decision rule</p>
+  <p style="margin:0 0 0.6rem"><strong>Can you enumerate the steps before the request arrives?</strong> If yes → workflow. Write the path down; it is cheaper, faster, testable, and traces to a fixed shape.</p>
+  <p style="margin:0"><strong>Autonomy is a price you pay for a path you couldn't write down in advance.</strong> Anthropic's own framing: add complexity <em>&ldquo;only when it demonstrably improves outcomes&rdquo;</em>; agentic systems <em>&ldquo;often trade latency and cost for better task performance.&rdquo;</em></p>
+</div>
+
+<h2>What does <em>not</em> make it an agent</h2>
+
+<ul>
+  <li><strong>Tool use.</strong> A retriever is a tool. A fixed retrieve-then-answer chain is a workflow.</li>
+  <li><strong>Multiple LLM calls.</strong> A generator plus a nightly faithfulness judge is two calls and zero agency.</li>
+  <li><strong>The model deciding <em>something</em>.</strong> A router picks a branch: but you enumerated the branches. Autonomy without an open path is still a workflow.</li>
+</ul>
+
+<p>The one thing that does: <strong>a loop-back arrow where the next action depends on what the last one returned.</strong></p>
+
+<h2>The five workflow patterns: reach for these first</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Pattern</th><th>Shape</th><th>Reach for it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Prompt chaining</strong></td><td>step → step → step, fixed order</td><td>The task decomposes into known stages; each stage's output feeds the next.</td></tr>
+    <tr><td><strong>Routing</strong></td><td>classify → one of N specialised prompts</td><td>Inputs fall into distinct kinds that want different handling. Cheap and very common.</td></tr>
+    <tr><td><strong>Parallelization</strong></td><td>fan out → aggregate</td><td>Independent subtasks, or several votes on the same one. (A nightly judge pass over 200 answers is this.)</td></tr>
+    <tr><td><strong>Orchestrator&ndash;workers</strong></td><td>planner splits → workers execute → merge</td><td>Subtasks aren't known up front but the <em>structure</em> is. The most agent-like workflow.</td></tr>
+    <tr><td><strong>Evaluator&ndash;optimizer</strong></td><td>generate → critique → revise, until accepted or capped</td><td>Quality is judgeable and iteration measurably helps. Needs a cap, like any loop.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>The minimal loop</h2>
+
+<pre><code>while steps &lt; MAX_STEPS:                 # guardrail 1
+    step = model(question, history, tools=ALLOWED)   # guardrail 2
+    if step.is_final:
+        return step.answer, steps, "goal"            # guardrail 3
+    history += run_tool(step.tool_call)   &larr; the loop closes here
+    steps += 1
+return best_effort, steps, "cap"                     # guardrail 3
+</code></pre>
+
+<p>Every agent framework: OpenAI Agents SDK, LangGraph, CrewAI, is a wrapper around this. Knowing the twelve lines is what lets you say what a framework actually buys you.</p>
+
+<h2>The three process guardrails</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Guardrail</th><th>Contains</th><th>Why it's non-optional</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Step cap</strong></td><td>Unbounded consumption: <a href="https://genai.owasp.org/llm-top-10/">OWASP LLM10</a></td><td>The only agent failure that shows up on a credit card instead of in an output. A stuck loop bills until someone notices.</td></tr>
+    <tr><td><strong>Tool allowlist</strong></td><td>Excessive agency: <strong>OWASP LLM06</strong></td><td>Every exposed tool is a capability reachable on a path you never imagined. Grant the minimum; a read-only tool is a different risk class from a writing one.</td></tr>
+    <tr><td><strong>Termination reason</strong></td><td>Silent truncation</td><td>An answer returned <em>because the cap was hit</em> is indistinguishable from a finished one unless you record which. Cap-terminated runs are a health metric, not a footnote.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Input and output guardrails sit either side of these (validate the request; validate the answer before it ships), that's the <a href="answer-defense.html">answer-defense</a> ladder, unchanged. The loop only adds the middle column.</p>
+
+<h2>Trajectory metrics: what you measure once the path varies</h2>
+
+<p>A fixed chain has one call per question, so <em>cost</em> and <em>latency</em> are constants. A loop turns each into a distribution, and adds numbers that have no equivalent upstream. Attach them the same way as any other verdict (see <a href="tracing-and-scores.html">Tracing answer quality</a>):</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Metric</th><th>What a bad reading means</th><th>Emit as</th></tr></thead>
+  <tbody>
+    <tr><td><code>steps</code> (mean / max / p95)</td><td>Creeping mean = the model is compensating for retrieval, not reasoning.</td><td><code>score(name="steps", data_type="NUMERIC")</code></td></tr>
+    <tr><td><code>terminated_by = cap</code> rate</td><td>Questions the loop cannot finish. Above a few percent, the cap is hiding a design fault.</td><td><code>score(…, data_type="CATEGORICAL")</code></td></tr>
+    <tr><td><code>tool_calls</code> / question</td><td>Repeated identical calls = the model is looping without learning from the result.</td><td><code>score(…, data_type="NUMERIC")</code></td></tr>
+    <tr><td>cost &amp; latency / question</td><td>Compare against the fixed-chain baseline. This is the &ldquo;trade&rdquo; being priced.</td><td>already in the trace</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="panel-label">The non-determinism rule, extended</p>
+  <p style="margin:0">At <code>temperature=1</code> a fixed chain rewords its answer every run, so you gate on <strong>properties, not text</strong>. An agent varies on a second axis: the <strong>path</strong>. Two runs can produce the same answer in one step and in three, at triple the bill. So the trajectory joins the property set: gate on <em>rates and distributions</em> (hallucination count, abstention rate, mean steps, cap rate), never on the transcript.</p>
+</div>
+
+<h2>The two honest interview answers</h2>
+
+<blockquote>
+<p>&ldquo;I measured a loop against my fixed chain on a question my abstention score had flagged. It rescued it, here's what it cost per query, and here's what it did to the trap set.&rdquo;</p>
+<p>&ldquo;I measured it and didn't ship it. Here's the number that stopped me.&rdquo;</p>
+</blockquote>
+
+<p>Both are senior. The weak answer is <em>&ldquo;we used an agent&rdquo;</em> with no number behind it: and that's the one an interviewer who has built agents will find in about ninety seconds.</p>
+
+<div class="footer">
+  Lesson 11
+  <a href="tracing-and-scores.html">Tracing answer quality</a>
+  <a href="answer-defense.html">Closing the answer gap</a>
+  <a href="pipeline-and-cost.html">Pipeline &amp; cost</a>
+</div>
+
+</div>

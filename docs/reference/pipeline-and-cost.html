@@ -1,0 +1,98 @@
+<title>The RAG Pipeline &amp; Its Cost, Reference Card</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · RAG</p>
+<h1>The pipeline, where the index lives, and what it costs</h1>
+<p class="standfirst">Retrieve &rarr; augment &rarr; generate; the vector-DB landscape; the cost and latency formulas. Compressed from Lesson 07. Made to be reread the night before.</p>
+
+<h2>The three stages</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Stage</th><th>Is</th><th>Not</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Retrieve</strong></td><td>Embed the query, rank chunks by similarity, keep the top-k. What Lessons 01&ndash;06 measured with MRR.</td><td>Not an answer &mdash; just candidate text. A perfect retrieval score says nothing about what a generator does with it.</td></tr>
+    <tr><td><strong>Augment</strong></td><td>Build the prompt: system instructions + retrieved context + the question, in one message set.</td><td>Not optional glue &mdash; how the context is framed (told to say &ldquo;I don't know&rdquo; or not, ordered how) changes what the model does with good chunks.</td></tr>
+    <tr><td><strong>Generate</strong></td><td>One LLM call, given the augmented prompt, producing the answer text. The only stage with real cost and real latency.</td><td>Not deterministic even at <code>temperature=0.0</code> across model versions &mdash; re-run before trusting a single generated answer as representative.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<pre><code>chunks   = retrieve_chunks(question)                 # stage 1, reuse eval's top-k, don't re-retrieve
+context  = "\n\n".join(c["text"] for c in chunks)     # stage 2
+messages = [{"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"}]
+response = client.chat.completions.create(model=ANSWER_MODEL, messages=messages, temperature=0.0)  # stage 3</code></pre>
+
+<h2>Determinism &amp; temperature</h2>
+
+<p>Retrieval is deterministic: embed &rarr; cosine-rank &rarr; top-k is arithmetic on fixed numbers, so the same query against the same corpus returns the same chunks every time. That's why MRR/coverage/misses can gate every commit &mdash; a drop between two runs of identical code is a real regression, not noise. Generation is a different animal: an LLM emits one token at a time from a probability distribution over the vocabulary, and <strong>temperature</strong> controls how that distribution is sampled.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Temperature</th><th>Sampling behavior</th></tr></thead>
+  <tbody>
+    <tr><td><code>0</code></td><td>Always take the single highest-probability token (argmax). No randomness by design &mdash; same prompt in, same text out, run after run.</td></tr>
+    <tr><td><code>1</code> (default)</td><td>Sample proportionally to the model's own probabilities &mdash; a genuine weighted random draw. Same prompt can yield different wording, or a different fact included/omitted, on every call.</td></tr>
+    <tr><td><code>&gt;1</code></td><td>Flattens the distribution further &mdash; lower-probability tokens become relatively more likely. More variety, more risk of incoherence.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><code>gpt-5.6-luna</code> <strong>rejects</strong> <code>temperature=0.0</code> outright (&ldquo;Only the default (1) value is supported&rdquo;) &mdash; there is no dial to turn off. Every call samples from the full distribution, so generated answers vary run-to-run even with identical code and identical retrieval. That's the concrete reason a content-based CI gate on generated text would flake, and why Lesson 07 splits the pipeline: deterministic retrieval metrics on every commit, non-deterministic priced generation nightly. Note that even <code>temperature=0.0</code> on other models isn't a perfect guarantee across model versions or hardware &mdash; but a model forced to <code>temperature=1</code> is a much larger, deliberate source of variance, not a rounding-error edge case.</p>
+
+<h2>Where the index lives</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Store</th><th>Tier</th><th>Adds over brute-force numpy</th></tr></thead>
+  <tbody>
+    <tr><td>Plain array + cosine</td><td>Dev / learning</td><td>Nothing &mdash; exact search, zero infra. Correct choice under a few thousand chunks.</td></tr>
+    <tr><td>Chroma</td><td>Dev &rarr; small prod</td><td>SQLite persistence, metadata filtering, a real client API.</td></tr>
+    <tr><td>FAISS</td><td>Prototyping at scale</td><td>Very fast in-memory search; no persistence by default.</td></tr>
+    <tr><td>pgvector</td><td>Small &rarr; medium prod</td><td>Vectors inside Postgres you already operate &mdash; no new database.</td></tr>
+    <tr><td>Pinecone / Weaviate</td><td>Large-scale prod</td><td>Managed, sharded, built for billions of vectors.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>The load-bearing line</strong> (Day 15 lecture notes, verbatim): <em>&ldquo;Remember: the encoder choice matters much more than the database choice!&rdquo;</em> At a scale where exact search is still fast &mdash; low thousands of chunks &mdash; a numpy array and Chroma return identical nearest neighbours. The gap only opens once a store switches to <em>approximate</em> search (HNSW) to stay fast at millions of vectors, trading a sliver of recall for speed. Don't claim a database you haven't needed yet.</p>
+
+<h2>Cost, defined</h2>
+
+<pre><code>cost = (usage.prompt_tokens     / 1_000_000) * input_price_per_million
+     + (usage.completion_tokens / 1_000_000) * output_price_per_million</code></pre>
+
+<p>Token counts come off the real API response &mdash; never estimated from character count once you have a live call. Prices come from the vendor's <em>current</em> published rate, checked the day you run it, not a remembered number from a lecture or a prior session: model pricing tables change, and the exact model a course notebook hardcodes can rotate off the current page entirely (it did, mid-course, for this one &mdash; see Lesson 07).</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Model</th><th>Input / 1M tok</th><th>Output / 1M tok</th><th>Confirmed</th></tr></thead>
+  <tbody>
+    <tr><td>OpenAI <code>gpt-5.4-mini</code></td><td>$0.75 <span style="color:var(--ink-faint)">($0.075 cached)</span></td><td>$4.50</td><td>2026-07-21, <a href="https://platform.openai.com/docs/pricing">OpenAI pricing docs</a></td></tr>
+    <tr><td>Claude Haiku 4.5</td><td>$1.00</td><td>$5.00</td><td>2026-07-21, <a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic pricing docs</a></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Re-check both before quoting either in an interview &mdash; these are snapshots, not constants.</p>
+
+<h2>Latency, defined</h2>
+
+<p>Time <em>only</em> the generation call &mdash; wall-clock around <code>client.chat.completions.create(...)</code> itself, the same way <code>embed_secs</code> already isolates embedding time from the rest of the pipeline. Conflating retrieval and generation latency hides which stage actually dominates a real deployment's response time (generation, almost always, by a wide margin).</p>
+
+<h2>Defend it in one line</h2>
+<blockquote>&ldquo;Retrieval, augmentation, and generation are three separable stages &mdash; I measure retrieval quality with MRR independent of any LLM, then add a real, priced, timed generation call on top once retrieval is trustworthy. I keep the vector store as the simplest thing that's provably equivalent to a real database at my scale, and I price every generation run from the vendor's current rate, checked the day I ran it &mdash; not a number I remembered.&rdquo;</blockquote>
+
+<div class="footer">
+  Lesson 07
+  <a href="reranking.html">Reference: Reranking</a>
+  <a href="chunking.html">Reference: Chunking</a>
+  Roadmap
+</div>
+
+</div>

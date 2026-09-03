@@ -1,0 +1,179 @@
+<title>MCP: the primitives, the wire, and the new trust boundary</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+<div class="wrap">
+
+<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
+
+<p class="eyebrow">Reference · Agents · Model Context Protocol</p>
+<h1>MCP &mdash; primitives, wire, trust boundary</h1>
+<p class="standfirst">The Model Context Protocol in the form an interviewer will probe it: what the three primitives actually distinguish, what changed in the <code>2026-07-28</code> spec that most blog posts still get wrong, and where the trust boundary moved. Compressed from Lesson 14. Made to be reread the night before an interview.</p>
+
+<div class="panel">
+  <p class="panel-label">Version stamp: read this first</p>
+  <p style="margin:0 0 0.6rem">Everything below is checked against protocol version <strong><code>2026-07-28</code></strong>, confirmed live on <strong>2026-08-09</strong>. MCP shipped in November 2024 and has revised repeatedly since. <strong>Most MCP writing on the internet describes the 2025 revisions and is now wrong in at least three load-bearing places.</strong> Cite the spec version when you answer, the way you would cite a library version.</p>
+  <p style="margin:0"><a href="https://modelcontextprotocol.io/specification/latest">modelcontextprotocol.io/specification/latest</a> &middot; check the version banner before trusting any of this card.</p>
+</div>
+
+<h2>The one durable idea</h2>
+
+<div class="panel">
+  <p class="panel-label">What the three primitives actually are</p>
+  <p style="margin:0"><strong>They are not three features. They are one question answered three ways: <em>who decides this enters the model&rsquo;s context?</em></strong> A tool is context the <strong>model</strong> pulls in, when it chooses. A resource is context the <strong>application</strong> pushes in, by its own logic. A prompt is context the <strong>user</strong> invokes, deliberately. Every argument about MCP design reduces to putting a capability on the right row of that table &mdash; and every MCP security question reduces to asking who <em>wrote</em> the text that arrived by each route.</p>
+</div>
+
+<h2>Server primitives: what a server offers</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Primitive</th><th>Who controls it</th><th>Methods</th><th>Enters context&hellip;</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tools</strong></td><td class="tag-bad">Model</td><td><code>tools/list</code> · <code>tools/call</code></td><td>&hellip;twice: the <em>description</em> at list time, the <em>result</em> at call time</td></tr>
+    <tr><td><strong>Resources</strong></td><td>Application</td><td><code>resources/list</code> · <code>resources/templates/list</code> · <code>resources/read</code></td><td>&hellip;when your app decides &mdash; it may embed, search, or ignore</td></tr>
+    <tr><td><strong>Prompts</strong></td><td>User</td><td><code>prompts/list</code> · <code>prompts/get</code></td><td>&hellip;only on explicit invocation (a slash command, a button)</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The spec&rsquo;s own words for the middle column: tools are <em>&ldquo;model-controlled, meaning that the language model can discover and invoke tools automatically&rdquo;</em>; resources are <em>&ldquo;application-driven, giving them flexibility in how they retrieve, process, and present available context&rdquo;</em>; prompts are <em>&ldquo;user-controlled, requiring explicit invocation rather than automatic triggering.&rdquo;</em></p>
+
+<p>Each has a discovery method (<code>*/list</code>) and a retrieval or execution method. <strong>Discovery being a protocol call is the whole point</strong> &mdash; it is what lets a client bind to a server it was not written for. It is also what puts a stranger&rsquo;s prose in your prompt before you have called anything.</p>
+
+<h3>Client primitives: what a client offers back</h3>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Primitive</th><th>Status at <code>2026-07-28</code></th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Elicitation</strong></td><td class="tag-good">Current</td><td>Server asks the <em>user</em> for input mid-request. <strong>Form mode</strong> (schema &rarr; client renders a form) or <strong>URL mode</strong> (out-of-band, for credentials &mdash; data never passes through the client or the LLM context)</td></tr>
+    <tr><td>Sampling</td><td class="tag-bad">Deprecated</td><td>Server borrowed the <em>client&rsquo;s</em> model. <em>&ldquo;New implementations should integrate directly with LLM provider APIs.&rdquo;</em></td></tr>
+    <tr><td>Roots</td><td class="tag-bad">Deprecated</td><td>Client told the server which directories to work in. Advisory only, never a security boundary. <em>&ldquo;Pass directories or files via tool parameters, resource URIs, or server configuration instead.&rdquo;</em></td></tr>
+    <tr><td>Logging</td><td class="tag-bad">Deprecated</td><td><em>&ldquo;Log to <code>stderr</code> (stdio transport) or use OpenTelemetry.&rdquo;</em></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p><strong>Saying &ldquo;sampling lets the server use your model&rdquo; in an interview is a dated-reading tell.</strong> It was the most-blogged MCP feature of 2025 and it is deprecated. Elicitation is the one client primitive that survived, and it now arrives through the <strong>Multi Round-Trip Requests</strong> pattern: the server answers <code>tools/call</code> with an <code>InputRequiredResult</code> carrying an <code>elicitation/create</code> request, the client collects the input, and the client <em>retries the original call</em> with <code>inputResponses</code> attached. Note the shape &mdash; a retry, not a callback. That is what statelessness forces.</p>
+
+<h2>The wire, in one screen</h2>
+
+<pre><code>Host (the AI app)  ──┬── Client 1 ──── Server A   stdio      local process
+                     ├── Client 2 ──── Server B   stdio
+                     └── Client 3 ──── Server C   Streamable HTTP  remote
+
+one client per server, dedicated connection
+JSON-RPC 2.0 · two layers: <strong>data</strong> (primitives, discovery) / <strong>transport</strong> (stdio, HTTP)
+</code></pre>
+
+<ul>
+  <li><strong>Host</strong> = the application (VS Code, Claude Desktop). <strong>Client</strong> = one connection object. <strong>Server</strong> = the thing serving context, local or remote. &ldquo;Local&rdquo; and &ldquo;remote&rdquo; describe where it runs, not what it is.</li>
+  <li><strong>stdio</strong> for a process on the same machine; <strong>Streamable HTTP</strong> (POST + optional SSE) for remote, with OAuth recommended for tokens.</li>
+  <li><strong>MCP is stateless as of <code>2026-07-28</code>.</strong> Every request carries <code>io.modelcontextprotocol/protocolVersion</code>, <code>clientCapabilities</code> and normally <code>clientInfo</code> in <code>_meta</code>, so <em>&ldquo;servers infer nothing from previous requests.&rdquo;</em></li>
+  <li><code>server/discover</code> replaces the old <code>initialize</code> handshake and is <strong>optional</strong> &mdash; it is a convenience for fetching identity, capabilities and supported versions in one call. Responses carry <code>ttlMs</code> and <code>cacheScope</code>, so listings are cacheable.</li>
+  <li>Notifications are <strong>opt-in</strong>: the client opens a long-lived <code>subscriptions/listen</code> stream naming the events it wants. Delivery is best-effort &mdash; <em>poll anyway.</em></li>
+</ul>
+
+<h3>Why tool listings are ordered and cacheable</h3>
+
+<p>The spec asks servers to return tools in a deterministic order, and says why in a line worth quoting back: deterministic ordering <em>&ldquo;enables clients to reliably cache the tool list and improves LLM prompt cache hit rates when tools are included in model context.&rdquo;</em> Tool definitions sit in the prompt prefix. Reorder them and you have changed the prefix &mdash; the same mechanism that takes prefix caching to zero when a per-request nonce goes near the top of a system prompt. <strong>Anything that varies early in the prompt is a cache bill.</strong> See <a href="pipeline-and-cost.html">Pipeline &amp; cost</a>.</p>
+
+<h2>Where the trust boundary moved</h2>
+
+<p>MCP does not give a model new powers. It changes <strong>who wrote the text</strong> that reaches it. Under a hand-written tool, the description is a string in your file. Under MCP, it is a string a server sends you &mdash; and it lands in the model&rsquo;s context <em>before you have called anything.</em></p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Channel</th><th>Arrives</th><th>Authored by</th><th>Typically defended by&hellip;</th></tr></thead>
+  <tbody>
+    <tr><td>Retrieved chunk</td><td>at context assembly</td><td>whoever wrote the corpus</td><td class="tag-good">delimiters + per-request nonce, if you built them</td></tr>
+    <tr><td><strong>Tool description</strong></td><td class="tag-bad">at <code>tools/list</code> &mdash; before any call</td><td class="tag-bad">the server operator</td><td class="tag-bad">usually nothing. It is not &ldquo;context,&rdquo; so context defences skip it</td></tr>
+    <tr><td><strong>Tool result</strong></td><td class="tag-bad">mid-loop, after a call</td><td class="tag-bad">the server operator</td><td class="tag-bad">usually nothing &mdash; and it is trusted <em>more</em>, because the model asked for it</td></tr>
+    <tr><td>Resource contents</td><td>when the app reads it</td><td>the server operator</td><td>whatever you apply to retrieved text &mdash; if you route it through the same code</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The spec says this outright, in the <a href="https://modelcontextprotocol.io/specification/latest/server/tools">Tools</a> page: clients <strong>MUST</strong> <em>&ldquo;consider tool annotations to be untrusted unless they come from trusted servers,&rdquo;</em> and <strong>SHOULD</strong> <em>&ldquo;validate tool results before passing to LLM&rdquo;</em> and <em>&ldquo;show tool inputs to the user before calling the server, to avoid malicious or accidental data exfiltration.&rdquo;</em> A human <strong>SHOULD</strong> be able to deny any invocation.</p>
+
+<h3>Named attacks in the security spec</h3>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Attack</th><th>Shape</th><th>The rule</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Confused deputy</strong></td><td>Proxy server with a static client ID + dynamic registration + a consent cookie &rarr; consent screen skipped, auth code redirected to the attacker</td><td>Proxies <strong>MUST</strong> implement per-client consent <em>before</em> forwarding</td></tr>
+    <tr><td><strong>Token passthrough</strong></td><td>Server accepts a token minted for something else and forwards it downstream</td><td>Servers <strong>MUST NOT</strong> accept tokens not explicitly issued for them</td></tr>
+    <tr><td><strong>State handle hijacking</strong></td><td>No protocol sessions exist, so servers mint handles (cart id, workflow id) returned as tool arguments. Guess one, act as someone else</td><td><strong>MUST NOT</strong> treat possession of a handle as authentication. Bind it server-side to the authenticated user</td></tr>
+    <tr><td><strong>SSRF via OAuth discovery</strong></td><td>Malicious server points metadata URLs at <code>169.254.169.254</code> or <code>localhost</code></td><td>Block private ranges, enforce HTTPS, validate redirect targets</td></tr>
+    <tr><td><strong>Local server compromise</strong></td><td>A one-click config whose &ldquo;startup command&rdquo; is arbitrary code, running with client privileges</td><td>Clients <strong>MUST</strong> show the exact command, untruncated, and require approval</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="tag-bad" style="font-family:var(--sans);font-size:0.9rem"><strong>Note what is not on that list:</strong> a payload written into a tool description or a tool result. The spec addresses it as a trust rule (&ldquo;untrusted unless&hellip;&rdquo;, &ldquo;validate results&rdquo;) rather than as a mitigable attack, because there is no protocol-level fix &mdash; it is <a href="prompt-injection-and-guardrails.html">indirect prompt injection</a> arriving through a new door.</p>
+
+<h2>Minimal server, Python SDK v2</h2>
+
+<p><strong>The class is <code>MCPServer</code>.</strong> SDK v2 is the current line and supports <code>2026-07-28</code>; almost every tutorial online still says <code>FastMCP</code>, which is v1.</p>
+
+<pre><code>uv add "mcp[cli]"
+
+<em># server.py</em>
+from mcp.server import MCPServer
+
+mcp = MCPServer("corpus")
+
+@mcp.tool()
+def search_corpus(query: str, k: int = 5) -&gt; str:
+    """Search the indexed corpus and return the top-k chunks.
+
+    Args:
+        query: the search string
+        k: how many chunks to return
+    """
+    ...
+
+@mcp.resource("corpus://manifest")
+def manifest() -&gt; str:
+    """The list of indexed documents."""
+    ...
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")
+</code></pre>
+
+<p>The type hints become the <code>inputSchema</code>; <strong>the docstring becomes the <code>description</code></strong> &mdash; the string that goes into every model&rsquo;s context that ever connects to you. Inspect a server before trusting it: <code>npx @modelcontextprotocol/inspector</code>.</p>
+
+<h2>MCP vs. plain tool-calling, the answer to give</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th></th><th>Provider tool-calling (what you already do)</th><th>MCP</th></tr></thead>
+  <tbody>
+    <tr><td>What it standardises</td><td>how <em>one vendor&rsquo;s model</em> asks for a call</td><td>how <em>any client</em> discovers and calls <em>any server</em></td></tr>
+    <tr><td>Tool definitions</td><td>you write them, in your process</td><td>fetched at runtime from a server; can change under you</td></tr>
+    <tr><td>Beyond tools</td><td>nothing &mdash; tools are the whole surface</td><td>resources and prompts, i.e. the app- and user-controlled rows</td></tr>
+    <tr><td>Trust</td><td>your code, your prose</td><td>someone else&rsquo;s code, someone else&rsquo;s prose</td></tr>
+    <tr><td>Buys you</td><td>a working agent</td><td>an <em>ecosystem</em> &mdash; and one integration instead of N</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The honest one-liner: <strong>MCP is not an agent framework and not a tool-calling API. It is a client-server protocol for provisioning context, and tool-calling is one of its three primitives.</strong> It sits <em>under</em> the Agents SDK, not beside it &mdash; an SDK agent can take its tools from an MCP server, and the orchestration questions from <a href="orchestration-and-validation.html">Lesson 13</a> are unchanged by that.</p>
+
+<div class="panel">
+  <p class="panel-label">The three sentences to have ready</p>
+  <p style="margin:0 0 0.6rem"><strong>1. What it is.</strong> &ldquo;A JSON-RPC protocol for provisioning context to an AI application. Three server primitives split by <em>who decides they enter the context</em> &mdash; tools the model pulls, resources the app pushes, prompts the user invokes.&rdquo;</p>
+  <p style="margin:0 0 0.6rem"><strong>2. What it changes.</strong> &ldquo;Not model capability &mdash; authorship. Tool descriptions and results are now written by whoever runs the server, and the description lands in context before any call. Context defences that wrap retrieved chunks don&rsquo;t cover either.&rdquo;</p>
+  <p style="margin:0"><strong>3. That you read it recently.</strong> &ldquo;As of <code>2026-07-28</code> it&rsquo;s stateless &mdash; <code>server/discover</code>, per-request <code>_meta</code>, no protocol sessions &mdash; and sampling, roots and logging are deprecated.&rdquo;</p>
+</div>
+
+<div class="footer">
+  Lesson 14
+  <a href="orchestration-and-validation.html">Orchestration &amp; the deterministic check</a>
+  <a href="agents-vs-workflows.html">Agent or workflow?</a>
+  <a href="prompt-injection-and-guardrails.html">Injection &amp; guardrails</a>
+  <a href="pipeline-and-cost.html">Pipeline &amp; cost</a>
+</div>
+
+</div>

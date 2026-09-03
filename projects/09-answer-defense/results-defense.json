@@ -1,0 +1,2670 @@
+{
+  "config": {
+    "encoder": "bge-small",
+    "chunk_size": 1000,
+    "top_k": 5,
+    "overlap": 50,
+    "mode": "all",
+    "chunker": "fixed",
+    "rerank": true,
+    "pool": 20,
+    "generate": true,
+    "model": "gpt-5.6-luna"
+  },
+  "judge_model": "gpt-5.6-terra",
+  "repeats": 3,
+  "prices_verified": "2026-07-25 via developers.openai.com/api/docs/pricing",
+  "A_trap_baseline": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "baseline",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "The **faithfulness metric** measures whether a generated answer is fully supported by the retrieved context, rather than containing unsupported or hallucinated information.\n\nA common calculation is:\n\n\\[\n\\text{Faithfulness} =\n\\frac{\\text{number of answer claims supported by the context}}\n{\\text{total number of answer claims}}\n\\]\n\nFor example, if an answer contains four factual claims and three are supported by the retrieved documents:\n\n\\[\n\\text{Faithfulness} = \\frac{3}{4} = 0.75\n\\]\n\nA score of **1.0** means every claim is supported; **0** means none are. In practice, an LLM judge often extracts the claims and checks each one against the retrieved context.",
+          "prompt_tokens": 1282,
+          "completion_tokens": 225,
+          "cached_tokens": 1279,
+          "latency_ms": 2342.4326670356095,
+          "cost": 0.0014809,
+          "abstained": false
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "## How BM25 scoring works\n\nBM25 is a lexical, keyword-based retrieval function. It scores a document according to how well its terms match the query while accounting for:\n\n- **Term frequency (TF):** A term appearing in a document increases its score, but with diminishing returns.\n- **Inverse document frequency (IDF):** Rare terms are more informative than common terms.\n- **Document length:** Long documents are normalized so they do not receive an unfair advantage.\n\nA common BM25 formulation is:\n\n\\[\n\\text{BM25}(D,Q)=\n\\sum_{t \\in Q}\n\\text{IDF}(t)\n\\cdot\n\\frac{f(t,D)(k_1+1)}\n{f(t,D)+k_1\\left(1-b+b\\frac{|D|}{\\text{avgdl}}\\right)}\n\\]\n\nWhere:\n\n- \\(f(t,D)\\) is the frequency of query term \\(t\\) in document \\(D\\)\n- \\(|D|\\) is the document length\n- \\(\\text{avgdl}\\) is the average document length\n- \\(k_1\\), commonly around `1.2\u20132.0`, controls TF saturation\n- \\(b\\), commonly around `0.75`, controls length normalization\n\nA typical IDF term is:\n\n\\[\n\\text{IDF}(t)=\n\\log\\left(\n\\frac{N-n(t)+0.5}{n(t)+0.5}+1\n\\right)\n\\]\n\nwhere \\(N\\) is the number of documents and \\(n(t)\\) is the number containing term \\(t\\).\n\nBM25 is good at exact terms, names, identifiers, numbers, and rare keywords. It generally does not understand synonyms or semantic similarity.\n\n---\n\n## Combining BM25 with vector similarity\n\nHybrid search runs two separate searches:\n\n1. **BM25 search** retrieves documents using lexical matching.\n2. **Vector search** retrieves documents whose embeddings are semantically similar to the query.\n\nThe results then need to be combined.\n\n### Important issue: raw scores are not directly compatible\n\nBM25 scores and vector scores have different meanings and ranges:\n\n- BM25 scores can vary substantially depending on query terms and corpus statistics.\n- Cosine similarity is often in `[-1, 1]`, or may be transformed into another range.\n- Inner-product scores can have yet another scale.\n\nTherefore, simply adding raw BM25 and vector scores is usually unreliable unless they have been calibrated.\n\n---\n\n## Method 1: Weighted score fusion\n\nNormalize both scores and combine them:\n\n\\[\nS(D)=\\alpha \\cdot S_{\\text{vector}}(D)\n+(1-\\alpha)\\cdot S_{\\text{BM25}}(D)\n\\]\n\nFor example:\n\n```python\nfinal_score = (\n    0.7 * normalized_vector_score\n    + 0.3 * normalized_bm25_score\n)\n```\n\nHere, \\(\\alpha\\) controls the balance:\n\n- Higher \\(\\alpha\\): favor semantic similarity\n- Lower \\(\\alpha\\): favor exact keyword matching\n\nPossible normalization methods include:\n\n### Min-max normalization\n\n\\[\nS'(D)=\\frac{S(D)-S_{\\min}}{S_{\\max}-S_{\\min}}\n\\]\n\n### Z-score normalization\n\n\\[\nS'(D)=\\frac{S(D)-\\mu}{\\sigma}\n\\]\n\nMin-max normalization is simple but can be sensitive to outliers. In practice, the best weighting and normalization method should be evaluated on representative queries.\n\n---\n\n## Method 2: Reciprocal Rank Fusion\n\nA more robust approach is to fuse rankings rather than raw scores.\n\nFor each document:\n\n\\[\n\\text{RRF}(D)=\n\\sum_{r \\in \\text{retrievers}}\n\\frac{w_r}{k+\\text{rank}_r(D)}\n\\]\n\nWhere:\n\n- \\(\\text{rank}_r(D)\\) is the document\u2019s rank from retriever \\(r\\)\n- \\(w_r\\) is an optional retriever weight\n- \\(k\\), often `60`, prevents the top ranks from dominating too strongly\n\nExample:\n\n```python\nrrf_score = (\n    1.0 / (60 + bm25_rank)\n    + 1.0 / (60 + vector_rank)\n)\n```\n\nIf a document appears in both result lists, its scores add together. Documents appearing near the top in both rankings receive high final scores.\n\nRRF is popular because it avoids the problem of comparing incompatible BM25 and vector score scales.\n\n---\n\n## Typical hybrid-search workflow\n\n```text\nQuery\n \u251c\u2500\u2500 BM25 retrieval \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n \u2514\u2500\u2500 Vector retrieval \u2500\u2500\u2500\u2500\u2524\n                           \u2193\n                    Score/rank fusion\n                           \u2193\n                    Optional reranker\n                           \u2193\n                    Final context\n```\n\nA practical implementation might:\n\n1. Retrieve the top 20\u2013100 documents from BM25.\n2. Retrieve the top 20\u2013100 documents from vector search.\n3. Merge and deduplicate them.\n4. Apply weighted score fusion or RRF.\n5. Optionally rerank the top candidates with a cross-encoder.\n6. Pass the best documents to the LLM.\n\n---\n\n## Which fusion method should be used?\n\n- **Weighted score fusion:** Useful when scores are well normalized and you want explicit control over semantic versus lexical importance.\n- **RRF:** Safer as a default because it operates on ranks and does not require score calibration.\n- **Learned fusion:** For production systems, weights can be learned from labeled relevance data.\n\nHybrid search works well because BM25 handles exact matches such as `\"\u822a\u7a7a\u5238\"`, product IDs, names, and dates, while vector search handles paraphrases and conceptually related wording.",
+          "prompt_tokens": 1297,
+          "completion_tokens": 1258,
+          "cached_tokens": 1294,
+          "latency_ms": 8726.032666978426,
+          "cost": 0.0076804,
+          "abstained": false
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "An MCP server exposes three main primitives to clients:\n\n- **Tools** \u2014 executable functions the client can invoke\n- **Resources** \u2014 data or context the client can read\n- **Prompts** \u2014 reusable prompt templates\n\nMCP messages use **JSON-RPC 2.0** and can be transported over:\n\n- **stdio** for local processes\n- **HTTP-based transports**\u2014traditionally HTTP with SSE, and more recently **Streamable HTTP**\u2014for remote servers",
+          "prompt_tokens": 1186,
+          "completion_tokens": 199,
+          "cached_tokens": 1183,
+          "latency_ms": 2476.191582973115,
+          "cost": 0.0013153000000000001,
+          "abstained": false
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "Chroma uses an **HNSW (Hierarchical Navigable Small World) graph** index under the hood, commonly implemented through **hnswlib**.\n\nHNSW organizes vectors into multiple graph layers:\n\n- Higher layers are sparse and allow fast, long-range navigation.\n- Lower layers contain more neighbors and provide finer-grained search.\n- A query starts at an upper layer and progressively moves toward closer vectors before searching the bottom layer.\n\nBecause it is **approximate**, HNSW does not necessarily examine every vector. This creates the speed\u2013recall trade-off:\n\n- **Higher search effort**\u2014typically controlled by `ef` or `search_ef`\u2014examines more graph candidates:\n  - Better recall\n  - Higher latency and CPU usage\n- **Lower search effort** examines fewer candidates:\n  - Faster queries\n  - Greater chance of missing the true nearest neighbors\n\nIndex construction also affects quality:\n\n- `M`: maximum number of graph connections per node. Higher values generally improve recall but increase memory usage and build time.\n- `ef_construction`: effort used while building the graph. Higher values can produce a better index but slow ingestion.\n\nIn short, HNSW sacrifices exactness for substantially faster nearest-neighbor search. Chroma\u2019s specific defaults and exposed configuration options can vary by version, but the underlying approach is HNSW-based approximate vector search.",
+          "prompt_tokens": 1294,
+          "completion_tokens": 329,
+          "cached_tokens": 1291,
+          "latency_ms": 3471.482333028689,
+          "cost": 0.0021061,
+          "abstained": false
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "OpenAI\u2019s cached prompt prefix typically remains valid for **5\u201310 minutes of inactivity**, and may persist for **up to 1 hour** during periods of continued use or off-peak availability. Cache retention is not guaranteed, so applications should treat cache hits as opportunistic rather than permanent.",
+          "prompt_tokens": 1414,
+          "completion_tokens": 145,
+          "cached_tokens": 1411,
+          "latency_ms": 1885.6665000203066,
+          "cost": 0.0010141,
+          "abstained": false
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 6473,
+      "total_completion_tokens": 2156,
+      "total_cached_tokens": 6458,
+      "total_cost": 0.013596800000000001,
+      "cost_per_query": 0.00271936,
+      "mean_latency_ms": 3780.3611500072293,
+      "max_latency_ms": 8726.032666978426,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "hallucinations": 5,
+      "hallucinated_questions": [
+        "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+        "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+        "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+        "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+        "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?"
+      ]
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "baseline",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "The **faithfulness metric** measures whether a generated answer is fully supported by the retrieved context, rather than containing hallucinated or unsupported information.\n\nA common calculation is:\n\n\\[\n\\text{Faithfulness} =\n\\frac{\\text{number of answer claims supported by the context}}\n{\\text{total number of answer claims}}\n\\]\n\nFor example, if an answer contains four factual claims and the retrieved context supports three of them:\n\n\\[\n\\text{Faithfulness} = \\frac{3}{4} = 0.75\n\\]\n\nA score of **1.0** means every claim is supported; **0.0** means none are supported. Typically, an LLM judge identifies the claims and checks each one against the retrieved context.",
+          "prompt_tokens": 1282,
+          "completion_tokens": 229,
+          "cached_tokens": 1279,
+          "latency_ms": 2472.3582919687033,
+          "cost": 0.0015049,
+          "abstained": false
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "## BM25 scoring\n\nBM25 is a lexical relevance score based on term matching. It rewards documents that:\n\n- Contain query terms\n- Contain them multiple times, with diminishing returns\n- Are not excessively long\n- Contain relatively rare query terms\n\nA common BM25 formula is:\n\n\\[\n\\text{BM25}(D,Q)=\n\\sum_{t \\in Q}\n\\text{IDF}(t)\n\\cdot\n\\frac{f(t,D)(k_1+1)}\n{f(t,D)+k_1\\left(1-b+b\\frac{|D|}{\\text{avgdl}}\\right)}\n\\]\n\nWhere:\n\n- \\(f(t,D)\\): frequency of term \\(t\\) in document \\(D\\)\n- \\(|D|\\): document length\n- \\(\\text{avgdl}\\): average document length\n- \\(k_1\\): controls term-frequency saturation, commonly around `1.2\u20132.0`\n- \\(b\\): controls document-length normalization, commonly `0.75`\n- \\(\\text{IDF}(t)\\): inverse document frequency\n\nA typical IDF definition is:\n\n\\[\n\\text{IDF}(t)=\n\\log\\left(\n1+\\frac{N-df(t)+0.5}{df(t)+0.5}\n\\right)\n\\]\n\nWhere:\n\n- \\(N\\): total number of documents\n- \\(df(t)\\): number of documents containing term \\(t\\)\n\nThus, a rare term such as a product code receives more weight than a common term such as \u201cthe\u201d.\n\n### Important properties\n\nBM25 is lexical:\n\n- It matches words and tokens, not meanings.\n- It is strong for exact names, IDs, error codes, and technical terms.\n- It generally does not match synonyms unless they share tokens.\n- Higher BM25 scores indicate better matches, but the absolute score has no universal meaning.\n\nFor example, BM25 is likely to favor a document containing exactly `ERR-503`, even if a semantic embedding model considers another document conceptually similar.\n\n---\n\n## Combining BM25 with vector similarity\n\nHybrid search runs two separate retrieval systems:\n\n1. **BM25 search** returns lexical scores.\n2. **Vector search** returns semantic similarity scores.\n3. Their results are combined or reranked.\n\nThe main issue is that the scores are not directly comparable:\n\n- BM25 scores may be `0\u201320` or higher.\n- Cosine similarities may be `-1\u20131` or `0\u20131`.\n- Some vector databases return distances, where lower is better.\n- Inner-product scores have yet another scale.\n\nTherefore, raw scores should usually not be added directly.\n\n---\n\n## Weighted score fusion\n\nFirst normalize both scores for the current query:\n\n\\[\nB'(D)=\\text{normalize}(\\text{BM25}(D))\n\\]\n\n\\[\nV'(D)=\\text{normalize}(\\text{VectorScore}(D))\n\\]\n\nThen calculate:\n\n\\[\n\\text{HybridScore}(D)\n=\n\\alpha B'(D)+(1-\\alpha)V'(D)\n\\]\n\nWhere:\n\n- \\(\\alpha=1\\): BM25 only\n- \\(\\alpha=0\\): vector search only\n- Intermediate values balance lexical and semantic relevance\n\nFor example:\n\n```python\nhybrid_score = (\n    alpha * normalized_bm25_score\n    + (1 - alpha) * normalized_vector_score\n)\n```\n\nA typical starting point might be:\n\n```python\nalpha = 0.5\n```\n\nBut the best value should be tuned on representative queries.\n\n### Score normalization\n\nCommon normalization techniques include:\n\n#### Min-max normalization\n\n\\[\ns'(D)=\\frac{s(D)-s_{\\min}}{s_{\\max}-s_{\\min}}\n\\]\n\nThis maps scores to `[0, 1]`, but can be sensitive to outliers.\n\n#### Z-score normalization\n\n\\[\ns'(D)=\\frac{s(D)-\\mu}{\\sigma}\n\\]\n\nThis centers scores relative to the result set, but may produce negative values.\n\n#### Softmax normalization\n\n\\[\ns'(D)=\\frac{e^{s(D)/\\tau}}\n{\\sum_j e^{s(j)/\\tau}}\n\\]\n\nThe temperature \\(\\tau\\) controls how concentrated the probabilities are.\n\nThe normalization must also account for vector distances. If the vector system returns a distance where lower is better, it must be converted into a higher-is-better similarity before fusion.\n\n---\n\n## Reciprocal Rank Fusion\n\nA popular alternative is **Reciprocal Rank Fusion**, or RRF. It avoids comparing raw BM25 and vector scores altogether.\n\nIf a document appears at rank \\(r\\) in a result list:\n\n\\[\n\\text{RRF}(D)=\n\\sum_{m}\n\\frac{1}{k+\\text{rank}_m(D)}\n\\]\n\nWhere:\n\n- \\(m\\) represents a retrieval method, such as BM25 or vector search\n- \\(k\\) is a smoothing constant, commonly `60`\n- Documents absent from a list contribute zero\n\nA weighted version is:\n\n\\[\n\\text{WeightedRRF}(D)=\nw_b\\frac{1}{k+\\text{rank}_{BM25}(D)}\n+\nw_v\\frac{1}{k+\\text{rank}_{Vector}(D)}\n\\]\n\nExample:\n\n```python\nfrom collections import defaultdict\n\nscores = defaultdict(float)\nk = 60\n\nfor rank, doc_id in enumerate(bm25_results, start=1):\n    scores[doc_id] += 0.5 / (k + rank)\n\nfor rank, doc_id in enumerate(vector_results, start=1):\n    scores[doc_id] += 0.5 / (k + rank)\n\nfinal_results = sorted(\n    scores.items(),\n    key=lambda item: item[1],\n    reverse=True\n)\n```\n\nRRF is often robust because it only relies on rankings. It is especially useful when BM25 and vector scores have incompatible or unstable distributions.\n\n---\n\n## Typical hybrid-search pipeline\n\n```text\nQuery\n \u251c\u2500\u2500 BM25 retrieval \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n \u2514\u2500\u2500 Vector retrieval \u2500\u2500\u2500\u2500\u2500\u2524\n                           \u2193\n              Merge candidate documents\n                           \u2193\n              Normalize scores or use RRF\n                           \u2193\n                    Rank documents\n                           \u2193\n              Optional cross-encoder reranker\n                           \u2193\n                    Send context to LLM\n```\n\nA practical system might retrieve the top 50 documents from each method, merge them, apply weighted score fusion or RRF, and then keep the top 5\u201310 documents for the LLM.\n\n## Which fusion method should be used?\n\n- **Weighted normalized scores**: useful when score distributions are stable and you want explicit control over the lexical/semantic balance.\n- **RRF**: a strong default when score scales differ or normalization is unreliable.\n- **Learned fusion**: best for production systems with labeled relevance data; a model learns how much to trust each retrieval signal.\n\nBM25 is particularly valuable for exact terms, identifiers, and rare keywords, while vector similarity handles paraphrases and semantically related wording. Hybrid search combines those complementary strengths.",
+          "prompt_tokens": 1297,
+          "completion_tokens": 1749,
+          "cached_tokens": 1294,
+          "latency_ms": 12122.38554097712,
+          "cost": 0.0106264,
+          "abstained": false
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "An MCP server exposes three core primitives to clients:\n\n- **Tools** \u2014 executable functions the client/model can invoke.\n- **Resources** \u2014 data or context the client can read, such as files, documents, or database records.\n- **Prompts** \u2014 reusable prompt templates exposed by the server.\n\nMCP uses **JSON-RPC 2.0** for messages. Its transports include:\n\n- **stdio** for local server processes\n- **HTTP-based transport** for remote servers\u2014originally HTTP with SSE, with **Streamable HTTP** used in newer MCP versions.",
+          "prompt_tokens": 1186,
+          "completion_tokens": 245,
+          "cached_tokens": 1183,
+          "latency_ms": 2658.906999975443,
+          "cost": 0.0015913,
+          "abstained": false
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "Chroma uses **HNSW (Hierarchical Navigable Small World)**\u2014typically through its HNSW-based vector index\u2014for approximate nearest-neighbour search.\n\nHNSW builds a multilayer graph:\n\n- Upper layers contain sparse, long-range links for quickly navigating the space.\n- Lower layers contain denser links for refining the nearest-neighbour results.\n- A query starts at an entry point in the upper layers and greedily descends toward closer vectors.\n\nBecause it does not compare the query with every stored vector, HNSW is much faster and scales better than exact search. The trade-off is that it may miss some true nearest neighbours:\n\n- **Higher search breadth (`ef_search`)**: examines more candidates, improving recall but increasing latency and CPU usage.\n- **Lower `ef_search`**: examines fewer candidates, giving faster responses but potentially lower recall.\n- **Higher graph connectivity (`M`)**: creates a richer index and generally improves recall, but uses more memory and increases build time.\n\nThus, HNSW provides a tunable **speed-versus-recall** trade-off. Chroma may also temporarily use a brute-force buffer for newly added vectors before they are incorporated into the HNSW index.",
+          "prompt_tokens": 1294,
+          "completion_tokens": 351,
+          "cached_tokens": 1291,
+          "latency_ms": 3705.7992500485852,
+          "cost": 0.0022381000000000002,
+          "abstained": false
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "OpenAI cached prompt prefixes typically remain valid for **5\u201310 minutes of inactivity**. They may persist for **up to about 1 hour during off-peak periods**, but there is no guaranteed fixed expiration time.",
+          "prompt_tokens": 1414,
+          "completion_tokens": 213,
+          "cached_tokens": 1411,
+          "latency_ms": 2407.514040998649,
+          "cost": 0.0014221,
+          "abstained": false
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 6473,
+      "total_completion_tokens": 2787,
+      "total_cached_tokens": 6458,
+      "total_cost": 0.0173828,
+      "cost_per_query": 0.00347656,
+      "mean_latency_ms": 4673.3928247937,
+      "max_latency_ms": 12122.38554097712,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "hallucinations": 5,
+      "hallucinated_questions": [
+        "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+        "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+        "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+        "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+        "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?"
+      ]
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "baseline",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "**Faithfulness** measures whether the generated answer is factually supported by the retrieved context, rather than introducing unsupported claims or hallucinations.\n\nA common calculation is:\n\n\\[\n\\text{Faithfulness} =\n\\frac{\\text{number of answer claims supported by the context}}\n{\\text{total number of answer claims}}\n\\]\n\nFor example, if 3 of 4 claims are supported, the faithfulness score is \\(3/4 = 0.75\\), or **75%**. An LLM judge is often used to identify and verify the claims.",
+          "prompt_tokens": 1282,
+          "completion_tokens": 177,
+          "cached_tokens": 1279,
+          "latency_ms": 1897.7182500530034,
+          "cost": 0.0011929,
+          "abstained": false
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "## BM25 scoring\n\nBM25 is a lexical-retrieval method. It scores a document based on how well its terms match the query, while accounting for:\n\n- **Term frequency (TF):** how often a query term occurs in the document\n- **Inverse document frequency (IDF):** rare terms matter more than common terms\n- **Document length:** very long documents are normalized so they do not win merely by containing more words\n- **Term-frequency saturation:** repeating a term many times has diminishing benefit\n\nA common BM25 formula is:\n\n\\[\n\\text{BM25}(D,Q)=\n\\sum_{t \\in Q}\n\\operatorname{IDF}(t)\n\\cdot\n\\frac{f(t,D)(k_1+1)}\n{f(t,D)+k_1\\left(1-b+b\\frac{|D|}{\\text{avgdl}}\\right)}\n\\]\n\nWhere:\n\n- \\(f(t,D)\\) is the frequency of term \\(t\\) in document \\(D\\)\n- \\(|D|\\) is the document length\n- \\(\\text{avgdl}\\) is the average document length\n- \\(k_1\\), commonly around `1.2\u20132.0`, controls TF saturation\n- \\(b\\), commonly `0.75`, controls length normalization\n- \\(\\operatorname{IDF}(t)\\) is typically computed from the number of documents containing \\(t\\), for example:\n\n\\[\n\\operatorname{IDF}(t)\n=\n\\log\\left(\n1+\\frac{N-n(t)+0.5}{n(t)+0.5}\n\\right)\n\\]\n\nHere, \\(N\\) is the number of documents and \\(n(t)\\) is the number containing term \\(t\\).\n\nA document containing an exact rare term\u2014such as a product code, name, or error identifier\u2014can therefore receive a high BM25 score even if its overall semantic meaning is not especially close to the query.\n\n## Hybrid search\n\nHybrid search runs two retrieval systems:\n\n1. **BM25 search** for exact or lexical matches\n2. **Vector search** for semantic similarity\n\nFor example:\n\n```text\nQuery: \"ticket prices to Heathrow\"\n\nBM25 may favor documents containing:\n\"ticket\", \"prices\", and \"Heathrow\"\n\nVector search may favor a document containing:\n\"airfare costs to London Airport\"\n```\n\nThe two result sets are then combined.\n\n## Weighted score fusion\n\nThe simplest approach is:\n\n\\[\nS(D)=\\alpha \\cdot S_{\\text{BM25}}(D)\n+\n(1-\\alpha)\\cdot S_{\\text{vector}}(D)\n\\]\n\nwhere \\(\\alpha\\) controls the balance between lexical and semantic retrieval.\n\nHowever, raw BM25 and vector scores usually have different scales and meanings. They should generally be normalized first:\n\n\\[\nS(D)=\n\\alpha \\cdot \\operatorname{norm}(S_{\\text{BM25}}(D))\n+\n(1-\\alpha)\\cdot \\operatorname{norm}(S_{\\text{vector}}(D))\n\\]\n\nPossible normalization methods include:\n\n- Min-max normalization\n- Z-score normalization\n- Rank-based normalization\n- Reciprocal transformations for distance scores\n\nFor vector databases, note that the returned value may be a **distance**, where lower is better, rather than a similarity, where higher is better. It must be converted or inverted before fusion.\n\n## Reciprocal Rank Fusion\n\nA widely used alternative is **Reciprocal Rank Fusion (RRF)**. It does not combine raw scores; it combines result ranks:\n\n\\[\n\\operatorname{RRF}(D)\n=\n\\sum_{r \\in \\text{retrievers}}\n\\frac{w_r}{k+\\operatorname{rank}_r(D)}\n\\]\n\n- \\(w_r\\) is the weight for a retriever\n- \\(\\operatorname{rank}_r(D)\\) is the document's rank in that retriever's results\n- \\(k\\) is a smoothing constant, often `60`\n\nIf a document appears near the top in either BM25 or vector results, it receives a strong score. If it appears in both lists, its contributions add together.\n\nExample:\n\n```python\ndef rrf_score(rank, weight=1.0, k=60):\n    return weight / (k + rank)\n\nfinal_score = (\n    rrf_score(bm25_rank, weight=0.5)\n    + rrf_score(vector_rank, weight=0.5)\n)\n```\n\nDocuments missing from one result list contribute zero for that retriever.\n\n## Practical distinction\n\n- **BM25** is strong for exact names, identifiers, quoted phrases, dates, and technical terms.\n- **Vector similarity** is strong for paraphrases and conceptually related wording.\n- **Fusion** combines both strengths.\n\nA typical production pipeline is:\n\n```text\n1. Run BM25 and vector search independently\n2. Retrieve top-k candidates from each\n3. Normalize scores or use RRF\n4. Merge and rank candidates\n5. Optionally rerank the top candidates\n6. Send the best documents to the LLM\n```\n\nThere is no universally correct fusion weight. It is normally tuned using representative evaluation queries. For example, a system emphasizing product codes may use more BM25 weight, while a conversational knowledge-base system may give vector search more influence.",
+          "prompt_tokens": 1297,
+          "completion_tokens": 1202,
+          "cached_tokens": 1294,
+          "latency_ms": 8242.731750011444,
+          "cost": 0.0073444,
+          "abstained": false
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "An MCP server exposes three main primitives:\n\n- **Tools** \u2014 executable functions the client/model can invoke.\n- **Resources** \u2014 readable data or context, identified by URIs.\n- **Prompts** \u2014 reusable prompt templates or workflows.\n\nMCP messages use **JSON-RPC 2.0**. The protocol can be transported over:\n\n- **stdio** for local server processes\n- **Streamable HTTP** for remote servers (with legacy HTTP+SSE support in older implementations)",
+          "prompt_tokens": 1186,
+          "completion_tokens": 226,
+          "cached_tokens": 1183,
+          "latency_ms": 2618.568208999932,
+          "cost": 0.0014773,
+          "abstained": false
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "Chroma generally uses an **HNSW (Hierarchical Navigable Small World) graph** index under the hood, via its vector-search backend (commonly `hnswlib`/HNSW-based indexing; exact implementation can vary by Chroma version).\n\nHNSW builds a multi-layer graph:\n\n- Upper layers contain fewer, long-range connections for fast navigation.\n- The bottom layer contains more connections and provides detailed local search.\n- At query time, it greedily traverses the graph to find vectors close to the query rather than comparing against every vector.\n\nThis is approximate search because it may not visit every potentially relevant vector:\n\n- **Higher search effort**\u2014for example, increasing `ef`/`ef_search`\u2014examines more candidates, improving recall but increasing latency and CPU usage.\n- **Lower search effort** returns faster results but may miss some true nearest neighbors.\n- **Higher graph connectivity** (`M`) usually improves recall and robustness, but increases memory usage and indexing cost.\n\nSo the trade-off is:\n\n```text\nmore candidates / connections \u2192 higher recall, slower and more expensive\nfewer candidates / connections \u2192 lower recall, faster and cheaper\n```\n\nIt is not strictly a \u201crecall versus speed\u201d limitation of Chroma specifically; it is the normal tunable trade-off of approximate HNSW search.",
+          "prompt_tokens": 1294,
+          "completion_tokens": 328,
+          "cached_tokens": 1291,
+          "latency_ms": 3441.870833048597,
+          "cost": 0.0021001,
+          "abstained": false
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "OpenAI\u2019s cached prompt prefix typically remains valid for **5\u201310 minutes of inactivity**, and is generally cleared within **one hour at most**. This isn\u2019t a guaranteed fixed TTL\u2014caches may be evicted earlier due to capacity or other factors.",
+          "prompt_tokens": 1414,
+          "completion_tokens": 229,
+          "cached_tokens": 1411,
+          "latency_ms": 2898.4680420253426,
+          "cost": 0.0015181,
+          "abstained": false
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 6473,
+      "total_completion_tokens": 2162,
+      "total_cached_tokens": 6458,
+      "total_cost": 0.0136328,
+      "cost_per_query": 0.0027265600000000003,
+      "mean_latency_ms": 3819.871416827664,
+      "max_latency_ms": 8242.731750011444,
+      "trace_url": null,
+      "n_abstained": 0,
+      "abstention_rate": 0.0,
+      "hallucinations": 5,
+      "hallucinated_questions": [
+        "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+        "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+        "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+        "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+        "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?"
+      ]
+    }
+  ],
+  "B_golden_baseline": {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "rerank": true,
+    "pool": 20,
+    "n_chunks": 734,
+    "n_questions": 20,
+    "question_set": "golden.jsonl",
+    "trap": false,
+    "mrr": 0.7849999999999999,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 2,
+    "embed_secs": null,
+    "generate": true,
+    "prompt_variant": "baseline",
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "answer": "NDCG measures the quality and ranking of **all relevant chunks** in the retrieved results, giving higher-ranked chunks more weight. It evaluates whether relevant information is concentrated near the top or scattered throughout the list.\n\nMRR only considers the position of the **first relevant chunk** and ignores any additional relevant chunks.",
+        "prompt_tokens": 1537,
+        "completion_tokens": 65,
+        "cached_tokens": 0,
+        "latency_ms": 1146.8939170008525,
+        "cost": 0.001927,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "NDCG measures the quality and ranking of all relevant chunks in the retrieved results, giving higher-ranked chunks more weight.",
+              "grounded": true,
+              "why": "The context states that NDCG considers all relevant chunks and discounts lower positions via a log-based denominator, so chunks nearer the top contribute more."
+            },
+            {
+              "claim": "NDCG evaluates whether relevant information is concentrated near the top or scattered throughout the list.",
+              "grounded": true,
+              "why": "The context explicitly describes NDCG as asking whether relevant chunks are near the top or scattered throughout."
+            },
+            {
+              "claim": "MRR only considers the position of the first relevant chunk and ignores additional relevant chunks.",
+              "grounded": true,
+              "why": "The context explicitly contrasts NDCG with MRR by stating that MRR only looks at the first hit."
+            }
+          ],
+          "prompt_tokens": 1898,
+          "completion_tokens": 212,
+          "cached_tokens": 0,
+          "latency_ms": 2385.7115829596296,
+          "cost": 0.007925
+        }
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "IoU (Intersection over Union) is calculated as:\n\n\\[\n\\text{IoU}=\\frac{\\text{Area of Overlap}}{\\text{Area of Union}}\n\\]\n\nFor a predicted box and a ground-truth box:\n\n1. Find the coordinates of their overlapping rectangle:\n   \\[\n   x_{\\text{left}}=\\max(x_{1p},x_{1g}),\\quad\n   y_{\\text{top}}=\\max(y_{1p},y_{1g})\n   \\]\n   \\[\n   x_{\\text{right}}=\\min(x_{2p},x_{2g}),\\quad\n   y_{\\text{bottom}}=\\min(y_{2p},y_{2g})\n   \\]\n\n2. Calculate intersection area:\n   \\[\n   A_{\\text{intersection}}=\n   \\max(0,x_{\\text{right}}-x_{\\text{left}})\n   \\times\n   \\max(0,y_{\\text{bottom}}-y_{\\text{top}})\n   \\]\n\n3. Calculate union area:\n   \\[\n   A_{\\text{union}}=A_{\\text{predicted}}+A_{\\text{ground truth}}-A_{\\text{intersection}}\n   \\]\n\n4. Divide:\n   \\[\n   \\text{IoU}=\\frac{A_{\\text{intersection}}}{A_{\\text{union}}}\n   \\]\n\nIoU ranges from **0** (no overlap) to **1** (perfect overlap).",
+        "prompt_tokens": 1517,
+        "completion_tokens": 311,
+        "cached_tokens": 0,
+        "latency_ms": 2120.860041992273,
+        "cost": 0.0033829999999999997,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 2,
+          "total_claims": 5,
+          "claims": [
+            {
+              "claim": "IoU is calculated as Area of Overlap divided by Area of Union.",
+              "grounded": true,
+              "why": "The context explicitly defines IoU as 'Area of Overlap / Area of Union.'"
+            },
+            {
+              "claim": "The overlap rectangle coordinates can be found using max of left/top coordinates and min of right/bottom coordinates.",
+              "grounded": false,
+              "why": "The context does not provide coordinate-based formulas for finding an overlap rectangle."
+            },
+            {
+              "claim": "The intersection area is max(0, x_right-x_left) multiplied by max(0, y_bottom-y_top).",
+              "grounded": false,
+              "why": "The context does not state this intersection-area formula."
+            },
+            {
+              "claim": "The union area equals predicted-box area plus ground-truth-box area minus intersection area.",
+              "grounded": false,
+              "why": "The context does not provide a formula for union area."
+            },
+            {
+              "claim": "IoU ranges from 0 for no overlap to 1 for perfect overlap.",
+              "grounded": true,
+              "why": "The context explicitly states that IoU ranges from 0 (no overlap) to 1 (perfect match)."
+            }
+          ],
+          "prompt_tokens": 2125,
+          "completion_tokens": 295,
+          "cached_tokens": 0,
+          "latency_ms": 3053.045833017677,
+          "cost": 0.0097375
+        }
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LoRA stands for **Low-Rank Adapters** (also commonly called **Low-Rank Adaptation**).",
+        "prompt_tokens": 1280,
+        "completion_tokens": 26,
+        "cached_tokens": 0,
+        "latency_ms": 1036.8804160389118,
+        "cost": 0.0014360000000000002,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "LoRA stands for Low-Rank Adapters.",
+              "grounded": true,
+              "why": "The context explicitly states: 'LoRA stands for Low Rank Adapters.'"
+            },
+            {
+              "claim": "LoRA is also called Low-Rank Adaptation.",
+              "grounded": true,
+              "why": "The context explicitly labels 'LoRA (Low-Rank Adaptation)' and describes it as such."
+            }
+          ],
+          "prompt_tokens": 1607,
+          "completion_tokens": 143,
+          "cached_tokens": 0,
+          "latency_ms": 1944.1741249756888,
+          "cost": 0.0061625000000000004
+        }
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangSmith handles monitoring and debugging in the LangChain ecosystem.",
+        "prompt_tokens": 1160,
+        "completion_tokens": 15,
+        "cached_tokens": 0,
+        "latency_ms": 955.3277500090189,
+        "cost": 0.00125,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LangSmith handles monitoring and debugging in the LangChain ecosystem.",
+              "grounded": true,
+              "why": "The context explicitly describes LangSmith as the monitoring and observability tool for the LangChain ecosystem and lists quick debugging of failures as a capability."
+            }
+          ],
+          "prompt_tokens": 1471,
+          "completion_tokens": 79,
+          "cached_tokens": 0,
+          "latency_ms": 1336.9796249899082,
+          "cost": 0.0048625000000000005
+        }
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "RAG optimization is described as **whack-a-mole** because fixing one retrieval problem can create or reveal another. For example, changing chunk boundaries might keep an employee\u2019s full name together and improve one answer, but cause a different question to fail by separating other relevant information. As a result, developers repeatedly adjust chunking, embeddings, or retrieval settings, with new issues appearing each time.",
+        "prompt_tokens": 1204,
+        "completion_tokens": 82,
+        "cached_tokens": 0,
+        "latency_ms": 1588.437124970369,
+        "cost": 0.001696,
+        "abstained": false,
+        "judge": {
+          "score": 4,
+          "grounded_claims": 2,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "RAG optimization is described as \u201cwhack-a-mole\u201d because fixing one retrieval problem can create or reveal another.",
+              "grounded": true,
+              "why": "The context explicitly says that after adjusting chunking to fix one problem, a different question can start failing, calling this the \u201cwhack-a-mole\u201d nature of RAG optimization."
+            },
+            {
+              "claim": "Changing chunk boundaries might keep a person\u2019s full name together and improve one answer, but cause a different question to fail by separating other relevant information.",
+              "grounded": true,
+              "why": "The context gives a case where chunk boundaries split \u201cMaxine Thompson,\u201d and states that adjusting chunking can fix that issue while another question then fails."
+            },
+            {
+              "claim": "Developers repeatedly adjust chunking, embeddings, or retrieval settings, with new issues appearing each time.",
+              "grounded": false,
+              "why": "The context supports repeated adjustment of chunking and recurring issues, but does not specifically state that embeddings or retrieval settings are repeatedly adjusted in this whack-a-mole process."
+            }
+          ],
+          "prompt_tokens": 1581,
+          "completion_tokens": 318,
+          "cached_tokens": 0,
+          "latency_ms": 3294.828124984633,
+          "cost": 0.0087225
+        }
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "The **Chat Completions API** is a standard interface for interacting with large language models. You provide a conversation as a list of messages\u2014typically with `system`, `user`, and `assistant` roles\u2014and the model generates the next response.\n\nFor example:\n\n```python\nresponse = client.chat.completions.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\"role\": \"system\", \"content\": \"You are a helpful assistant.\"},\n        {\"role\": \"user\", \"content\": \"Hello!\"}\n    ]\n)\n\nprint(response.choices[0].message.content)\n```\n\nBehind the scenes, the API sends an HTTP request to the model provider, which returns a JSON response containing the generated message and usage information. The API is stateless, so conversation history must be included in each request to maintain context.",
+        "prompt_tokens": 1280,
+        "completion_tokens": 175,
+        "cached_tokens": 0,
+        "latency_ms": 1864.8779999930412,
+        "cost": 0.00233,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 7,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "The Chat Completions API is a standard way to interact with large language models.",
+              "grounded": true,
+              "why": "The context explicitly calls it 'the standard way to interact with LLMs.'"
+            },
+            {
+              "claim": "A conversation is provided as a list of messages, typically using system, user, and assistant roles.",
+              "grounded": true,
+              "why": "The context shows a messages list containing system, user, and assistant roles and explains that users provide a conversation/chat history."
+            },
+            {
+              "claim": "The model generates or predicts the next response in the conversation.",
+              "grounded": true,
+              "why": "The context states that completions means the model predicts what comes next and describes it as predicting the most likely response."
+            },
+            {
+              "claim": "The example call uses model 'gpt-4o-mini', passes system and user messages, and reads the output from response.choices[0].message.content.",
+              "grounded": true,
+              "why": "The context provides an equivalent API-call example using gpt-4o-mini and explicitly identifies response.choices[0].message.content as the response text."
+            },
+            {
+              "claim": "Behind the scenes, an API call sends an HTTP request to the provider's servers and receives a JSON response.",
+              "grounded": true,
+              "why": "The context says code builds an HTTP request, sends it to an endpoint, OpenAI's servers process it, and a response comes back as JSON."
+            },
+            {
+              "claim": "The response includes the generated message and usage information.",
+              "grounded": true,
+              "why": "The illustrated response structure includes message.content and a usage object with prompt, completion, and total token counts."
+            },
+            {
+              "claim": "The API is stateless, so the conversation history must be included with each request to maintain context.",
+              "grounded": true,
+              "why": "The context explicitly says every API call is stateless and that the entire conversation history is passed with every call to create memory."
+            }
+          ],
+          "prompt_tokens": 1754,
+          "completion_tokens": 490,
+          "cached_tokens": 0,
+          "latency_ms": 5213.615208980627,
+          "cost": 0.011734999999999999
+        }
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "Chat models are optimized to respond quickly and naturally in conversations. They are generally good for:\n\n- General questions and interactive chat\n- Creative writing\n- Summarization and rewriting\n- Following straightforward instructions\n- Fast, high-volume applications\n\nReasoning models are optimized to work through complex problems before producing an answer. They are generally better for:\n\n- Mathematics and logic\n- Complex coding and debugging\n- Multi-step planning\n- Difficult analysis and problem-solving\n\nThe main trade-offs are:\n\n| Aspect | Chat models | Reasoning models |\n|---|---|---|\n| Speed | Faster | Slower |\n| Cost | Usually lower | Usually higher |\n| Creativity | Often stronger | May be less creative |\n| Complex problem-solving | Good | Usually better |\n| Best use | Conversation and content | Logic-heavy, multi-step tasks |\n\nA reasoning model may spend more computation internally before answering, while a chat model typically responds more directly. Reasoning models are not always better\u2014for a simple question or creative task, a chat model is often the better choice.",
+        "prompt_tokens": 1243,
+        "completion_tokens": 215,
+        "cached_tokens": 0,
+        "latency_ms": 2143.8691669609398,
+        "cost": 0.0025329999999999997,
+        "abstained": false,
+        "judge": {
+          "score": 4,
+          "grounded_claims": 13,
+          "total_claims": 18,
+          "claims": [
+            {
+              "claim": "Chat models are optimized to respond quickly and naturally in conversations.",
+              "grounded": true,
+              "why": "The context describes chat models as fast, good for general conversation, and trained specifically for conversations."
+            },
+            {
+              "claim": "Chat models are generally good for general questions and interactive chat.",
+              "grounded": true,
+              "why": "The context says chat models are good for general conversation and interactive use."
+            },
+            {
+              "claim": "Chat models are generally good for creative writing.",
+              "grounded": true,
+              "why": "The context says chat models are better for creative content."
+            },
+            {
+              "claim": "Chat models are generally good for summarization and rewriting.",
+              "grounded": false,
+              "why": "The context does not mention summarization or rewriting as chat-model strengths."
+            },
+            {
+              "claim": "Chat models are generally good at following straightforward instructions.",
+              "grounded": true,
+              "why": "The context says chat models are trained on user-message-to-good-response data and understand user prompts and how to respond helpfully; it also identifies instruction-following as a chat-model capability."
+            },
+            {
+              "claim": "Chat models are generally good for fast, high-volume applications.",
+              "grounded": false,
+              "why": "The context says chat models are fast and discusses open source for high-volume applications, but does not specifically establish chat models as suited for high-volume applications."
+            },
+            {
+              "claim": "Reasoning models are optimized to work through complex problems before producing an answer.",
+              "grounded": true,
+              "why": "The context says reasoning models think before responding, generate a thinking trace, work through problems step by step, and are better at complex problem-solving."
+            },
+            {
+              "claim": "Reasoning models are generally better for mathematics and logic.",
+              "grounded": true,
+              "why": "The context identifies O1/O3-mini reasoning models as excellent for math and logic."
+            },
+            {
+              "claim": "Reasoning models are generally better for complex coding and debugging.",
+              "grounded": false,
+              "why": "The context says certain reasoning models are excellent for coding, but does not mention debugging or establish this as a general reasoning-model advantage."
+            },
+            {
+              "claim": "Reasoning models are generally better for multi-step planning.",
+              "grounded": false,
+              "why": "The context does not discuss multi-step planning."
+            },
+            {
+              "claim": "Reasoning models are generally better for difficult analysis and problem-solving.",
+              "grounded": true,
+              "why": "The context says reasoning models are better at complex problem-solving and lists complex reasoning as their use case."
+            },
+            {
+              "claim": "Chat models are faster than reasoning models.",
+              "grounded": true,
+              "why": "The context characterizes chat models as fast and reasoning models as slower."
+            },
+            {
+              "claim": "Chat models usually cost less than reasoning models.",
+              "grounded": true,
+              "why": "The comparison table lists chat-model cost as low and reasoning-model cost as higher."
+            },
+            {
+              "claim": "Chat models are often stronger creatively, while reasoning models may be less creative.",
+              "grounded": true,
+              "why": "The context says chat models are better for creative content and that reasoning models may not be as good at generating creative content."
+            },
+            {
+              "claim": "Reasoning models are usually better at complex problem-solving than chat models.",
+              "grounded": true,
+              "why": "The comparison table rates chat problem-solving as good and reasoning problem-solving as excellent."
+            },
+            {
+              "claim": "Chat models are best for conversation and content, while reasoning models are best for logic-heavy, multi-step tasks.",
+              "grounded": false,
+              "why": "Conversation/content and complex reasoning are supported use cases, but the context does not specifically state 'logic-heavy, multi-step tasks' as the best-use formulation."
+            },
+            {
+              "claim": "A reasoning model may spend more computation internally before answering, whereas a chat model typically responds more directly.",
+              "grounded": true,
+              "why": "The context says reasoning models generate a thinking trace and think before responding, while chat models are described as fast conversational responders."
+            },
+            {
+              "claim": "Reasoning models are not always better; for simple questions or creative tasks, a chat model is often the better choice.",
+              "grounded": true,
+              "why": "The context explicitly says reasoning models are not always better and may not be as good at creative content; it also contrasts instant responses to simple questions with careful reasoning for complex puzzles."
+            }
+          ],
+          "prompt_tokens": 1757,
+          "completion_tokens": 993,
+          "cached_tokens": 0,
+          "latency_ms": 7715.721332991961,
+          "cost": 0.0192875
+        }
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangChain and LiteLLM differ mainly in scope and abstraction level:\n\n| Aspect | LangChain | LiteLLM |\n|---|---|---|\n| **Purpose** | Full framework for building LLM applications | Lightweight interface for calling different LLM providers |\n| **Abstraction** | High-level abstractions for chains, agents, RAG, memory, tools, and workflows | Thin, consistent API modeled largely after OpenAI\u2019s API |\n| **Typical use** | Complex applications and multi-step workflows | Simple, provider-agnostic model calls |\n| **Example** | Build an agent or RAG pipeline using built-in components | Call GPT, Claude, Gemini, or other models with similar code |\n| **Trade-off** | More features and scaffolding, but heavier and less transparent | Easier to understand and more direct, but fewer application-level features |\n\nFor example, LiteLLM lets you switch providers with a small model-name change:\n\n```python\nfrom litellm import completion\n\nresponse = completion(\n    model=\"openai/gpt-4o-mini\",\n    messages=[{\"role\": \"user\", \"content\": \"Tell me a joke\"}]\n)\n```\n\nLangChain provides a broader application framework:\n\n```python\nfrom langchain_openai import ChatOpenAI\n\nllm = ChatOpenAI(model=\"gpt-4o-mini\")\nresponse = llm.invoke(\"Tell me a joke\")\n```\n\nIn short: **LiteLLM standardizes access to LLM APIs, while LangChain helps structure and orchestrate complete LLM applications.** They can also be used together.",
+        "prompt_tokens": 1166,
+        "completion_tokens": 328,
+        "cached_tokens": 0,
+        "latency_ms": 2632.9217909951694,
+        "cost": 0.003134,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 10,
+          "total_claims": 16,
+          "claims": [
+            {
+              "claim": "LangChain and LiteLLM differ mainly in scope and abstraction level.",
+              "grounded": true,
+              "why": "The context describes LangChain as a feature-rich, heavyweight abstraction framework and LiteLLM as a lightweight framework focused on consistent provider calls."
+            },
+            {
+              "claim": "LangChain is a full framework for building LLM applications.",
+              "grounded": true,
+              "why": "The context calls LangChain an open-source framework for building applications with LLMs."
+            },
+            {
+              "claim": "LiteLLM is a lightweight interface for calling different LLM providers.",
+              "grounded": true,
+              "why": "The context says LiteLLM is lightweight and provides a simple, consistent way to call any LLM provider."
+            },
+            {
+              "claim": "LangChain provides high-level abstractions for chains, agents, RAG, memory, tools, and workflows.",
+              "grounded": true,
+              "why": "The context explicitly lists chaining, agents, RAG, memory management, tool abstractions, and LCEL workflows."
+            },
+            {
+              "claim": "LiteLLM has a thin, consistent API modeled largely after OpenAI\u2019s API.",
+              "grounded": false,
+              "why": "The context supports that LiteLLM has a simple, consistent calling interface, but does not say it is thin or modeled after OpenAI's API."
+            },
+            {
+              "claim": "LangChain is typically used for complex applications and multi-step workflows.",
+              "grounded": true,
+              "why": "The context says LangChain is excellent for complex applications and describes its chaining and workflow capabilities."
+            },
+            {
+              "claim": "LiteLLM is typically used for simple, provider-agnostic model calls.",
+              "grounded": true,
+              "why": "The context says LiteLLM does one thing well: offering a simple, consistent way to call any LLM provider."
+            },
+            {
+              "claim": "LiteLLM can call GPT, Claude, Gemini, or other models with similar code.",
+              "grounded": false,
+              "why": "The context supports calls to any LLM provider in general, but does not specifically establish GPT, Claude, and Gemini calls through LiteLLM or that their code is similar."
+            },
+            {
+              "claim": "LangChain has more features and scaffolding but is heavier and less transparent.",
+              "grounded": true,
+              "why": "The context describes LangChain as powerful and heavyweight, offering scaffolding, while noting its abstractions can obscure prompts and reduce under-the-hood visibility."
+            },
+            {
+              "claim": "LiteLLM is easier to understand and more direct, but has fewer application-level features.",
+              "grounded": false,
+              "why": "Its lightweight, simple focus is supported, but the context does not explicitly compare its understandability, directness, or application-level feature set against LangChain."
+            },
+            {
+              "claim": "The LiteLLM code example shown is a valid example of calling openai/gpt-4o-mini with a user message and reading the response content.",
+              "grounded": true,
+              "why": "This code is substantively the same as the LiteLLM example in the context."
+            },
+            {
+              "claim": "Changing a LiteLLM model name lets a user switch providers with only a small model-name change.",
+              "grounded": false,
+              "why": "The context says LiteLLM provides a consistent way to call any provider, but does not specifically state that switching requires only a model-name change."
+            },
+            {
+              "claim": "The LangChain code example shown is a valid example of using ChatOpenAI with gpt-4o-mini and invoking it with a prompt.",
+              "grounded": true,
+              "why": "This code is substantively the same as the LangChain example in the context."
+            },
+            {
+              "claim": "LangChain provides a broader application framework.",
+              "grounded": true,
+              "why": "The context presents LangChain as a comprehensive framework with application-building features beyond direct model calls."
+            },
+            {
+              "claim": "LiteLLM standardizes access to LLM APIs, while LangChain helps structure and orchestrate complete LLM applications.",
+              "grounded": true,
+              "why": "This is a supported summary of LiteLLM's consistent provider-call interface and LangChain's framework, chains, workflows, and application tooling."
+            },
+            {
+              "claim": "LiteLLM and LangChain can be used together.",
+              "grounded": false,
+              "why": "The context does not state that LiteLLM and LangChain are interoperable or can be used together."
+            }
+          ],
+          "prompt_tokens": 1792,
+          "completion_tokens": 959,
+          "cached_tokens": 0,
+          "latency_ms": 6914.810416987166,
+          "cost": 0.018865
+        }
+      },
+      {
+        "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Prompt caching is a feature that lets an LLM provider reuse processing for prompt content that stays the same across requests, such as a large policy document or system instructions. This reduces latency and input-token costs.\n\nFor best results:\n\n- Put static content first.\n- Put variable content, such as the user\u2019s question or current date, last.\n- Some providers cache automatically, while others require you to explicitly mark content for caching.\n\nThe exact savings and caching rules depend on the provider.",
+        "prompt_tokens": 1259,
+        "completion_tokens": 99,
+        "cached_tokens": 0,
+        "latency_ms": 1567.1245410339907,
+        "cost": 0.0018529999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 4,
+          "grounded_claims": 6,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "Prompt caching lets an LLM provider reuse processing for prompt content that stays the same across requests.",
+              "grounded": true,
+              "why": "The context says prompt caching allows the provider to reuse some processing work when sending the same or similar prompts repeatedly."
+            },
+            {
+              "claim": "A large policy document or system instructions can be examples of reusable static prompt content.",
+              "grounded": true,
+              "why": "The context gives a company 10-page policy document as the caching example and discusses system prompts as content processed at the beginning that shapes subsequent responses."
+            },
+            {
+              "claim": "Prompt caching reduces latency and input-token costs.",
+              "grounded": false,
+              "why": "The context explicitly says caching saves money and gives token-cost discounts, but it does not state that caching reduces latency."
+            },
+            {
+              "claim": "Static content should be placed first in the prompt.",
+              "grounded": true,
+              "why": "The context's golden rule is: 'Put static content FIRST, variable content LAST.'"
+            },
+            {
+              "claim": "Variable content, such as the user's question or current date, should be placed last.",
+              "grounded": true,
+              "why": "The context says to put variable content last and uses a user question and today's date as examples."
+            },
+            {
+              "claim": "Some providers cache automatically, while others require explicit marking of content for caching.",
+              "grounded": true,
+              "why": "The context says OpenAI caching is automatic, while Anthropic requires the user to tell it what to cache."
+            },
+            {
+              "claim": "Exact savings and caching rules depend on the provider.",
+              "grounded": true,
+              "why": "The context lists different caching modes, prices, and matching requirements for OpenAI, Anthropic, and Gemini."
+            }
+          ],
+          "prompt_tokens": 1661,
+          "completion_tokens": 378,
+          "cached_tokens": 0,
+          "latency_ms": 4608.975415991154,
+          "cost": 0.009822500000000001
+        }
+      },
+      {
+        "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Computer vision is a field of artificial intelligence that enables machines to interpret and understand visual information\u2014such as images, videos, and live camera feeds. It uses image processing and often machine learning to identify objects, detect motion, recognize patterns, and derive meaningful information from visual data.",
+        "prompt_tokens": 1114,
+        "completion_tokens": 58,
+        "cached_tokens": 0,
+        "latency_ms": 1151.4261669944972,
+        "cost": 0.001462,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Computer vision is a field of artificial intelligence that enables machines to interpret and understand visual information such as images, videos, and live camera feeds.",
+              "grounded": true,
+              "why": "The context defines computer vision as a field of AI that teaches machines to interpret and understand visual information from images, videos, and live camera feeds."
+            },
+            {
+              "claim": "Computer vision uses image processing and often machine learning.",
+              "grounded": true,
+              "why": "The context states that modern CV systems use image processing to prepare data and machine learning to recognize patterns."
+            },
+            {
+              "claim": "Computer vision can identify objects, detect motion, recognize patterns, and derive meaningful information from visual data.",
+              "grounded": true,
+              "why": "The context says CV recognizes objects, detects motion, uses machine learning to recognize patterns, and outputs understanding/meaning from images."
+            }
+          ],
+          "prompt_tokens": 1475,
+          "completion_tokens": 257,
+          "cached_tokens": 0,
+          "latency_ms": 2496.4151669992134,
+          "cost": 0.007542500000000001
+        }
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "`RecursiveCharacterTextSplitter` is more context-aware than a plain character splitter.\n\n- **Plain character splitter:** Divides text strictly at a fixed character count, regardless of paragraphs, sentences, or words. This can split related content awkwardly.\n- **RecursiveCharacterTextSplitter:** Tries multiple separators in order\u2014typically paragraph breaks, line breaks, sentences, and finally words\u2014while targeting the specified chunk size. This helps preserve natural boundaries and context.\n\nBoth support parameters such as `chunk_size` and `chunk_overlap`, but the recursive splitter generally produces more coherent chunks and is better suited for most documents.",
+        "prompt_tokens": 1276,
+        "completion_tokens": 125,
+        "cached_tokens": 0,
+        "latency_ms": 1865.2792909997515,
+        "cost": 0.002026,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 6,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "RecursiveCharacterTextSplitter is more context-aware than a plain character splitter.",
+              "grounded": true,
+              "why": "The context says CharacterTextSplitter has no intelligence about content structure, while RecursiveCharacterTextSplitter splits at natural boundaries and preserves context better."
+            },
+            {
+              "claim": "A plain character splitter divides text by character count without regard for content structure such as paragraphs, sentences, or words.",
+              "grounded": true,
+              "why": "The context describes CharacterTextSplitter as splitting by character count with no intelligence about content structure."
+            },
+            {
+              "claim": "RecursiveCharacterTextSplitter tries separators in order: paragraph breaks, line breaks, sentences, and finally words.",
+              "grounded": true,
+              "why": "The context explicitly provides this hierarchy of splitting."
+            },
+            {
+              "claim": "RecursiveCharacterTextSplitter targets a specified chunk size.",
+              "grounded": true,
+              "why": "The context defines chunk_size as the target size in characters and shows it configured for RecursiveCharacterTextSplitter."
+            },
+            {
+              "claim": "RecursiveCharacterTextSplitter helps preserve natural boundaries and context.",
+              "grounded": true,
+              "why": "The context states that it tries natural boundaries and preserves context better."
+            },
+            {
+              "claim": "Both plain character splitters and RecursiveCharacterTextSplitter support parameters such as chunk_size and chunk_overlap.",
+              "grounded": false,
+              "why": "The context shows these parameters for RecursiveCharacterTextSplitter, but does not state that CharacterTextSplitter supports them."
+            },
+            {
+              "claim": "RecursiveCharacterTextSplitter generally produces more coherent chunks and is better suited for most documents.",
+              "grounded": true,
+              "why": "The context says it preserves context better and gives its use case as most documents."
+            }
+          ],
+          "prompt_tokens": 1696,
+          "completion_tokens": 414,
+          "cached_tokens": 0,
+          "latency_ms": 3547.1113749663346,
+          "cost": 0.01045
+        }
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "An LSTM mitigates the vanishing gradient problem through its **cell state**, which provides a relatively direct path for information and gradients across many time steps.\n\nAt each step, the cell state is updated approximately as:\n\n\\[\nc_t = f_t \\odot c_{t-1} + i_t \\odot \\tilde{c}_t\n\\]\n\nwhere:\n\n- \\(f_t\\) is the **forget gate**\n- \\(i_t\\) is the **input gate**\n- \\(c_t\\) is the cell state\n- \\(\\tilde{c}_t\\) is candidate new information\n\nThe key difference from a basic RNN is the **additive cell-state update**. If the forget gate learns values close to 1, then:\n\n\\[\nc_t \\approx c_{t-1}\n\\]\n\nConsequently, gradients can flow backward through many time steps with little reduction. The gates learn:\n\n- **Forget gate:** which old information to preserve or discard\n- **Input gate:** which new information to write\n- **Output gate:** which information to expose as the hidden state\n\nThus, an LSTM does not eliminate vanishing gradients entirely, but its cell-state \u201chighway\u201d and learned gates greatly reduce the problem and allow it to retain long-range dependencies.",
+        "prompt_tokens": 1454,
+        "completion_tokens": 319,
+        "cached_tokens": 0,
+        "latency_ms": 2957.2324579930864,
+        "cost": 0.003368,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 4,
+          "total_claims": 13,
+          "claims": [
+            {
+              "claim": "An LSTM mitigates the vanishing-gradient problem through its cell state, which provides a relatively direct path for information and gradients across many time steps.",
+              "grounded": true,
+              "why": "The context describes the cell state as a long-term-memory highway running through time steps with minimal modification, allowing information to flow unchanged and solving the vanishing-gradient problem."
+            },
+            {
+              "claim": "At each step, the cell state is updated as c_t = f_t \u2299 c_{t-1} + i_t \u2299 c\u0303_t.",
+              "grounded": false,
+              "why": "The context does not provide an LSTM cell-state update equation or describe this additive formula."
+            },
+            {
+              "claim": "f_t is the forget gate.",
+              "grounded": false,
+              "why": "While the context names a forget gate, it does not define the symbol f_t."
+            },
+            {
+              "claim": "i_t is the input gate.",
+              "grounded": false,
+              "why": "While the context names an input gate, it does not define the symbol i_t."
+            },
+            {
+              "claim": "c_t is the cell state.",
+              "grounded": false,
+              "why": "The context discusses a cell state but does not define the symbol c_t."
+            },
+            {
+              "claim": "c\u0303_t is candidate new information.",
+              "grounded": false,
+              "why": "Candidate cell information and the symbol c\u0303_t are not stated in the context."
+            },
+            {
+              "claim": "The key difference from a basic RNN is the additive cell-state update.",
+              "grounded": false,
+              "why": "The context does not compare LSTM and basic-RNN update rules or state that an additive update is the key difference."
+            },
+            {
+              "claim": "If the forget gate learns values close to 1, then c_t is approximately c_{t-1}.",
+              "grounded": false,
+              "why": "This depends on the unstated cell-state equation and is not described in the context."
+            },
+            {
+              "claim": "Consequently, gradients can flow backward through many time steps with little reduction.",
+              "grounded": true,
+              "why": "The context states that the cell-state highway lets information flow through unchanged and solves the vanishing-gradient problem, which supports this high-level claim."
+            },
+            {
+              "claim": "The forget gate determines which old information to preserve or discard.",
+              "grounded": true,
+              "why": "The context says the forget gate decides what to remove from the cell state."
+            },
+            {
+              "claim": "The input gate determines which new information to write.",
+              "grounded": true,
+              "why": "The context says the input gate decides what new information to add."
+            },
+            {
+              "claim": "The output gate determines which information to expose as the hidden state.",
+              "grounded": false,
+              "why": "The context says the output gate decides what to output, but does not state that it exposes information specifically as the hidden state."
+            },
+            {
+              "claim": "An LSTM does not eliminate vanishing gradients entirely, but its cell-state highway and learned gates greatly reduce the problem and allow retention of long-range dependencies.",
+              "grounded": false,
+              "why": "The cell-state highway and its role in solving the vanishing-gradient problem are supported, but the qualification that LSTMs do not eliminate it entirely and the explicit long-range-retention claim are not stated in the context."
+            }
+          ],
+          "prompt_tokens": 2020,
+          "completion_tokens": 881,
+          "cached_tokens": 0,
+          "latency_ms": 8303.515499981586,
+          "cost": 0.018265
+        }
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Skip connections solve the **degradation problem** in very deep networks, where adding layers can make training accuracy worse\u2014not because of overfitting, but because optimization becomes difficult.\n\nThey help by:\n\n- Allowing layers to learn a residual \\(F(x)=H(x)-x\\) rather than the full mapping.\n- Making identity mappings easy when extra layers are unnecessary.\n- Providing a direct path for gradients, reducing vanishing-gradient problems.\n- Letting the network effectively bypass unhelpful layers.\n\nThus, deeper ResNets can be trained effectively without performance degrading as depth increases.",
+        "prompt_tokens": 1359,
+        "completion_tokens": 120,
+        "cached_tokens": 0,
+        "latency_ms": 1610.155250004027,
+        "cost": 0.002079,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 6,
+          "total_claims": 6,
+          "claims": [
+            {
+              "claim": "Skip connections solve the degradation problem in deep networks, where adding layers can make training accuracy worse because of a training/optimization problem rather than overfitting.",
+              "grounded": true,
+              "why": "The context describes deeper networks performing worse even on training data, explicitly says this is not overfitting, and calls it a fundamental training problem."
+            },
+            {
+              "claim": "Residual blocks learn F(x)=H(x)-x rather than directly learning the full mapping H(x).",
+              "grounded": true,
+              "why": "The context explicitly defines the residual as F(x)=H(x)-x and contrasts this with learning H(x)."
+            },
+            {
+              "claim": "Skip connections make identity mappings easy when extra layers are unnecessary.",
+              "grounded": true,
+              "why": "The context states that if the optimal mapping is close to identity, F(x) only needs to be close to zero, and unnecessary layers can learn F(x)\u22480."
+            },
+            {
+              "claim": "Skip connections provide a direct path for gradients and reduce vanishing-gradient problems.",
+              "grounded": true,
+              "why": "The context explicitly says gradients flow directly through skip connections and notes 'no vanishing.'"
+            },
+            {
+              "claim": "Skip connections let the network effectively bypass or shorten unnecessary layers.",
+              "grounded": true,
+              "why": "The context states that the network can effectively be shorter by learning F(x)\u22480 for unnecessary layers."
+            },
+            {
+              "claim": "Consequently, deeper ResNets can be trained effectively without degradation of performance as depth increases.",
+              "grounded": true,
+              "why": "The context says skip connections enable depth and presents progressively deeper ResNet variants with increasing listed ImageNet Top-1 accuracies."
+            }
+          ],
+          "prompt_tokens": 1777,
+          "completion_tokens": 416,
+          "cached_tokens": 0,
+          "latency_ms": 3825.5502919782884,
+          "cost": 0.010682500000000001
+        }
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "mAP (mean Average Precision) measures the overall accuracy of an object detection model across all object classes. It evaluates both:\n\n- **Precision:** How many predicted detections are correct\n- **Recall:** How many actual objects are detected\n\nIt also considers whether predicted bounding boxes overlap the ground-truth boxes sufficiently, using an IoU threshold such as **mAP@0.5** or multiple thresholds such as **mAP@0.5:0.95**. Higher mAP is better.",
+        "prompt_tokens": 1283,
+        "completion_tokens": 105,
+        "cached_tokens": 0,
+        "latency_ms": 1575.8613329962827,
+        "cost": 0.0019130000000000002,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 3,
+          "total_claims": 5,
+          "claims": [
+            {
+              "claim": "mAP (Mean Average Precision) measures the overall accuracy/quality of an object detection model across all object classes.",
+              "grounded": true,
+              "why": "The context describes mAP as the standard object-detection metric and as measuring overall detection quality across all classes."
+            },
+            {
+              "claim": "mAP evaluates precision, meaning how many predicted detections are correct.",
+              "grounded": false,
+              "why": "The context defines precision separately, but does not explicitly state that mAP evaluates or combines precision."
+            },
+            {
+              "claim": "mAP evaluates recall, meaning how many actual objects are detected.",
+              "grounded": false,
+              "why": "The context defines recall separately, but does not explicitly state that mAP evaluates or combines recall."
+            },
+            {
+              "claim": "mAP considers sufficiently overlapping predicted and ground-truth bounding boxes via an IoU threshold, such as mAP@0.5 or mAP@0.5:0.95.",
+              "grounded": true,
+              "why": "The context states that mAP is typically reported at an IoU threshold of 0.5 or averaged across thresholds from 0.5 to 0.95, and explains IoU as predicted-versus-ground-truth overlap."
+            },
+            {
+              "claim": "Higher mAP is better.",
+              "grounded": true,
+              "why": "The context explicitly states that higher mAP is better."
+            }
+          ],
+          "prompt_tokens": 1687,
+          "completion_tokens": 440,
+          "cached_tokens": 0,
+          "latency_ms": 4527.9473749687895,
+          "cost": 0.0108175
+        }
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Reranking improves retrieval quality by taking the initially retrieved chunks and reordering them according to how relevant they are to the user\u2019s question.\n\nA typical process is:\n\n1. Retrieve a larger set of candidates using vector search.\n2. Use a reranker\u2014often an LLM or cross-encoder\u2014to score each candidate against the query.\n3. Place the most relevant chunks at the top.\n4. Pass the best chunks to the answer-generating LLM.\n\nThis helps when embedding search returns broadly related but less precise results. For example, a query about Jessica Liu\u2019s education might initially retrieve several university-related chunks; reranking moves the chunk specifically describing her education to the top.",
+        "prompt_tokens": 1232,
+        "completion_tokens": 140,
+        "cached_tokens": 0,
+        "latency_ms": 1815.2310409932397,
+        "cost": 0.002072,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 3,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "Reranking improves retrieval quality by taking initially retrieved chunks and reordering them according to relevance to the user's question.",
+              "grounded": true,
+              "why": "The context's reranking example shows chunks reordered, with the chunk about Jessica Liu's education moved to the top."
+            },
+            {
+              "claim": "A typical reranking process retrieves a larger set of candidates using vector search.",
+              "grounded": false,
+              "why": "The context does not state that reranking candidates are retrieved via vector search or that a larger candidate set is used."
+            },
+            {
+              "claim": "A reranker, often an LLM or cross-encoder, scores each candidate against the query.",
+              "grounded": false,
+              "why": "The context mentions one LLM call per question for reranking, but does not mention cross-encoders or explicitly describe per-candidate scoring."
+            },
+            {
+              "claim": "Reranking places the most relevant chunks at the top.",
+              "grounded": true,
+              "why": "The context explicitly illustrates a relevant chunk being moved to the top after reranking."
+            },
+            {
+              "claim": "The best reranked chunks are passed to an answer-generating LLM.",
+              "grounded": false,
+              "why": "The provided context does not state this downstream step."
+            },
+            {
+              "claim": "Reranking helps when embedding search returns broadly related but less precise results.",
+              "grounded": false,
+              "why": "The context does not make this characterization of embedding search results."
+            },
+            {
+              "claim": "For a query about Jessica Liu's education, reranking can move the chunk specifically describing her education to the top over other university-related chunks.",
+              "grounded": true,
+              "why": "The context's example states that the chunk about Jessica Liu's education moved to the top after reranking, ahead of university-partnership and other chunks."
+            }
+          ],
+          "prompt_tokens": 1669,
+          "completion_tokens": 503,
+          "cached_tokens": 0,
+          "latency_ms": 4772.953750041779,
+          "cost": 0.011717499999999999
+        }
+      },
+      {
+        "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Gradio is used to quickly build web-based user interfaces for Python applications, especially machine learning and AI models. It lets you create inputs such as text, images, or audio and display outputs through components like text boxes, chat windows, audio players, and image displays\u2014without writing frontend code.",
+        "prompt_tokens": 1213,
+        "completion_tokens": 62,
+        "cached_tokens": 0,
+        "latency_ms": 1358.9189580525272,
+        "cost": 0.001585,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "Gradio is used to quickly build web-based user interfaces for Python applications.",
+              "grounded": true,
+              "why": "The context describes Gradio as a Python library for creating web interfaces and says it can build UIs in minutes with Python."
+            },
+            {
+              "claim": "Gradio is especially used for machine-learning and AI models/applications.",
+              "grounded": true,
+              "why": "The context calls Gradio a library for user interfaces for machine learning applications and discusses AI-assistant/chat interfaces."
+            },
+            {
+              "claim": "Gradio lets users create interfaces without writing frontend code.",
+              "grounded": true,
+              "why": "The context explicitly says Gradio lets users create web interfaces without knowing frontend code."
+            },
+            {
+              "claim": "Gradio can support text, image, and audio interactions and UI elements such as chat displays, audio playback, and image displays.",
+              "grounded": true,
+              "why": "The context includes text input/output examples and states that Gradio Blocks can show chat, play audio, and display images."
+            }
+          ],
+          "prompt_tokens": 1576,
+          "completion_tokens": 341,
+          "cached_tokens": 0,
+          "latency_ms": 4199.736625014339,
+          "cost": 0.009055
+        }
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Async IO in Python is a way to handle many I/O-bound tasks concurrently\u2014such as API calls, network requests, or file operations\u2014without creating multiple threads or processes.\n\nIt uses:\n\n- **`async def`** to define a coroutine, which is a function that can pause and resume.\n- **`await`** to pause a coroutine while it waits for an operation to finish, allowing other tasks to run.\n- An **event loop** to manage and switch between these coroutines.\n\nExample:\n\n```python\nimport asyncio\n\nasync def fetch_data():\n    await asyncio.sleep(1)  # Simulates waiting for a network response\n    return \"data received\"\n\nasync def main():\n    result = await fetch_data()\n    print(result)\n\nasyncio.run(main())\n```\n\nFor multiple independent operations, `asyncio.gather()` can run them concurrently:\n\n```python\nasync def main():\n    results = await asyncio.gather(\n        fetch_data(),\n        fetch_data()\n    )\n    print(results)\n```\n\nAsync IO is especially useful for **I/O-bound work**, where the program spends much of its time waiting. It generally does not make CPU-intensive calculations faster.",
+        "prompt_tokens": 1099,
+        "completion_tokens": 240,
+        "cached_tokens": 0,
+        "latency_ms": 2322.229834040627,
+        "cost": 0.002539,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 8,
+          "total_claims": 12,
+          "claims": [
+            {
+              "claim": "Async IO in Python handles many I/O-bound tasks concurrently without creating multiple threads or processes.",
+              "grounded": true,
+              "why": "The context describes Async IO as providing concurrency without OS-level threads or multiple processes and as suitable for I/O-bound operations such as API calls."
+            },
+            {
+              "claim": "API calls are an example of I/O-bound work for Async IO.",
+              "grounded": true,
+              "why": "The context explicitly identifies API calls as an I/O-bound use case and discusses waiting for LLM API responses."
+            },
+            {
+              "claim": "Network requests and file operations are examples of the tasks described.",
+              "grounded": false,
+              "why": "The context discusses sending requests over a network, but does not explicitly identify network requests or file operations as Async IO examples."
+            },
+            {
+              "claim": "`async def` defines a coroutine.",
+              "grounded": true,
+              "why": "The context says putting `async` before `def` makes an async function or coroutine."
+            },
+            {
+              "claim": "A coroutine can pause and resume.",
+              "grounded": true,
+              "why": "The context describes cooperative multitasking, in which coroutines voluntarily yield control, and the event loop switches between coroutines when they are waiting."
+            },
+            {
+              "claim": "`await` pauses a coroutine while it waits for an operation to finish and permits other tasks to run.",
+              "grounded": true,
+              "why": "The context says `await` runs a coroutine and waits for it to finish, while the event loop switches between coroutines when they are waiting."
+            },
+            {
+              "claim": "An event loop manages and switches between coroutines.",
+              "grounded": true,
+              "why": "The context explicitly states that an event loop switches between coroutines when they are waiting."
+            },
+            {
+              "claim": "`asyncio.sleep(1)` simulates waiting for a network response.",
+              "grounded": false,
+              "why": "Neither `asyncio.sleep` nor this simulation behavior is stated in the context."
+            },
+            {
+              "claim": "`asyncio.run(main())` is the way shown to execute the async main function.",
+              "grounded": false,
+              "why": "The context does not mention `asyncio.run`."
+            },
+            {
+              "claim": "`asyncio.gather()` can run multiple independent operations concurrently.",
+              "grounded": true,
+              "why": "The context explicitly says that `asyncio.gather()` runs multiple coroutines concurrently."
+            },
+            {
+              "claim": "Async IO is especially useful when a program spends much of its time waiting on I/O.",
+              "grounded": true,
+              "why": "The context explains that programs can be idle while waiting for API/network responses and presents Async IO as the solution for making progress during that waiting."
+            },
+            {
+              "claim": "Async IO generally does not make CPU-intensive calculations faster.",
+              "grounded": false,
+              "why": "The context says multiprocessing is good for CPU-intensive tasks and Async IO is suited to I/O-bound work, but it does not explicitly state that Async IO does not speed up CPU-intensive calculations."
+            }
+          ],
+          "prompt_tokens": 1640,
+          "completion_tokens": 874,
+          "cached_tokens": 0,
+          "latency_ms": 8861.668958037626,
+          "cost": 0.01721
+        }
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Overfitting occurs when a neural network learns the training data too closely\u2014including noise and irrelevant details\u2014so it performs well on training data but poorly on unseen validation or test data.\n\n**Typical signs:**\n- Training loss continues decreasing.\n- Validation loss starts increasing.\n- Training accuracy is much higher than validation accuracy.\n\n**Ways to reduce overfitting:**\n- Use dropout.\n- Apply weight decay (L2 regularization).\n- Collect more training data or use data augmentation.\n- Reduce model complexity.\n- Use early stopping.\n- Properly split and prepare the data.",
+        "prompt_tokens": 1380,
+        "completion_tokens": 118,
+        "cached_tokens": 0,
+        "latency_ms": 1856.6908329958096,
+        "cost": 0.002088,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 3,
+          "total_claims": 9,
+          "claims": [
+            {
+              "claim": "Overfitting occurs when a neural network learns training data too closely, including noise and irrelevant details, and consequently performs well on training data but poorly on unseen validation or test data.",
+              "grounded": false,
+              "why": "The context discusses preventing overfitting but does not provide this definition or explicitly mention learning noise/irrelevant details and poor unseen-data performance."
+            },
+            {
+              "claim": "A typical sign of overfitting is that training loss continues decreasing while validation loss starts increasing.",
+              "grounded": false,
+              "why": "The context says to monitor training/validation metrics and validation loss, but does not state this specific loss-divergence pattern."
+            },
+            {
+              "claim": "A typical sign of overfitting is that training accuracy is much higher than validation accuracy.",
+              "grounded": false,
+              "why": "The context does not state this accuracy-gap criterion."
+            },
+            {
+              "claim": "Dropout can reduce overfitting.",
+              "grounded": true,
+              "why": "The context explicitly says dropout prevents overfitting."
+            },
+            {
+              "claim": "Weight decay (L2 regularization) can reduce overfitting.",
+              "grounded": true,
+              "why": "The context defines weight decay as L2 regularization and explicitly says it prevents overfitting."
+            },
+            {
+              "claim": "Collecting more training data or using data augmentation can reduce overfitting.",
+              "grounded": false,
+              "why": "The context does not state either of these mitigation methods."
+            },
+            {
+              "claim": "Reducing model complexity can reduce overfitting.",
+              "grounded": false,
+              "why": "The context does not state this method."
+            },
+            {
+              "claim": "Early stopping can reduce overfitting.",
+              "grounded": true,
+              "why": "The context explicitly says to use early stopping to prevent overfitting."
+            },
+            {
+              "claim": "Properly splitting and preparing the data can reduce overfitting.",
+              "grounded": false,
+              "why": "The context recommends splitting and preparing data, but does not explicitly connect this to reducing overfitting."
+            }
+          ],
+          "prompt_tokens": 1796,
+          "completion_tokens": 520,
+          "cached_tokens": 0,
+          "latency_ms": 5050.600667018443,
+          "cost": 0.012289999999999999
+        }
+      },
+      {
+        "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Backpropagation is the process a neural network uses to learn from its mistakes.\n\n1. **Forward propagation:** The input passes through the network to produce a prediction.\n2. **Calculate loss:** The prediction is compared with the actual answer.\n3. **Compute gradients:** Using the chain rule, the network calculates how much each weight and bias contributed to the error.\n4. **Update parameters:** An optimizer, such as gradient descent or Adam, adjusts the weights and biases to reduce the loss.\n5. **Repeat:** This process occurs over many batches and epochs until the model improves.\n\nIn short, **backpropagation sends the error backward through the network and adjusts its parameters to make better predictions.**",
+        "prompt_tokens": 1289,
+        "completion_tokens": 144,
+        "cached_tokens": 0,
+        "latency_ms": 1823.9224170101807,
+        "cost": 0.002153,
+        "abstained": false,
+        "judge": {
+          "score": 4,
+          "grounded_claims": 6,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "Backpropagation is the process a neural network uses to learn from its mistakes.",
+              "grounded": true,
+              "why": "The context defines backward propagation as updating weights to minimize prediction error and says it is how the network learns."
+            },
+            {
+              "claim": "In forward propagation, the input passes through the network to produce a prediction.",
+              "grounded": true,
+              "why": "The context states that forward propagation passes input through layers to generate predictions."
+            },
+            {
+              "claim": "Loss is calculated by comparing the prediction with the actual answer.",
+              "grounded": true,
+              "why": "The context says to compare prediction with actual value/labels and quantify the error with a loss function."
+            },
+            {
+              "claim": "Using the chain rule, the network computes how much each weight and bias contributed to the error.",
+              "grounded": false,
+              "why": "The context explicitly says the chain rule is used to calculate how much each weight contributed to error, but it does not explicitly state that this contribution calculation is performed for each bias."
+            },
+            {
+              "claim": "An optimizer such as gradient descent or Adam adjusts weights and biases to reduce loss.",
+              "grounded": true,
+              "why": "The context says to use optimizers including Gradient Descent and Adam, adjust weights toward lower loss, and elsewhere explicitly says to update all weights and biases."
+            },
+            {
+              "claim": "The process repeats over many batches and epochs until the model improves.",
+              "grounded": true,
+              "why": "The context describes repeating training, defines batches and epochs, gives typical training epochs, and says to stop when loss stops decreasing."
+            },
+            {
+              "claim": "Backpropagation sends error backward through the network and adjusts parameters to make better predictions.",
+              "grounded": true,
+              "why": "The context says error flows backward through the network to adjust weights and that the updates minimize loss/prediction error."
+            }
+          ],
+          "prompt_tokens": 1735,
+          "completion_tokens": 477,
+          "cached_tokens": 0,
+          "latency_ms": 4958.477417007089,
+          "cost": 0.0114925
+        }
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Non-Maximum Suppression (NMS) is a post-processing technique used in object detection to remove duplicate bounding boxes for the same object.\n\nIt works by:\n\n1. Selecting the bounding box with the highest confidence score.\n2. Comparing it with other boxes using Intersection over Union (IoU).\n3. Suppressing boxes whose IoU exceeds a chosen threshold.\n4. Repeating the process for the remaining boxes.\n\nThe result is one best bounding box per detected object instead of multiple overlapping detections.",
+        "prompt_tokens": 1282,
+        "completion_tokens": 103,
+        "cached_tokens": 0,
+        "latency_ms": 1281.8022500141524,
+        "cost": 0.0018999999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 3,
+          "grounded_claims": 3,
+          "total_claims": 7,
+          "claims": [
+            {
+              "claim": "Non-Maximum Suppression (NMS) is a post-processing technique used in object detection.",
+              "grounded": false,
+              "why": "The context describes NMS as a step in YOLO object detection, but does not call it a post-processing technique."
+            },
+            {
+              "claim": "NMS removes duplicate bounding boxes for the same object.",
+              "grounded": true,
+              "why": "The context states that multiple cells may detect the same object and that NMS removes duplicate detections."
+            },
+            {
+              "claim": "NMS selects the bounding box with the highest confidence score.",
+              "grounded": true,
+              "why": "The context says NMS keeps only the highest-confidence box for each object."
+            },
+            {
+              "claim": "NMS compares boxes using Intersection over Union (IoU).",
+              "grounded": false,
+              "why": "The context defines box confidence as involving IoU, but does not state that NMS compares boxes using IoU."
+            },
+            {
+              "claim": "NMS suppresses boxes whose IoU exceeds a chosen threshold.",
+              "grounded": false,
+              "why": "No IoU thresholding rule for NMS is given in the context."
+            },
+            {
+              "claim": "NMS repeats this selection and suppression process for remaining boxes.",
+              "grounded": false,
+              "why": "The context does not describe an iterative NMS procedure."
+            },
+            {
+              "claim": "The result is one best bounding box per detected object rather than multiple overlapping detections.",
+              "grounded": true,
+              "why": "The context says NMS keeps only the highest-confidence box for each object and removes duplicate detections."
+            }
+          ],
+          "prompt_tokens": 1682,
+          "completion_tokens": 492,
+          "cached_tokens": 0,
+          "latency_ms": 5354.687125014607,
+          "cost": 0.011585
+        }
+      }
+    ],
+    "gen_model": "gpt-5.6-luna",
+    "price_per_million": {
+      "input": 1.0,
+      "cached_input": 0.1,
+      "output": 6.0
+    },
+    "temperature": "default(1)",
+    "total_prompt_tokens": 25627,
+    "total_completion_tokens": 2850,
+    "total_cached_tokens": 0,
+    "total_cost": 0.042727,
+    "cost_per_query": 0.00213635,
+    "mean_latency_ms": 1733.7971290544374,
+    "max_latency_ms": 2957.2324579930864,
+    "trace_url": null,
+    "n_abstained": 0,
+    "abstention_rate": 0.0,
+    "judge_model": "gpt-5.6-terra",
+    "judge_price_per_million": {
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15.0
+    },
+    "n_judged_scored": 20,
+    "n_zero_claim": 0,
+    "mean_faithfulness": 3.9,
+    "min_faithfulness": 3,
+    "claim_groundedness": 0.6690140845070423,
+    "grounded_claims": 95,
+    "total_claims": 142,
+    "judge_cost": 0.2282275,
+    "judge_mean_latency_ms": 4618.326295845327,
+    "total_cost_with_judge": 0.2709545
+  },
+  "C_trap_hardened": [
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1394,
+          "completion_tokens": 27,
+          "cached_tokens": 0,
+          "latency_ms": 1094.555833027698,
+          "cost": 0.001556,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "latency_ms": 680.7034169905819,
+          "cost": 0.001463,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "latency_ms": 828.2819589949213,
+          "cost": 0.001352,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1406,
+          "completion_tokens": 41,
+          "cached_tokens": 0,
+          "latency_ms": 1120.1984589570202,
+          "cost": 0.0016519999999999998,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 0,
+          "latency_ms": 795.3377920202911,
+          "cost": 0.00158,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 95,
+      "total_cached_tokens": 0,
+      "total_cost": 0.007603,
+      "cost_per_query": 0.0015206,
+      "mean_latency_ms": 903.8154919981025,
+      "max_latency_ms": 1120.1984589570202,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1394,
+          "completion_tokens": 28,
+          "cached_tokens": 1391,
+          "latency_ms": 937.0376250008121,
+          "cost": 0.0003101,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 1406,
+          "latency_ms": 795.2821669750847,
+          "cost": 0.00019759999999999998,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 1295,
+          "latency_ms": 860.393374983687,
+          "cost": 0.00018649999999999998,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1406,
+          "completion_tokens": 36,
+          "cached_tokens": 1403,
+          "latency_ms": 1015.580500010401,
+          "cost": 0.0003593,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 1523,
+          "latency_ms": 1091.3158750045113,
+          "cost": 0.0002093,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 91,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0012628,
+      "cost_per_query": 0.00025256,
+      "mean_latency_ms": 939.9219083948992,
+      "max_latency_ms": 1091.3158750045113,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    },
+    {
+      "encoder": "bge-small",
+      "model": "BAAI/bge-small-en-v1.5",
+      "chunker": "fixed",
+      "chunk_size": 1000,
+      "overlap": 50,
+      "top_k": 5,
+      "relevance": "all",
+      "rerank": true,
+      "pool": 20,
+      "n_chunks": 734,
+      "n_questions": 5,
+      "question_set": "golden-trap.jsonl",
+      "trap": true,
+      "mrr": null,
+      "keyword_coverage": null,
+      "misses": null,
+      "embed_secs": null,
+      "generate": true,
+      "prompt_variant": "hardened",
+      "per_question": [
+        {
+          "question": "What does the faithfulness metric measure, and how is a faithfulness score calculated?",
+          "top_source": "day16-rag-evals.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1394,
+          "completion_tokens": 38,
+          "cached_tokens": 1391,
+          "latency_ms": 989.1210409696214,
+          "cost": 0.00037010000000000005,
+          "abstained": true
+        },
+        {
+          "question": "How does BM25 scoring work, and how are BM25 scores fused with vector-similarity scores in hybrid search?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1409,
+          "completion_tokens": 9,
+          "cached_tokens": 1406,
+          "latency_ms": 680.5981670040637,
+          "cost": 0.00019759999999999998,
+          "abstained": true
+        },
+        {
+          "question": "What primitives does an MCP server expose to a client, and what transport does the protocol use?",
+          "top_source": "day17.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1298,
+          "completion_tokens": 9,
+          "cached_tokens": 1295,
+          "latency_ms": 725.4272910067812,
+          "cost": 0.00018649999999999998,
+          "abstained": true
+        },
+        {
+          "question": "Which approximate-nearest-neighbour index does Chroma use under the hood, and how does HNSW trade recall for speed?",
+          "top_source": "day15-rag-langchain.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1406,
+          "completion_tokens": 9,
+          "cached_tokens": 1403,
+          "latency_ms": 806.4211250166409,
+          "cost": 0.00019729999999999997,
+          "abstained": true
+        },
+        {
+          "question": "How long does a cached prompt prefix stay valid in OpenAI's cache before it expires?",
+          "top_source": "day13-multimodal.md",
+          "answer": "I don't have that information.",
+          "prompt_tokens": 1526,
+          "completion_tokens": 9,
+          "cached_tokens": 1523,
+          "latency_ms": 810.4840000160038,
+          "cost": 0.0002093,
+          "abstained": true
+        }
+      ],
+      "gen_model": "gpt-5.6-luna",
+      "price_per_million": {
+        "input": 1.0,
+        "cached_input": 0.1,
+        "output": 6.0
+      },
+      "temperature": "default(1)",
+      "total_prompt_tokens": 7033,
+      "total_completion_tokens": 74,
+      "total_cached_tokens": 7018,
+      "total_cost": 0.0011608,
+      "cost_per_query": 0.00023216,
+      "mean_latency_ms": 802.4103248026222,
+      "max_latency_ms": 989.1210409696214,
+      "trace_url": null,
+      "n_abstained": 5,
+      "abstention_rate": 1.0,
+      "hallucinations": 0,
+      "hallucinated_questions": []
+    }
+  ],
+  "D_golden_hardened": {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "rerank": true,
+    "pool": 20,
+    "n_chunks": 734,
+    "n_questions": 20,
+    "question_set": "golden.jsonl",
+    "trap": false,
+    "mrr": 0.7849999999999999,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 2,
+    "embed_secs": null,
+    "generate": true,
+    "prompt_variant": "hardened",
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "answer": "NDCG considers all relevant chunks and how they are distributed in the retrieved results, whereas MRR only considers the position of the first relevant chunk.",
+        "prompt_tokens": 1649,
+        "completion_tokens": 33,
+        "cached_tokens": 0,
+        "latency_ms": 1104.550709016621,
+        "cost": 0.0018470000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "NDCG considers all relevant chunks and how they are distributed in the retrieved results.",
+              "grounded": true,
+              "why": "The context states that NDCG considers all relevant chunks and measures how well they are distributed in retrieved results."
+            },
+            {
+              "claim": "MRR only considers the position of the first relevant chunk.",
+              "grounded": true,
+              "why": "The context explicitly contrasts NDCG with MRR, stating that MRR only looks at the first hit."
+            }
+          ],
+          "prompt_tokens": 1866,
+          "completion_tokens": 159,
+          "cached_tokens": 0,
+          "latency_ms": 2147.983417031355,
+          "cost": 0.00705
+        }
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "IoU is calculated as:\n\n**IoU = Area of Overlap / Area of Union**\n\nValues range from 0 (no overlap) to 1 (perfect overlap).",
+        "prompt_tokens": 1629,
+        "completion_tokens": 38,
+        "cached_tokens": 0,
+        "latency_ms": 924.4357909774408,
+        "cost": 0.0018570000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "IoU is calculated as Area of Overlap divided by Area of Union.",
+              "grounded": true,
+              "why": "The context explicitly states: 'IoU = Area of Overlap / Area of Union.'"
+            },
+            {
+              "claim": "IoU values range from 0 for no overlap to 1 for perfect overlap.",
+              "grounded": true,
+              "why": "The context explicitly states that IoU ranges from 0 (no overlap) to 1 (perfect match/perfect overlap)."
+            }
+          ],
+          "prompt_tokens": 1852,
+          "completion_tokens": 142,
+          "cached_tokens": 0,
+          "latency_ms": 1804.84166595852,
+          "cost": 0.0067599999999999995
+        }
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Low Rank Adapters.",
+        "prompt_tokens": 1392,
+        "completion_tokens": 8,
+        "cached_tokens": 0,
+        "latency_ms": 818.5133339720778,
+        "cost": 0.00144,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LoRA stands for Low Rank Adapters.",
+              "grounded": true,
+              "why": "The context explicitly states that LoRA stands for Low Rank Adapters."
+            }
+          ],
+          "prompt_tokens": 1589,
+          "completion_tokens": 81,
+          "cached_tokens": 0,
+          "latency_ms": 1716.3835419923998,
+          "cost": 0.005187499999999999
+        }
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangSmith.",
+        "prompt_tokens": 1272,
+        "completion_tokens": 6,
+        "cached_tokens": 0,
+        "latency_ms": 1025.2787079662085,
+        "cost": 0.001308,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "LangSmith is the referenced item.",
+              "grounded": true,
+              "why": "The context explicitly identifies LangSmith as the monitoring and observability tool for the LangChain ecosystem."
+            }
+          ],
+          "prompt_tokens": 1462,
+          "completion_tokens": 168,
+          "cached_tokens": 0,
+          "latency_ms": 2670.1032500131987,
+          "cost": 0.006175
+        }
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Because fixing one RAG failure\u2014such as adjusting chunking\u2014can cause a different question to fail, leading to repeated cycles of fixing newly emerging issues.",
+        "prompt_tokens": 1316,
+        "completion_tokens": 34,
+        "cached_tokens": 0,
+        "latency_ms": 1225.712499988731,
+        "cost": 0.0015199999999999999,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Fixing one RAG failure, such as by adjusting chunking, can cause a different question to fail.",
+              "grounded": true,
+              "why": "The context explicitly describes adjusting chunking to fix one problem, followed by a different question failing."
+            },
+            {
+              "claim": "This can lead to repeated cycles of fixing newly emerging issues.",
+              "grounded": true,
+              "why": "The context calls this the 'whack-a-mole' nature of RAG optimization and states that after fixing another issue, another problem can pop up."
+            }
+          ],
+          "prompt_tokens": 1533,
+          "completion_tokens": 146,
+          "cached_tokens": 0,
+          "latency_ms": 2094.1258749808185,
+          "cost": 0.0060225
+        }
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "The Chat Completions API is a standard way to interact with large language models by providing a conversation or chat history. The model predicts and generates what should come next, completing the chat.",
+        "prompt_tokens": 1392,
+        "completion_tokens": 41,
+        "cached_tokens": 0,
+        "latency_ms": 998.4858329989947,
+        "cost": 0.0016380000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "The Chat Completions API is a standard way to interact with large language models by providing a conversation or chat history.",
+              "grounded": true,
+              "why": "The context explicitly calls it the standard way to interact with LLMs and says that users provide a conversation (chat history)."
+            },
+            {
+              "claim": "The model predicts and generates what should come next, completing the chat.",
+              "grounded": true,
+              "why": "The context explicitly says completions means the model predicts what should come next and that it completes the chat; it also describes predicting the most likely response/next words."
+            }
+          ],
+          "prompt_tokens": 1620,
+          "completion_tokens": 170,
+          "cached_tokens": 0,
+          "latency_ms": 1925.3859999589622,
+          "cost": 0.0066
+        }
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "Chat models are fast, conversational, creative, and good for general interactive use. Reasoning models generate a thinking trace and work through problems step by step before answering; they are better for complex problem-solving but tend to be slower and may be less effective for creative content.",
+        "prompt_tokens": 1355,
+        "completion_tokens": 57,
+        "cached_tokens": 0,
+        "latency_ms": 1200.4359160200693,
+        "cost": 0.0016970000000000002,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Chat models are fast, conversational, creative, and good for general interactive use.",
+              "grounded": true,
+              "why": "The context describes chat models as fast, creative, good for general conversation, and good for interactive use."
+            },
+            {
+              "claim": "Reasoning models generate a thinking trace and work through problems step by step before answering.",
+              "grounded": true,
+              "why": "The context explicitly states that reasoning models generate a thinking trace, work through problems step by step, and then answer."
+            },
+            {
+              "claim": "Reasoning models are better for complex problem-solving but tend to be slower and may be less effective for creative content.",
+              "grounded": true,
+              "why": "The context says reasoning models are better at complex problem-solving, tend to be slower, and may not be as good at generating creative content."
+            }
+          ],
+          "prompt_tokens": 1599,
+          "completion_tokens": 231,
+          "cached_tokens": 0,
+          "latency_ms": 2241.7111250106245,
+          "cost": 0.0074625
+        }
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "LangChain is a comprehensive LLM framework with abstractions and built-in components for chains, agents, memory, RAG, prompts, tools, and integrations. It speeds up development but can be heavyweight and obscure what happens under the hood.\n\nLiteLLM is a lightweight framework focused on providing a simple, consistent interface for calling different LLM providers.",
+        "prompt_tokens": 1278,
+        "completion_tokens": 73,
+        "cached_tokens": 0,
+        "latency_ms": 1536.0274170525372,
+        "cost": 0.001716,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "LangChain is an LLM framework with abstractions and components for chains, agents, memory, RAG, prompts, tools, and integrations.",
+              "grounded": true,
+              "why": "The context describes LangChain as an abstraction layer and lists chaining, agents, memory management, RAG, prompt templates, tool abstractions, multiple-provider integration, and related tooling."
+            },
+            {
+              "claim": "LangChain speeds up development.",
+              "grounded": true,
+              "why": "The context explicitly says LangChain dramatically speeds up development and reduces boilerplate."
+            },
+            {
+              "claim": "LangChain can be heavyweight and obscure what happens under the hood.",
+              "grounded": true,
+              "why": "The context calls it heavyweight and states that heavy abstractions can obscure underlying prompts and give less visibility into what is happening under the hood."
+            },
+            {
+              "claim": "LiteLLM is a lightweight framework focused on providing a simple, consistent interface for calling different LLM providers.",
+              "grounded": true,
+              "why": "The context explicitly describes LiteLLM as lightweight and says it provides a simple, consistent way to call any LLM provider."
+            }
+          ],
+          "prompt_tokens": 1537,
+          "completion_tokens": 280,
+          "cached_tokens": 0,
+          "latency_ms": 2707.870999991428,
+          "cost": 0.0080425
+        }
+      },
+      {
+        "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Prompt caching allows an LLM provider to reuse processing for the same or similar prompt content, saving money. Static content should come first and variable content last so it can be cached effectively.",
+        "prompt_tokens": 1371,
+        "completion_tokens": 40,
+        "cached_tokens": 0,
+        "latency_ms": 1156.3847080105916,
+        "cost": 0.001611,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Prompt caching allows an LLM provider to reuse processing for the same or similar prompt content, saving money.",
+              "grounded": true,
+              "why": "The context states that prompt caching lets the provider reuse some processing work for the same or similar prompts and saves money."
+            },
+            {
+              "claim": "Static content should come first and variable content last so it can be cached effectively.",
+              "grounded": true,
+              "why": "The context explicitly gives the golden rule to put static content first and variable content last, explaining that caching matches from the beginning of the prompt."
+            }
+          ],
+          "prompt_tokens": 1602,
+          "completion_tokens": 173,
+          "cached_tokens": 0,
+          "latency_ms": 1909.6277499920689,
+          "cost": 0.0066
+        }
+      },
+      {
+        "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Computer vision is the field of artificial intelligence that teaches machines to interpret and understand visual information from images, videos, and live camera feeds.",
+        "prompt_tokens": 1226,
+        "completion_tokens": 30,
+        "cached_tokens": 0,
+        "latency_ms": 1185.1580000366084,
+        "cost": 0.0014060000000000001,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Computer vision is a field of artificial intelligence.",
+              "grounded": true,
+              "why": "The context explicitly defines Computer Vision as 'the field of artificial intelligence.'"
+            },
+            {
+              "claim": "Computer vision teaches machines to interpret and understand visual information.",
+              "grounded": true,
+              "why": "This is explicitly stated in the context's simple definition."
+            },
+            {
+              "claim": "The visual information includes images, videos, and live camera feeds.",
+              "grounded": true,
+              "why": "The context explicitly lists 'images, videos, and live camera feeds.'"
+            }
+          ],
+          "prompt_tokens": 1447,
+          "completion_tokens": 131,
+          "cached_tokens": 0,
+          "latency_ms": 2073.4096249798313,
+          "cost": 0.005582500000000001
+        }
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "RecursiveCharacterTextSplitter tries to split at natural boundaries\u2014paragraphs, lines, sentences, then words\u2014while CharacterTextSplitter simply splits by character count without considering content structure.",
+        "prompt_tokens": 1388,
+        "completion_tokens": 38,
+        "cached_tokens": 0,
+        "latency_ms": 1183.4272079868242,
+        "cost": 0.0016159999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "RecursiveCharacterTextSplitter tries to split at natural boundaries in the order of paragraphs, lines, sentences, then words.",
+              "grounded": true,
+              "why": "The context lists its hierarchy as double newlines (paragraph breaks), single newlines (line breaks), sentences, and finally words."
+            },
+            {
+              "claim": "CharacterTextSplitter splits by character count without considering content structure.",
+              "grounded": true,
+              "why": "The context describes it as splitting by character count with no intelligence about content structure."
+            }
+          ],
+          "prompt_tokens": 1609,
+          "completion_tokens": 158,
+          "cached_tokens": 0,
+          "latency_ms": 2015.0640000356361,
+          "cost": 0.0063925
+        }
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "answer": "LSTMs use a cell state\u2014a long-term memory highway\u2014that passes through time steps with minimal modification. Their forget, input, and output gates control what information is removed, stored, and produced, allowing information and gradients to flow through many steps and reducing the vanishing gradient problem.",
+        "prompt_tokens": 1566,
+        "completion_tokens": 60,
+        "cached_tokens": 0,
+        "latency_ms": 1342.6286250469275,
+        "cost": 0.001926,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "LSTMs use a cell state described as a long-term memory highway that passes through time steps with minimal modification.",
+              "grounded": true,
+              "why": "The context calls the cell state a 'Long-term memory highway' and says it runs through all time steps with minimal modification."
+            },
+            {
+              "claim": "LSTM forget, input, and output gates control what information is removed, stored, and produced.",
+              "grounded": true,
+              "why": "The context states that the forget gate decides what to remove, the input gate decides what new information to add, and the output gate decides what to output."
+            },
+            {
+              "claim": "These mechanisms allow information and gradients to flow through many steps and reduce the vanishing-gradient problem.",
+              "grounded": true,
+              "why": "The context says information can flow through the cell state unchanged, solving the vanishing-gradient problem, and presents LSTMs as solving that problem via gating."
+            }
+          ],
+          "prompt_tokens": 1810,
+          "completion_tokens": 243,
+          "cached_tokens": 0,
+          "latency_ms": 2448.0324579635635,
+          "cost": 0.00817
+        }
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Skip connections solve the degradation problem: deeper networks performing worse than shallower ones even on training data. They also help gradients flow directly through the network, reducing vanishing-gradient issues and enabling unnecessary layers to learn near-identity mappings.",
+        "prompt_tokens": 1471,
+        "completion_tokens": 49,
+        "cached_tokens": 0,
+        "latency_ms": 1130.815459007863,
+        "cost": 0.001765,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Skip connections address the degradation problem in which deeper networks perform worse than shallower networks even on training data.",
+              "grounded": true,
+              "why": "The context describes this exact degradation problem and presents skip connections as the ResNet solution."
+            },
+            {
+              "claim": "Skip connections help gradients flow directly through the network, reducing vanishing-gradient issues.",
+              "grounded": true,
+              "why": "The context states that gradients flow directly through skip connections and says \u201cno vanishing.\u201d"
+            },
+            {
+              "claim": "Skip connections enable unnecessary layers to learn near-identity mappings.",
+              "grounded": true,
+              "why": "The context says the network can effectively be shorter when unnecessary layers learn F(x) approximately equal to zero, making the block output approximately x (the identity mapping)."
+            }
+          ],
+          "prompt_tokens": 1706,
+          "completion_tokens": 222,
+          "cached_tokens": 0,
+          "latency_ms": 3151.7280000261962,
+          "cost": 0.007594999999999999
+        }
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Overall detection quality across all classes.",
+        "prompt_tokens": 1395,
+        "completion_tokens": 10,
+        "cached_tokens": 0,
+        "latency_ms": 829.2054160265252,
+        "cost": 0.001455,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "mAP measures overall detection quality across all classes.",
+              "grounded": true,
+              "why": "The context's detection-metrics table defines mAP (Mean Average Precision) as measuring overall detection quality across all classes."
+            }
+          ],
+          "prompt_tokens": 1592,
+          "completion_tokens": 110,
+          "cached_tokens": 0,
+          "latency_ms": 1699.7967910137959,
+          "cost": 0.00563
+        }
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Reranking reorders retrieved chunks so the most relevant information appears at the top\u2014for example, moving Jessica Liu\u2019s education chunk to the first position.",
+        "prompt_tokens": 1344,
+        "completion_tokens": 108,
+        "cached_tokens": 0,
+        "latency_ms": 1841.6555839939974,
+        "cost": 0.001992,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Reranking reorders retrieved chunks so the most relevant information appears at the top.",
+              "grounded": true,
+              "why": "The context's reranking example shows the chunk about Jessica Liu's education being moved to the top after reranking."
+            },
+            {
+              "claim": "Reranking can move Jessica Liu's education chunk to the first position.",
+              "grounded": true,
+              "why": "The context explicitly states that after reranking, the chunk about Jessica Liu's education was moved to the top."
+            }
+          ],
+          "prompt_tokens": 1562,
+          "completion_tokens": 174,
+          "cached_tokens": 0,
+          "latency_ms": 1982.9253329662606,
+          "cost": 0.006515
+        }
+      },
+      {
+        "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+        "prompt_tokens": 1325,
+        "completion_tokens": 23,
+        "cached_tokens": 0,
+        "latency_ms": 864.1806660452858,
+        "cost": 0.0014629999999999999,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 1,
+          "total_claims": 1,
+          "claims": [
+            {
+              "claim": "Gradio is used to create web interfaces for machine learning applications using Python, without needing frontend code.",
+              "grounded": true,
+              "why": "The context describes Gradio as a Python library for creating web interfaces without frontend code and says it makes it easy to build user interfaces for machine learning applications."
+            }
+          ],
+          "prompt_tokens": 1537,
+          "completion_tokens": 126,
+          "cached_tokens": 0,
+          "latency_ms": 1629.518041969277,
+          "cost": 0.0057325
+        }
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Async IO is Python\u2019s lightweight approach to concurrency without using OS-level threads or multiple processes. It uses the `async` and `await` keywords, an event loop, and cooperative multitasking, where coroutines voluntarily yield control\u2014making it efficient for I/O-bound operations such as API calls.",
+        "prompt_tokens": 1211,
+        "completion_tokens": 62,
+        "cached_tokens": 0,
+        "latency_ms": 1115.827041969169,
+        "cost": 0.0015830000000000002,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 4,
+          "total_claims": 4,
+          "claims": [
+            {
+              "claim": "Async IO is Python\u2019s lightweight approach to concurrency without using OS-level threads or multiple processes.",
+              "grounded": true,
+              "why": "The context states that Async IO provides concurrency without using OS-level threads or multiple processes and describes it as extremely lightweight."
+            },
+            {
+              "claim": "Async IO uses the `async` and `await` keywords, an event loop, and cooperative multitasking.",
+              "grounded": true,
+              "why": "The context explicitly lists special Python keywords (`async` and `await`), an event loop, and cooperative multitasking as Async IO's components."
+            },
+            {
+              "claim": "In cooperative multitasking, coroutines voluntarily yield control.",
+              "grounded": true,
+              "why": "The context defines cooperative multitasking as coroutines voluntarily yielding control."
+            },
+            {
+              "claim": "Async IO is efficient for I/O-bound operations such as API calls.",
+              "grounded": true,
+              "why": "The context describes Async IO as lightweight and efficient, and says it is perfect for I/O-bound operations like API calls."
+            }
+          ],
+          "prompt_tokens": 1462,
+          "completion_tokens": 266,
+          "cached_tokens": 0,
+          "latency_ms": 2741.433000017423,
+          "cost": 0.007645000000000001
+        }
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "answer": "Overfitting occurs when a neural network learns the training data too closely, including noise, and performs poorly on new, unseen data.",
+        "prompt_tokens": 1492,
+        "completion_tokens": 30,
+        "cached_tokens": 0,
+        "latency_ms": 1379.3734579812735,
+        "cost": 0.001672,
+        "abstained": false,
+        "judge": {
+          "score": 1,
+          "grounded_claims": 0,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Overfitting occurs when a neural network learns the training data too closely, including noise.",
+              "grounded": false,
+              "why": "The context mentions overfitting and methods intended to prevent it, but does not define it as learning training data/noise too closely."
+            },
+            {
+              "claim": "Overfitting causes poor performance on new, unseen data.",
+              "grounded": false,
+              "why": "The context does not state that overfitting results in poor performance on unseen data."
+            }
+          ],
+          "prompt_tokens": 1708,
+          "completion_tokens": 246,
+          "cached_tokens": 0,
+          "latency_ms": 3525.4739999654703,
+          "cost": 0.00796
+        }
+      },
+      {
+        "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Backpropagation is the process of calculating gradients and updating a neural network\u2019s weights to minimize prediction error. Error flows backward through the network, and an optimizer adjusts the weights and biases in the direction that reduces the loss.",
+        "prompt_tokens": 1401,
+        "completion_tokens": 47,
+        "cached_tokens": 0,
+        "latency_ms": 1433.5483750328422,
+        "cost": 0.0016829999999999998,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 3,
+          "total_claims": 3,
+          "claims": [
+            {
+              "claim": "Backpropagation calculates gradients and updates a neural network\u2019s weights to minimize prediction error.",
+              "grounded": true,
+              "why": "The context defines backward propagation as updating weights to minimize prediction error and lists computing gradients and updating weights as its steps."
+            },
+            {
+              "claim": "Error flows backward through the network.",
+              "grounded": true,
+              "why": "The context explicitly states that error flows backward through the network to adjust weights."
+            },
+            {
+              "claim": "An optimizer adjusts weights and biases in the direction that reduces loss.",
+              "grounded": true,
+              "why": "The context says to use an optimizer to adjust weights in the direction that reduces loss, and later states that an optimizer updates all weights and biases."
+            }
+          ],
+          "prompt_tokens": 1638,
+          "completion_tokens": 247,
+          "cached_tokens": 0,
+          "latency_ms": 2454.5129170292057,
+          "cost": 0.0078
+        }
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "answer": "Non-Maximum Suppression (NMS) removes duplicate detections by keeping only the highest-confidence bounding box for each object.",
+        "prompt_tokens": 1394,
+        "completion_tokens": 28,
+        "cached_tokens": 0,
+        "latency_ms": 913.8640000019222,
+        "cost": 0.001562,
+        "abstained": false,
+        "judge": {
+          "score": 5,
+          "grounded_claims": 2,
+          "total_claims": 2,
+          "claims": [
+            {
+              "claim": "Non-Maximum Suppression (NMS) removes duplicate detections.",
+              "grounded": true,
+              "why": "The context explicitly states that NMS 'Removes duplicate detections.'"
+            },
+            {
+              "claim": "NMS keeps only the highest-confidence bounding box for each object.",
+              "grounded": true,
+              "why": "The context explicitly states that NMS 'keeps only the highest-confidence box for each object.'"
+            }
+          ],
+          "prompt_tokens": 1607,
+          "completion_tokens": 142,
+          "cached_tokens": 0,
+          "latency_ms": 2026.7020000028424,
+          "cost": 0.0061475
+        }
+      }
+    ],
+    "gen_model": "gpt-5.6-luna",
+    "price_per_million": {
+      "input": 1.0,
+      "cached_input": 0.1,
+      "output": 6.0
+    },
+    "temperature": "default(1)",
+    "total_prompt_tokens": 27867,
+    "total_completion_tokens": 815,
+    "total_cached_tokens": 0,
+    "total_cost": 0.032757,
+    "cost_per_query": 0.0016378500000000002,
+    "mean_latency_ms": 1160.4754374566255,
+    "max_latency_ms": 1841.6555839939974,
+    "trace_url": null,
+    "n_abstained": 0,
+    "abstention_rate": 0.0,
+    "judge_model": "gpt-5.6-terra",
+    "judge_price_per_million": {
+      "input": 2.5,
+      "cached_input": 0.25,
+      "output": 15.0
+    },
+    "n_judged_scored": 20,
+    "n_zero_claim": 0,
+    "mean_faithfulness": 4.8,
+    "min_faithfulness": 1,
+    "claim_groundedness": 0.9555555555555556,
+    "grounded_claims": 43,
+    "total_claims": 45,
+    "judge_cost": 0.13507,
+    "judge_mean_latency_ms": 2248.331489544944,
+    "total_cost_with_judge": 0.167827
+  },
+  "wall_secs": 413.3,
+  "total_spend": 0.49342
+}

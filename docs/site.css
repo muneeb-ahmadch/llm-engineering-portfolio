@@ -1,0 +1,42 @@
+/* Landing-page additions. Uses the tokens defined in assets/style.css. */
+.hero { border-bottom: 1px solid var(--rule); padding-bottom: 1.6rem; margin-bottom: 2rem; }
+.hero h1 { margin-bottom: .3rem; }
+.contact { font-family: var(--sans); font-size: .85rem; color: var(--ink-soft); margin-top: .9rem; }
+.contact a { margin-right: .9rem; white-space: nowrap; }
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+         gap: .8rem; margin: 1.8rem 0 2.4rem; }
+.stat { background: var(--bg-panel); border: 1px solid var(--rule); border-radius: 3px;
+        padding: .85rem .95rem; }
+.stat .n { font-family: var(--sans); font-size: 1.45rem; font-weight: 650; color: var(--accent);
+           line-height: 1.1; display: block; font-variant-numeric: tabular-nums; }
+.stat .l { font-family: var(--sans); font-size: .74rem; color: var(--ink-soft);
+           text-transform: uppercase; letter-spacing: .04em; margin-top: .35rem; display: block; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+         gap: 1rem; margin: 1.4rem 0 2rem; }
+.card { border: 1px solid var(--rule); border-radius: 3px; padding: 1rem 1.1rem;
+        background: var(--bg); display: flex; flex-direction: column; }
+.card .num { font-family: var(--mono); font-size: .72rem; color: var(--ink-faint);
+             letter-spacing: .06em; }
+.card h3 { font-family: var(--sans); font-size: 1.02rem; margin: .25rem 0 .5rem; line-height: 1.3; }
+.card h3 a { text-decoration: none; }
+.card h3 a:hover { text-decoration: underline; }
+.card .q { font-size: .88rem; color: var(--ink-soft); font-style: italic; margin: 0 0 .6rem; }
+.card .f { font-size: .9rem; margin: 0 0 .8rem; flex: 1; }
+.card .links { font-family: var(--sans); font-size: .78rem; border-top: 1px solid var(--rule);
+               padding-top: .55rem; margin-top: auto; }
+.card .links a { margin-right: .8rem; }
+
+.flow { background: var(--bg-panel); border: 1px solid var(--rule); border-radius: 3px;
+        padding: 1rem; overflow-x: auto; }
+.flow pre { background: none; border: 0; margin: 0; padding: 0; font-size: .78rem; line-height: 1.55; }
+
+.reflist { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+           gap: .35rem .9rem; font-family: var(--sans); font-size: .86rem;
+           list-style: none; padding: 0; margin: 1rem 0 0; }
+.reflist li::before { content: "› "; color: var(--ink-faint); }
+
+.note { font-size: .88rem; color: var(--ink-soft); border-left: 2px solid var(--rule);
+        padding-left: .9rem; margin: 1.4rem 0; }
+@media (max-width: 560px) { .stat .n { font-size: 1.25rem; } }

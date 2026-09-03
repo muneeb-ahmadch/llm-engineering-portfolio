@@ -1,0 +1,52 @@
+// Golden set — one JSON object per line. Lines starting with // are ignored.
+//
+// 20 questions, built out to the lesson target. The point still stands: this is
+// YOUR opinion about YOUR corpus. Read every keyword line and make sure you'd
+// defend it. Deciding what counts as a right answer is the part of this loop a
+// machine can't do for you, and it's the part an interviewer is actually testing.
+//
+// Fields:
+//   question          what you'd actually ask the system
+//   keywords          strings that must appear in a chunk for it to count as
+//                     relevant. This is the whole ballgame — see README.
+//   reference_answer  the true answer, in your words. Not scored by this
+//                     harness (no LLM judge here), but write it anyway: if you
+//                     can't, the question is ambiguous and will poison the set.
+//                     These answers are worded from general knowledge, NOT
+//                     lifted from the corpus — an independent ground truth.
+//   category          direct_fact | concept | spanning — lets you slice the
+//                     results later and find WHICH kind of question fails.
+//
+// Picking keywords, learned the hard way:
+//   - Too generic ("RAG", "model") and every chunk matches. MRR pins to ~1.0
+//     and the experiment is dead — you've measured nothing.
+//   - Too many, or spread across paragraphs, and no chunk holds them all.
+//     Automatic zero, forever, no matter how good retrieval gets.
+//   - Aim for 2-3 terms that co-occur in the passage a human would point at.
+//   - Run `check` after every batch you write. It catches both failures.
+
+// ---- Seed examples (worked for you in the original scaffold) ----
+{"question": "What does NDCG measure that MRR does not?", "keywords": ["NDCG", "scattered"], "reference_answer": "MRR only looks at the position of the first relevant chunk. NDCG considers all relevant chunks, asking whether they are near the top or scattered throughout the results.", "category": "concept"}
+{"question": "How is IoU calculated for a predicted bounding box?", "keywords": ["IoU", "Area of Overlap", "Area of Union"], "reference_answer": "IoU = Area of Overlap / Area of Union — the overlap between predicted and ground-truth boxes divided by their combined area.", "category": "direct_fact"}
+{"question": "What does LoRA stand for?", "keywords": ["LoRA", "Low Rank Adapters"], "reference_answer": "Low Rank Adapters — the technique that makes modern fine-tuning practical and affordable.", "category": "direct_fact"}
+{"question": "Which tool in the LangChain ecosystem handles monitoring and debugging?", "keywords": ["LangSmith", "monitoring", "debugging"], "reference_answer": "LangSmith is the monitoring and observability tool for the LangChain ecosystem, providing visibility into LLM calls, traces, and cost tracking. It works with both LangChain and LangGraph.", "category": "direct_fact"}
+{"question": "Why is RAG optimization described as whack-a-mole?", "keywords": ["whack-a-mole", "chunking"], "reference_answer": "Because fixing one failing question by adjusting chunking causes a different question to start failing. Improvements are not monotonic, which is why you need a golden set and a metric rather than reasoning from first principles.", "category": "concept"}
+
+// ---- Your five ----
+{"question": "What is the Chat Completions API?", "keywords": ["chat", "completion", "interact", "LLMs"], "reference_answer": "The Chat Completions API is the standard, widely-adopted interface for sending messages to an LLM and getting a response back. OpenAI introduced it and most other providers adopted the same format.", "category": "direct_fact"}
+{"question": "How are chat models different from reasoning models?", "keywords": ["conversation", "think", "answer"], "reference_answer": "Chat models are trained specifically for conversation and answer directly. Reasoning models think before answering, working through the problem step by step and often leaving a visible thinking trace.", "category": "spanning"}
+{"question": "How are LangChain and LiteLLM different?", "keywords": ["heavyweight", "lightweight"], "reference_answer": "LangChain is a heavyweight, feature-rich and powerful framework with a steep learning curve. LiteLLM is lightweight and easy to use, with minimal abstraction.", "category": "concept"}
+{"question": "What is prompt caching?", "keywords": ["prompt caching", "reuse", "processing"], "reference_answer": "Prompt caching saves the processing work for a frequently repeated prompt so the provider reuses it instead of recomputing from scratch each time, which saves money and latency.", "category": "concept"}
+{"question": "What is computer vision?", "keywords": ["interpret", "understand", "visual information"], "reference_answer": "Computer vision is a branch of AI that trains machines to interpret and understand the visual world — extracting meaning from images, video, and camera feeds.", "category": "direct_fact"}
+
+// ---- Ten new, drawn from across the corpus (Day 11-31) ----
+{"question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?", "keywords": ["RecursiveCharacterTextSplitter", "natural boundaries"], "reference_answer": "It splits text hierarchically at natural boundaries — trying paragraph breaks first, then line breaks, then sentences, then words — so chunks stay coherent. A plain character splitter just cuts at a fixed length regardless of structure.", "category": "concept"}
+{"question": "How does an LSTM solve the vanishing gradient problem?", "keywords": ["LSTM", "vanishing gradient", "cell state"], "reference_answer": "An LSTM carries information along a gated cell state — a memory highway that runs across time steps with minimal change — regulated by forget, input, and output gates. Because gradients flow along that path largely unchanged, they don't shrink to zero over long sequences.", "category": "concept"}
+{"question": "What problem do skip connections in ResNet solve?", "keywords": ["skip connection", "ResNet"], "reference_answer": "Skip (residual) connections let a layer's input bypass layers and add directly to their output, giving gradients a direct path backward. This lets very deep networks train without the signal degrading or vanishing.", "category": "concept"}
+{"question": "What does mAP measure in object detection?", "keywords": ["mAP", "Mean Average Precision"], "reference_answer": "mAP (mean Average Precision) summarizes detection quality by averaging the average-precision score across all classes, capturing both how accurately and how completely a model detects objects.", "category": "direct_fact"}
+{"question": "What does reranking do in a RAG pipeline?", "keywords": ["Reranking", "reorder", "relevance"], "reference_answer": "Reranking is a second pass that reorders an initially retrieved set of chunks by relevance to the query — often with a stronger model — so the most relevant passages rise to the top before being sent to the generator.", "category": "concept"}
+{"question": "What is Gradio used for?", "keywords": ["Gradio", "web interface", "Python"], "reference_answer": "Gradio is an open-source Python library for quickly building shareable web interfaces for machine-learning models and demos, with no frontend code required.", "category": "direct_fact"}
+{"question": "What is Async IO in Python?", "keywords": ["Async IO", "multithreading", "multiprocessing"], "reference_answer": "Async IO is Python's single-threaded concurrency model built on an event loop, letting a program interleave many I/O-bound tasks while they wait — a lightweight alternative to multithreading or multiprocessing.", "category": "concept"}
+{"question": "What is overfitting in a neural network?", "keywords": ["Overfitting", "Training accuracy", "Validation accuracy"], "reference_answer": "Overfitting is when a model learns the training data too closely, including its noise, so it generalizes poorly — visible when training accuracy is much higher than validation accuracy.", "category": "concept"}
+{"question": "What is backpropagation?", "keywords": ["Backward propagation", "weights", "minimize"], "reference_answer": "Backpropagation is the training algorithm that computes how much each weight contributed to the error and updates the weights, via gradient descent, to minimize that error.", "category": "concept"}
+{"question": "What is Non-Maximum Suppression in object detection?", "keywords": ["Non-Maximum Suppression", "duplicate"], "reference_answer": "Non-Maximum Suppression (NMS) is a post-processing step that removes duplicate overlapping boxes for the same object, keeping only the highest-confidence detection.", "category": "direct_fact"}

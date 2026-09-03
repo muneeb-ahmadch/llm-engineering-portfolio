@@ -1,0 +1,546 @@
+[
+  {
+    "encoder": "minilm",
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "n_chunks": 734,
+    "n_questions": 20,
+    "mrr": 0.6266666666666666,
+    "keyword_coverage": 0.8666666666666668,
+    "misses": 4,
+    "embed_secs": null,
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "rr": 0.0,
+        "coverage": 0.5,
+        "top_source": "day24-finetuning-showdown.md"
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day21-langgraph.md"
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "rr": 0.0,
+        "coverage": 0.5,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day12-llm-apis.md"
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day14-prompt-context.md"
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "What is prompt caching?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is computer vision?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day28-cv.md"
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day31-cv-4.md"
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "rr": 0.0,
+        "coverage": 0.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is Gradio used for?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day19.md"
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What is backpropagation?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day26-deep-learning.md"
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "rr": 0.2,
+        "coverage": 1.0,
+        "top_source": "day31-cv-4.md"
+      }
+    ]
+  },
+  {
+    "encoder": "minilm",
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunk_size": 500,
+    "overlap": 50,
+    "top_k": 10,
+    "relevance": "all",
+    "n_chunks": 1539,
+    "n_questions": 20,
+    "mrr": 0.5291666666666667,
+    "keyword_coverage": 0.9249999999999998,
+    "misses": 4,
+    "embed_secs": null,
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "rr": 0.25,
+        "coverage": 1.0,
+        "top_source": "day24-finetuning-showdown.md"
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day21-langgraph.md"
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "rr": 0.0,
+        "coverage": 0.5,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day12-llm-apis.md"
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "rr": 0.0,
+        "coverage": 0.6666666666666666,
+        "top_source": "day14-prompt-context.md"
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "rr": 0.0,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "What is prompt caching?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is computer vision?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day28-cv.md"
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is Gradio used for?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day19.md"
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What is backpropagation?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day26-deep-learning.md"
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day31-cv-4.md"
+      }
+    ]
+  },
+  {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunk_size": 1000,
+    "overlap": 50,
+    "top_k": 5,
+    "relevance": "all",
+    "n_chunks": 734,
+    "n_questions": 20,
+    "mrr": 0.7541666666666667,
+    "keyword_coverage": 0.9499999999999998,
+    "misses": 2,
+    "embed_secs": null,
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day22-finetuning.md"
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day21-langgraph.md"
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day12-llm-apis.md"
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day14-prompt-context.md"
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is prompt caching?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is computer vision?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day28-cv.md"
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "rr": 0.0,
+        "coverage": 0.6666666666666666,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "rr": 0.25,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is Gradio used for?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day19.md"
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "top_source": "day23-oss-finetuning.md"
+      },
+      {
+        "question": "What is backpropagation?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day26-deep-learning.md"
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day31-cv-4.md"
+      }
+    ]
+  },
+  {
+    "encoder": "bge-small",
+    "model": "BAAI/bge-small-en-v1.5",
+    "chunk_size": 500,
+    "overlap": 50,
+    "top_k": 10,
+    "relevance": "all",
+    "n_chunks": 1539,
+    "n_questions": 20,
+    "mrr": 0.6416666666666666,
+    "keyword_coverage": 0.9333333333333332,
+    "misses": 4,
+    "embed_secs": null,
+    "per_question": [
+      {
+        "question": "What does NDCG measure that MRR does not?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "How is IoU calculated for a predicted bounding box?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does LoRA stand for?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day22-finetuning.md"
+      },
+      {
+        "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day21-langgraph.md"
+      },
+      {
+        "question": "Why is RAG optimization described as whack-a-mole?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is the Chat Completions API?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day12-llm-apis.md"
+      },
+      {
+        "question": "How are chat models different from reasoning models?",
+        "rr": 0.0,
+        "coverage": 0.6666666666666666,
+        "top_source": "day23-oss-finetuning.md"
+      },
+      {
+        "question": "How are LangChain and LiteLLM different?",
+        "rr": 0.0,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "What is prompt caching?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is computer vision?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day28-cv.md"
+      },
+      {
+        "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day15-rag-langchain.md"
+      },
+      {
+        "question": "How does an LSTM solve the vanishing gradient problem?",
+        "rr": 0.0,
+        "coverage": 0.6666666666666666,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What problem do skip connections in ResNet solve?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day27-deep-learning-2.md"
+      },
+      {
+        "question": "What does mAP measure in object detection?",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0,
+        "top_source": "day31-cv-4.md"
+      },
+      {
+        "question": "What does reranking do in a RAG pipeline?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day16-rag-evals.md"
+      },
+      {
+        "question": "What is Gradio used for?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day13-multimodal.md"
+      },
+      {
+        "question": "What is Async IO in Python?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day19.md"
+      },
+      {
+        "question": "What is overfitting in a neural network?",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333,
+        "top_source": "day26-deep-learning.md"
+      },
+      {
+        "question": "What is backpropagation?",
+        "rr": 1.0,
+        "coverage": 1.0,
+        "top_source": "day26-deep-learning.md"
+      },
+      {
+        "question": "What is Non-Maximum Suppression in object detection?",
+        "rr": 0.5,
+        "coverage": 1.0,
+        "top_source": "day29-cv-2.md"
+      }
+    ]
+  }
+]

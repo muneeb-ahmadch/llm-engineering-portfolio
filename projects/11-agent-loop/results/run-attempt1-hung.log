@@ -1,0 +1,44 @@
+Q · the overfitting question alone, x3 per arm (+judge)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 14491.74it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 4556.90it/s]
+    [shipped] Q run 1/3: abstained=1 faith=5/5 (0/0 claims) 1190ms $0.001804
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5834.54it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6166.02it/s]
+    [shipped] Q run 2/3: abstained=1 faith=5/5 (0/0 claims) 1444ms $0.000566
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5246.21it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5183.39it/s]
+    [shipped] Q run 3/3: abstained=1 faith=5/5 (0/0 claims) 721ms $0.000206
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6454.37it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 4541.16it/s]
+    [control] Q run 1/3: abstained=1 faith=5/5 (0/0 claims) 840ms $0.001552
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10108.72it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6032.08it/s]
+    [control] Q run 2/3: abstained=1 faith=5/5 (0/0 claims) 961ms $0.000212
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6672.95it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5701.96it/s]
+    [control] Q run 3/3: abstained=1 faith=5/5 (0/0 claims) 1497ms $0.000662
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6125.90it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5362.65it/s]
+    [agent] Q run 1/3: abstained=0 faith=5/5 (3/3 claims) 3064ms $0.002546 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting is when a neural network learns the training data too well and performs poorly on unseen data
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6854.06it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 4270.73it/s]
+    [agent] Q run 2/3: abstained=0 faith=5/5 (2/2 claims) 2793ms $0.002644 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting is when a neural network learns the training data too well and performs poorly on unseen data
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6376.37it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5734.85it/s]
+    [agent] Q run 3/3: abstained=0 faith=5/5 (2/2 claims) 3369ms $0.002953 · steps 2.00 (max 2, cap 0%)
+        step 1 query: Overfitting is when a neural network learns the training data too well including noise and performs poorly on unseen validation or test data
+
+G · the golden set (20 questions), once per arm (+judge)
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 5888.59it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5626.63it/s]
+    [shipped] golden: faith 4.89/5 · abstention 5.0% · $0.001570/q · 1160ms
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6357.23it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 5931.18it/s]
+    [control] golden: faith 5.00/5 · abstention 5.0% · $0.001589/q · 1327ms
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 6359.07it/s]
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 6361.80it/s]
+Failed to export span batch code: None, reason: HTTPSConnectionPool(host='cloud.langfuse.com', port=443): Read timed out. (read timeout=4.99999475479126)
+/Users/apple/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/lib/python3.12/multiprocessing/resource_tracker.py:279: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
