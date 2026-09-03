@@ -1,11 +1,3 @@
-<title>The RAG Pipeline &amp; Its Cost, Reference Card</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG</p>
 <h1>The pipeline, where the index lives, and what it costs</h1>
 <p class="standfirst">Retrieve &rarr; augment &rarr; generate; the vector-DB landscape; the cost and latency formulas. Compressed from Lesson 07. Made to be reread the night before.</p>
 
@@ -87,12 +79,3 @@ response = client.chat.completions.create(model=ANSWER_MODEL, messages=messages,
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;Retrieval, augmentation, and generation are three separable stages &mdash; I measure retrieval quality with MRR independent of any LLM, then add a real, priced, timed generation call on top once retrieval is trustworthy. I keep the vector store as the simplest thing that's provably equivalent to a real database at my scale, and I price every generation run from the vendor's current rate, checked the day I ran it &mdash; not a number I remembered.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 07
-  <a href="reranking.html">Reference: Reranking</a>
-  <a href="chunking.html">Reference: Chunking</a>
-  Roadmap
-</div>
-
-</div>

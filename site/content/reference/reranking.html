@@ -1,11 +1,3 @@
-<title>Reranking: Reference Card</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG</p>
 <h1>Reranking: bi-encoder wide, cross-encoder narrow</h1>
 <p class="standfirst">Two-stage retrieval, the pool-depth trap, and the one line that defends it. Compressed from Lesson 06. Made to be reread the night before.</p>
 
@@ -67,12 +59,3 @@ top_k   = [pool[i] for i in argsort(-rscores)][:k]</code></pre>
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;A reranker is a second stage: cheap bi-encoder retrieval widens the net, then a cross-encoder that reads the query and each candidate together re-scores that shortlist. It only fixes ranking failures, never recall &mdash; and I treat pool depth as its own recall boundary, checking a candidate's full-corpus rank before I trust a &lsquo;reranking didn't help&rsquo; result.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 06
-  <a href="embeddings-and-retrieval.html">Reference: Embeddings &amp; retrieval</a>
-  <a href="chunking.html">Reference: Chunking</a>
-  Roadmap
-</div>
-
-</div>

@@ -1,11 +1,3 @@
-<title>RAG vs fine-tune vs prompt: Reference Card</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG</p>
 <h1>RAG vs fine-tune vs prompt</h1>
 <p class="standfirst">Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides. Compressed from Lesson 08. Made to be reread the night before.</p>
 
@@ -71,12 +63,3 @@
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;Prompting changes what I say, RAG changes what the model can see, fine-tuning changes what the model is. First question: is the gap knowledge or behaviour? Knowledge, especially private or changing, is RAG, because facts belong in an index I can update and cite, not weights that go stale. Behaviour is fine-tuning, but only after a prompt hits a measured ceiling and only if the task is stable and high-volume enough to earn back the training cost. My RAG system stops at prompt+retrieval on purpose, I haven't measured a behaviour gap that justifies the third rung.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 08
-  <a href="pipeline-and-cost.html">Reference: Pipeline &amp; cost</a>
-  <a href="reranking.html">Reference: Reranking</a>
-  Roadmap
-</div>
-
-</div>

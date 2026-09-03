@@ -1,11 +1,3 @@
-<title>Closing the answer gap: grounding, faithfulness & the CI gate</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG · the defense layer</p>
 <h1>Closing the answer gap</h1>
 <p class="standfirst">RAG never scores 1.0. You don't fix that, you make it <em>fail safe</em> and <em>measurable</em>. Every gap between your golden set and perfect gets a named control. Compressed from Lesson 09. Made to be reread the night before.</p>
 
@@ -112,12 +104,3 @@ abstention too HIGH  → uselessly timid; retrieval or threshold is starving it
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;I can't build a RAG system that's always right, nobody can; honest RAG tops out well under 1.0. So I build one that fails safe and tells me when it's wrong. Grounded prompting and forced abstention turn a retrieval miss into &lsquo;I don't know&rsquo; instead of a fabrication; a faithfulness judge grades every answer against only its context, so an ungrounded claim fails even when it's accidentally true; and a trap set of unanswerable questions gates CI on hallucination count, because generation is non-deterministic, I gate on stable <em>rates</em>, not on the answer text. Every abstention is logged, and that log is the queue of gaps I close in the corpus next.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 09: Close the answer gap
-  <a href="rag-metrics.html">Reference: RAG metrics</a>
-  <a href="pipeline-and-cost.html">Reference: Pipeline &amp; cost</a>
-  Roadmap
-</div>
-
-</div>

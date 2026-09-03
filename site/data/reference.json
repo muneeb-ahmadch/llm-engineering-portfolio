@@ -1,0 +1,185 @@
+[
+  {
+    "slug": "chunking",
+    "title": "Chunking & Retrieval Misses: Reference Card",
+    "nav": "Chunking",
+    "eyebrow": "Reference · RAG",
+    "lesson": "05",
+    "experiment": "05",
+    "related": [
+      "rag-metrics",
+      "embeddings-and-retrieval"
+    ],
+    "blurb": "How to cut text so answers surface, and how to name a miss before you fix it.",
+    "order": 0
+  },
+  {
+    "slug": "embeddings-and-retrieval",
+    "title": "Embeddings & Semantic Retrieval: Reference Card",
+    "nav": "Embeddings & retrieval",
+    "eyebrow": "Reference · RAG",
+    "lesson": "02",
+    "experiment": "01",
+    "related": [
+      "rag-metrics"
+    ],
+    "blurb": "What an encoder is, how retrieval finds a chunk, and the sentences that survive an interview.",
+    "order": 1
+  },
+  {
+    "slug": "rag-metrics",
+    "title": "RAG Evaluation Metrics: Reference Card",
+    "nav": "RAG metrics",
+    "eyebrow": "Reference · RAG",
+    "lesson": null,
+    "experiment": "01",
+    "related": [],
+    "blurb": "The formulas, the thresholds, and the mistakes that a keyword ruler hides from you.",
+    "order": 2
+  },
+  {
+    "slug": "reranking",
+    "title": "Reranking: Reference Card",
+    "nav": "Reranking",
+    "eyebrow": "Reference · RAG",
+    "lesson": "06",
+    "experiment": "06",
+    "related": [
+      "embeddings-and-retrieval",
+      "chunking"
+    ],
+    "blurb": "Two-stage retrieval, the pool-depth trap, and the one line that defends it.",
+    "order": 3
+  },
+  {
+    "slug": "pipeline-and-cost",
+    "title": "The RAG Pipeline &amp; Its Cost, Reference Card",
+    "nav": "Pipeline & cost",
+    "eyebrow": "Reference · RAG",
+    "lesson": "07",
+    "experiment": "07",
+    "related": [
+      "reranking",
+      "chunking"
+    ],
+    "blurb": "Retrieve &rarr; augment &rarr; generate; the vector-DB landscape; the cost and latency formulas.",
+    "order": 4
+  },
+  {
+    "slug": "rag-vs-finetune-vs-prompt",
+    "title": "RAG vs fine-tune vs prompt: Reference Card",
+    "nav": "RAG vs fine-tune vs prompt",
+    "eyebrow": "Reference · RAG",
+    "lesson": "08",
+    "experiment": "08",
+    "related": [
+      "pipeline-and-cost",
+      "reranking"
+    ],
+    "blurb": "Three levers, the one distinction that settles most interview questions, the cost trade, and the failure each one hides.",
+    "order": 5
+  },
+  {
+    "slug": "answer-defense",
+    "title": "Closing the answer gap: grounding, faithfulness & the CI gate",
+    "nav": "Answer defense",
+    "eyebrow": "Reference · RAG · the defense layer",
+    "lesson": "09",
+    "experiment": "09",
+    "related": [
+      "rag-metrics",
+      "pipeline-and-cost"
+    ],
+    "blurb": "RAG never scores 1.0. You don't fix that, you make it fail safe and measurable. Every gap between your golden set and perfect gets a named control.",
+    "order": 6
+  },
+  {
+    "slug": "tracing-and-scores",
+    "title": "Tracing answer quality: scores, not tags",
+    "nav": "Tracing & scores",
+    "eyebrow": "Reference · RAG · observability",
+    "lesson": "10",
+    "experiment": "10",
+    "related": [
+      "answer-defense",
+      "pipeline-and-cost"
+    ],
+    "blurb": "A trace shows you what happened on one request. A score is what makes whether it was any good queryable, aggregatable, and alertable across all of them.",
+    "order": 7
+  },
+  {
+    "slug": "agents-vs-workflows",
+    "title": "Agent or workflow?, the decision, the loop, the guardrails",
+    "nav": "Agents vs workflows",
+    "eyebrow": "Reference · Agents",
+    "lesson": "11",
+    "experiment": "11",
+    "related": [
+      "tracing-and-scores",
+      "answer-defense",
+      "pipeline-and-cost"
+    ],
+    "blurb": "The decision rule, the five workflow patterns, the minimal loop, and the three guardrails that must exist before a loop runs once.",
+    "order": 8
+  },
+  {
+    "slug": "prompt-injection-and-guardrails",
+    "title": "Injection &amp; guardrails, the RAG-agent threat model",
+    "nav": "Injection & guardrails",
+    "eyebrow": "Reference · Agents · Security",
+    "lesson": "12",
+    "experiment": "12",
+    "related": [
+      "agents-vs-workflows",
+      "answer-defense",
+      "tracing-and-scores"
+    ],
+    "blurb": "The one attack a RAG agent uniquely exposes, why the faithfulness score can't see it, and the three defences you can build from parts you already own.",
+    "order": 9
+  },
+  {
+    "slug": "orchestration-and-validation",
+    "title": "Orchestration &amp; the deterministic check",
+    "nav": "Orchestration & validation",
+    "eyebrow": "Reference · Agents · Orchestration",
+    "lesson": "13",
+    "experiment": "13",
+    "related": [
+      "prompt-injection-and-guardrails",
+      "agents-vs-workflows",
+      "answer-defense"
+    ],
+    "blurb": "A pipeline is a sequence of stages. Some are code, some are models, and only one of those two kinds can be argued with. How to map yours, where to put a check.",
+    "order": 10
+  },
+  {
+    "slug": "mcp",
+    "title": "MCP: the primitives, the wire, and the new trust boundary",
+    "nav": "MCP",
+    "eyebrow": "Reference · Agents · Model Context Protocol",
+    "lesson": "14",
+    "experiment": "14",
+    "related": [
+      "orchestration-and-validation",
+      "agents-vs-workflows",
+      "prompt-injection-and-guardrails"
+    ],
+    "blurb": "The three primitives, what changed in the 2026-07-28 spec that most blog posts still get wrong, and where the trust boundary moved.",
+    "order": 11
+  },
+  {
+    "slug": "stateful-graphs",
+    "title": "Stateful graphs: state, nodes, edges, checkpoints",
+    "nav": "Stateful graphs",
+    "eyebrow": "Reference · LangGraph",
+    "lesson": "15",
+    "experiment": "15",
+    "related": [
+      "agents-vs-workflows",
+      "mcp",
+      "orchestration-and-validation"
+    ],
+    "blurb": "The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it.",
+    "order": 12
+  }
+]

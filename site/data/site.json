@@ -1,0 +1,13 @@
+{
+  "name": "Muneeb Ahmad",
+  "role": "Applied LLM & RAG engineering",
+  "email": "muneebahmad.ch1@gmail.com",
+  "github": "https://github.com/muneeb-ahmadch",
+  "repo": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio",
+  "repo_blob": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/",
+  "repo_tree": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/",
+  "url": "https://muneeb-ahmadch.github.io/llm-engineering-portfolio/",
+  "updated": "September 2026",
+  "title": "LLM Engineering Portfolio · Muneeb Ahmad",
+  "description": "Thirteen measured experiments on one RAG pipeline: retrieval evaluation, hallucination defense, prompt injection, MCP, and stateful agents. Every number produced by code in the repository."
+}

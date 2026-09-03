@@ -1,11 +1,3 @@
-<title>Stateful graphs: state, nodes, edges, checkpoints</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · LangGraph</p>
 <h1>Stateful graphs</h1>
 <p class="standfirst">The four ideas, the minimal graph, what a checkpoint does and does not protect, and the decision rule for adopting any of it. Compressed from Lesson 15. Versions and quotes checked against the docs on 2026-08-10 &mdash; <code>langgraph 1.2.10</code>.</p>
 
@@ -134,12 +126,3 @@ list(graph.get_state_history(cfg))    # every checkpoint, newest first  → time
   <li><strong>Checkpoint</strong> &mdash; the saved state after a superstep. <strong>Durable execution</strong> &mdash; the property those checkpoints give you.</li>
   <li><strong>Time travel</strong> &mdash; resuming from an <em>older</em> checkpoint instead of the newest, to replay or branch.</li>
 </ul>
-
-<div class="footer">
-  &larr; Lesson 15
-  <a href="agents-vs-workflows.html">Agents vs workflows</a>
-  <a href="mcp.html">MCP</a>
-  <a href="orchestration-and-validation.html">Orchestration &amp; validation</a>
-</div>
-
-</div>

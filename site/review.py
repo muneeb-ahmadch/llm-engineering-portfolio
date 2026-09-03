@@ -2,7 +2,7 @@
 """Independent visual review. Spawns a separate Claude process that has never seen the
 executor's context, gives it the locked rubric and the screenshots, and records its verdict.
 Exit 0 on PASS, 1 otherwise. Locked after the baseline commit."""
-import glob, hashlib, json, os, re, subprocess, sys
+import glob, hashlib, json, os, re, subprocess, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -30,16 +30,22 @@ def main():
     help_text = subprocess.run([CLAUDE, "--help"], capture_output=True, text=True).stdout
     tools_flag = "--allowedTools" if "--allowedTools" in help_text else "--allowed-tools"
     env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
-    r = subprocess.run([CLAUDE, "-p", prompt, "--model", "opus", "--max-turns", "14",
-                        tools_flag, "Read", "--output-format", "json"],
-                       cwd=SHOTS, env=env, capture_output=True, text=True, timeout=900)
-    raw = r.stdout
-    text = raw
-    try:
-        text = json.loads(raw).get("result", raw)
-    except Exception:
-        pass
-    m = re.findall(r"\{.*\}", text, re.S)
+    text, m = "", []
+    for attempt in range(3):
+        r = subprocess.run([CLAUDE, "-p", prompt, "--model", "opus", "--max-turns", "14",
+                            tools_flag, "Read", "--output-format", "json"],
+                           cwd=SHOTS, env=env, capture_output=True, text=True, timeout=900)
+        text = r.stdout
+        try:
+            text = json.loads(r.stdout).get("result", r.stdout)
+        except Exception:
+            pass
+        m = re.findall(r"\{.*\}", text, re.S)
+        transient = re.search(r"API Error|Overloaded|529|rate.?limit|timed? ?out", text, re.I)
+        if m or not transient:
+            break
+        print(f"transient reviewer error, retrying ({attempt + 1}/3): {text[-160:].strip()}")
+        time.sleep(20 * (attempt + 1))
     verdict = {"verdict": "FAIL", "findings": [{"severity": "major", "issue": "reviewer output unparseable"}]}
     for cand in reversed(m):
         try:

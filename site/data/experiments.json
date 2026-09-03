@@ -1,0 +1,363 @@
+[
+  {
+    "number": "01",
+    "slug": "01-chunking",
+    "title": "The evaluation harness",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/01-chunking/",
+    "question": "Chunk size or encoder: which lever matters?",
+    "finding_html": "The encoder. <strong>bge-small over minilm bought +0.128 MRR</strong> (0.627 → 0.754) at zero extra cost. Halving the chunk size hurt <em>both</em> encoders. At n=20 one question is worth 0.05 MRR, so the encoder gain clears the noise floor and the 0.015 gaps do not.",
+    "answer": "The encoder",
+    "metric_value": "+0.128",
+    "metric_label": "MRR from the encoder swap",
+    "tags": [
+      "retrieval"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/README.md"
+      },
+      {
+        "label": "Sweep",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/results/results.md"
+      },
+      {
+        "label": "Code",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/01-chunking/rag_eval.py"
+      }
+    ]
+  },
+  {
+    "number": "04",
+    "slug": "04-answer-quality",
+    "title": "Reading the chunks by hand",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/04-answer-quality/",
+    "question": "Where does the keyword ruler disagree with a human?",
+    "finding_html": "On the question I had already written off. Reading the retrieved text <strong>overturned my own earlier verdict</strong> and reclassified the miss from a coverage problem to a ranking problem, which is what pointed experiment 06 at a cross encoder.",
+    "answer": "Overturned",
+    "metric_value": "By hand",
+    "metric_label": "my own earlier verdict, reversed",
+    "tags": [
+      "retrieval"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/04-answer-quality/README.md"
+      },
+      {
+        "label": "Chunks",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/04-answer-quality/report.md"
+      }
+    ]
+  },
+  {
+    "number": "05",
+    "slug": "05-heading-chunker",
+    "title": "Heading aware chunking",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/05-heading-chunker/",
+    "question": "Does splitting on headings rescue a known miss?",
+    "finding_html": "No. The target chunk fell from full corpus <strong>rank #8 to #67</strong>. Cleaner chunks helped it, and helped 66 competitors more. Aggregate MRR rose 0.013 while the question I was fixing went backwards, which is the argument for per-question diffs.",
+    "answer": "No",
+    "metric_value": "#8 &rarr; #67",
+    "metric_label": "target chunk rank after the change",
+    "tags": [
+      "retrieval"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/05-heading-chunker/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/05-heading-chunker/results.md"
+      }
+    ]
+  },
+  {
+    "number": "06",
+    "slug": "06-reranking",
+    "title": "Retrieve wide, then rerank",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/06-reranking/",
+    "question": "Can a cross encoder rescue the two misses?",
+    "finding_html": "One of two. LSTM flipped to a hit at pool 20. Overfitting stayed a miss at <strong>every pool size from 5 to 30</strong>, scoring −9.01, so being in the pool was necessary and not sufficient. A scoring decision, not a recall problem.",
+    "answer": "One of two",
+    "metric_value": "1 of 2",
+    "metric_label": "misses rescued at pool 20",
+    "tags": [
+      "retrieval"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/06-reranking/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/06-reranking/results.md"
+      }
+    ]
+  },
+  {
+    "number": "07",
+    "slug": "07-generation",
+    "title": "What an answer costs",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/07-generation/",
+    "question": "Cost, latency, and what new failure mode did I buy?",
+    "finding_html": "<strong>$0.002174 per query, 2.1 s mean latency</strong>, input 59% of the bill. A live price check overruled my own memory, which had the model down as fiction. And a probe returned \"Paris, the capital of France\" from context that never mentioned it.",
+    "answer": "Measured",
+    "metric_value": "$0.002174",
+    "metric_label": "per query, 2.1 s mean latency",
+    "tags": [
+      "generation"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/07-generation/README.md"
+      },
+      {
+        "label": "Report",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/07-generation/report.md"
+      }
+    ]
+  },
+  {
+    "number": "08",
+    "slug": "08-rag-vs-finetune",
+    "title": "RAG, fine-tune, or prompt",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/08-rag-vs-finetune/",
+    "question": "Which tool fits which problem, with a number?",
+    "finding_html": "Four scenarios sorted on knowledge versus behaviour, with the break-even written out: <strong>~$72.47/day saved</strong> means a small-model fine-tune pays back in days. Stability lets a one-time cost amortise; churn kills it.",
+    "answer": "It depends on churn",
+    "metric_value": "~$72.47/day",
+    "metric_label": "break-even that pays for a fine-tune",
+    "tags": [
+      "generation"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/08-rag-vs-finetune/README.md"
+      },
+      {
+        "label": "Decision doc",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/08-rag-vs-finetune/decision.md"
+      }
+    ]
+  },
+  {
+    "number": "09",
+    "slug": "09-answer-defense",
+    "title": "Closing the hallucination gap",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/09-answer-defense/",
+    "question": "Will it answer questions the corpus cannot support?",
+    "finding_html": "The prompt I had been shipping hallucinated on <strong>15 of 15</strong> trap runs. Not a flicker, a flatline. A better prompt alone took it to <strong>0 of 15</strong>, faithfulness 3.90 → 4.80, groundedness 66.9% → 95.6%. Plus a CI gate that exits non-zero.",
+    "answer": "Every time, then never",
+    "metric_value": "15/15 &rarr; 0/15",
+    "metric_label": "trap hallucinations, prompt only",
+    "tags": [
+      "generation"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/09-answer-defense/README.md"
+      },
+      {
+        "label": "Report",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/09-answer-defense/report.md"
+      },
+      {
+        "label": "Reference card",
+        "href": "reference/answer-defense.html"
+      }
+    ]
+  },
+  {
+    "number": "10",
+    "slug": "10-abstention-trace",
+    "title": "Abstention in production telemetry",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/10-abstention-trace/",
+    "question": "There is no test set in production. How would I know?",
+    "finding_html": "A boolean score on every span. Traps <strong>5/5</strong>, golden <strong>1/20</strong>. The one false abstention traced to <strong>one chunk in 734</strong>, so a chunking defect rather than a timid model. Band set at 0 &lt; rate ≤ 0.10, because never abstaining is the failure of experiment 09.",
+    "answer": "Score the trace",
+    "metric_value": "1 in 734",
+    "metric_label": "chunk behind the one false abstention",
+    "tags": [
+      "generation"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/10-abstention-trace/README.md"
+      },
+      {
+        "label": "Report",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/10-abstention-trace/report.md"
+      },
+      {
+        "label": "Reference card",
+        "href": "reference/tracing-and-scores.html"
+      }
+    ]
+  },
+  {
+    "number": "11",
+    "slug": "11-agent-loop",
+    "title": "Is a search loop worth it?",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/11-agent-loop/",
+    "question": "Does letting the model search again fix anything?",
+    "finding_html": "<strong>Four of five preregistered hypotheses were wrong.</strong> The loop closed a defect that had survived five experiments, 3/3 at 5/5 faithfulness. It fired on 2 questions in 20, zero false fires, <strong>1.32× cost</strong>. Ship behind a trigger, not by default.",
+    "answer": "Yes, behind a trigger",
+    "metric_value": "4 of 5",
+    "metric_label": "preregistered hypotheses wrong",
+    "tags": [
+      "agents"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/results.md"
+      },
+      {
+        "label": "Preregistration",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/11-agent-loop/hypothesis.md"
+      }
+    ]
+  },
+  {
+    "number": "12",
+    "slug": "12-injection",
+    "title": "The attack that scores grounded",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/12-injection/",
+    "question": "What if someone can write into my corpus?",
+    "finding_html": "<strong>1,820 bytes, 0.255% of the corpus, obeyed 8 of 18 runs.</strong> My own faithfulness judge scored the most successful attack <strong>5/5, fully grounded, 3/3</strong>. A nonce delimiter cut obedience to 1/18 at zero quality cost and 1.68× money. The injection that issues no order still walks through.",
+    "answer": "Obeyed",
+    "metric_value": "8 of 18",
+    "metric_label": "runs obeyed, cut to 1 of 18 by a nonce",
+    "tags": [
+      "security"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/results.md"
+      },
+      {
+        "label": "Threat model",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/12-injection/threat-model.md"
+      },
+      {
+        "label": "Reference card",
+        "href": "reference/prompt-injection-and-guardrails.html"
+      }
+    ]
+  },
+  {
+    "number": "13",
+    "slug": "13-citation-validation",
+    "title": "The stage that cannot be argued with",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/13-citation-validation/",
+    "question": "Does forcing citations stop the attack?",
+    "finding_html": "No. It catches <strong>none of the eight attacks that landed</strong>, because the attacker's method is to make the citation true. Segregating the judge did work: correct answers wrongly punished went <strong>4 to 0</strong>. And my own validator blocked two correct answers, from a prose contract with two readings.",
+    "answer": "No",
+    "metric_value": "0 of 8",
+    "metric_label": "landed attacks caught by citations",
+    "tags": [
+      "security"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/results.md"
+      },
+      {
+        "label": "Decidability",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/decidability.md"
+      },
+      {
+        "label": "Prediction",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/13-citation-validation/predictions.md"
+      }
+    ]
+  },
+  {
+    "number": "14",
+    "slug": "14-mcp",
+    "title": "Serving the retriever over MCP",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/14-mcp/",
+    "question": "Can I expose my index as an MCP server?",
+    "finding_html": "Built to the 2026-07-28 spec and verified three ways, including <strong>Claude Code discovering and calling it unprompted</strong>. A poisoned tool description got 0/3 compliance but <strong>1/3 contamination</strong>: the model reasoned about a tool it never called.",
+    "answer": "Yes, three ways",
+    "metric_value": "1/3",
+    "metric_label": "contamination at 0/3 compliance",
+    "tags": [
+      "agents",
+      "security"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/results.md"
+      },
+      {
+        "label": "Server",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/14-mcp/server.py"
+      },
+      {
+        "label": "Reference card",
+        "href": "reference/mcp.html"
+      }
+    ]
+  },
+  {
+    "number": "15",
+    "slug": "15-langgraph",
+    "title": "Kill it, then resume it",
+    "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/tree/main/projects/15-langgraph/",
+    "question": "Does LangGraph durability survive a crash?",
+    "finding_html": "Only on a flag that is not the default. With <code>durability=\"async\"</code>, a <code>kill -9</code> <strong>lost a model call I had already paid for</strong>. <code>sync</code> fixes it. Verdict: keep my own loop, and the condition that would change that is written down.",
+    "answer": "Not yet",
+    "metric_value": "1 call",
+    "metric_label": "paid for and lost on kill -9 with async",
+    "tags": [
+      "agents"
+    ],
+    "links": [
+      {
+        "label": "README",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/15-langgraph/README.md"
+      },
+      {
+        "label": "Results",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/15-langgraph/results.md"
+      },
+      {
+        "label": "Reference card",
+        "href": "reference/stateful-graphs.html"
+      },
+      {
+        "label": "Prediction",
+        "href": "https://github.com/muneeb-ahmadch/llm-engineering-portfolio/blob/main/projects/15-langgraph/predictions.md"
+      }
+    ]
+  }
+]

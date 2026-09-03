@@ -1,0 +1,55 @@
+{
+  "caption": "corpus (21 markdown files, 712 KB)",
+  "stages": [
+    {
+      "name": "chunker",
+      "config": "fixed 1000 / 50 overlap, or heading aware",
+      "set_in": "05"
+    },
+    {
+      "name": "encoder",
+      "config": "bge-small-en-v1.5, local, CPU, no API cost",
+      "set_in": "01"
+    },
+    {
+      "name": "retrieval",
+      "config": "cosine top-k over an in-memory index",
+      "set_in": "01"
+    },
+    {
+      "name": "reranker",
+      "config": "cross-encoder/ms-marco-MiniLM-L6-v2, pool 20",
+      "set_in": "06"
+    },
+    {
+      "name": "context",
+      "config": "per-request nonce delimiter around every chunk",
+      "set_in": "12"
+    },
+    {
+      "name": "generator",
+      "config": "gpt-5.6-luna, hardened system prompt",
+      "set_in": "09"
+    },
+    {
+      "name": "agent loop",
+      "config": "one search_corpus tool, MAX_STEPS 3, trigger gated",
+      "set_in": "11"
+    },
+    {
+      "name": "judge",
+      "config": "gpt-5.6-terra, segregated context",
+      "set_in": "13"
+    },
+    {
+      "name": "validator",
+      "config": "pure Python citation check, 19 unit tests",
+      "set_in": "13"
+    },
+    {
+      "name": "tracing",
+      "config": "Langfuse spans, abstained / needle_in_context scores",
+      "set_in": "10"
+    }
+  ]
+}

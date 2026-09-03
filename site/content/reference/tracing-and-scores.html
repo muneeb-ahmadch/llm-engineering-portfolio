@@ -1,11 +1,3 @@
-<title>Tracing answer quality: scores, not tags</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG · observability</p>
 <h1>Tracing answer quality</h1>
 <p class="standfirst">A trace shows you <em>what happened</em> on one request. A <strong>score</strong> is what makes <em>whether it was any good</em> queryable, aggregatable, and alertable across all of them. Compressed from Lesson 10. Made to be reread the night before.</p>
 
@@ -86,12 +78,3 @@ langfuse.create_score(name="abstained", value=1, data_type="BOOLEAN",
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;I don't just trace latency and cost, I score answer quality onto the trace. Every request carries an <code>abstained</code> score, so in production I filter to the ones that declined, that's my queue of corpus gaps, and I watch the abstention rate as a band: a sudden drop means the model started answering things it shouldn't, on real traffic my CI golden set never covers. Faithfulness rides the same trace as a numeric score. Scores, not tags, because a tag can't average into a rate.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 10: Catch abstention in the trace
-  <a href="answer-defense.html">Reference: Closing the answer gap</a>
-  <a href="pipeline-and-cost.html">Reference: Pipeline &amp; cost</a>
-  Roadmap
-</div>
-
-</div>

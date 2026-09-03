@@ -1,11 +1,3 @@
-<title>Embeddings & Semantic Retrieval: Reference Card</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG</p>
 <h1>Embeddings &amp; semantic retrieval</h1>
 <p class="standfirst">What an encoder is, how retrieval finds a chunk, and the sentences that survive an interview. Compressed from Days 14&ndash;15 and Lesson 02. Made to be reread the night before.</p>
 
@@ -81,12 +73,3 @@ top_k  = argsort(-scores)[:k]    # nearest points win</code></pre>
   <li><strong>Why did a different encoder retrieve better?</strong> &ldquo;It arranges the space better for this corpus &mdash; I measured +0.13 MRR. Both were 384-dim, so it wasn&rsquo;t size; it was training.&rdquo;</li>
   <li><strong>Why did a question fail retrieval?</strong> &ldquo;The query landed too far from its answer in that encoder&rsquo;s space. A miss is geometry, not the LLM&rsquo;s fault.&rdquo;</li>
 </ul>
-
-<div class="footer">
-  Lesson 02: Why did the encoder win?
-  <a href="rag-metrics.html">Reference: RAG metrics</a>
-  Day 15 source notes
-  Resources
-</div>
-
-</div>

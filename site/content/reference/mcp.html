@@ -1,11 +1,3 @@
-<title>MCP: the primitives, the wire, and the new trust boundary</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · Agents · Model Context Protocol</p>
 <h1>MCP &mdash; primitives, wire, trust boundary</h1>
 <p class="standfirst">The Model Context Protocol in the form an interviewer will probe it: what the three primitives actually distinguish, what changed in the <code>2026-07-28</code> spec that most blog posts still get wrong, and where the trust boundary moved. Compressed from Lesson 14. Made to be reread the night before an interview.</p>
 
@@ -166,14 +158,4 @@ if __name__ == "__main__":
   <p style="margin:0 0 0.6rem"><strong>1. What it is.</strong> &ldquo;A JSON-RPC protocol for provisioning context to an AI application. Three server primitives split by <em>who decides they enter the context</em> &mdash; tools the model pulls, resources the app pushes, prompts the user invokes.&rdquo;</p>
   <p style="margin:0 0 0.6rem"><strong>2. What it changes.</strong> &ldquo;Not model capability &mdash; authorship. Tool descriptions and results are now written by whoever runs the server, and the description lands in context before any call. Context defences that wrap retrieved chunks don&rsquo;t cover either.&rdquo;</p>
   <p style="margin:0"><strong>3. That you read it recently.</strong> &ldquo;As of <code>2026-07-28</code> it&rsquo;s stateless &mdash; <code>server/discover</code>, per-request <code>_meta</code>, no protocol sessions &mdash; and sampling, roots and logging are deprecated.&rdquo;</p>
-</div>
-
-<div class="footer">
-  Lesson 14
-  <a href="orchestration-and-validation.html">Orchestration &amp; the deterministic check</a>
-  <a href="agents-vs-workflows.html">Agent or workflow?</a>
-  <a href="prompt-injection-and-guardrails.html">Injection &amp; guardrails</a>
-  <a href="pipeline-and-cost.html">Pipeline &amp; cost</a>
-</div>
-
 </div>

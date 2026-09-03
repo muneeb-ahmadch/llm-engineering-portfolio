@@ -1,11 +1,3 @@
-<title>Chunking & Retrieval Misses: Reference Card</title>
-<link rel="stylesheet" href="../assets/style.css">
-
-<div class="wrap">
-
-<p class="eyebrow" style="margin-bottom:1.2rem"><a href="../index.html">&larr; LLM Engineering Portfolio</a></p>
-
-<p class="eyebrow">Reference · RAG</p>
 <h1>Chunking &amp; the three misses</h1>
 <p class="standfirst">How to cut text so answers surface, and how to name a miss before you fix it. Compressed from Lesson 05. Made to be reread the night before.</p>
 
@@ -59,10 +51,3 @@
 
 <h2>Defend it in one line</h2>
 <blockquote>&ldquo;There&rsquo;s no universal chunk size &mdash; it&rsquo;s a measured trade-off. I start with a recursive or structure-aware splitter matched to the document, keep heading metadata for citations, and I let the eval decide the size: a new splitter helps some questions and hurts others, so I ship the one that moves overall MRR, not the one that fixes a single query.&rdquo;</blockquote>
-
-<div class="footer">
-  Lesson 05
-  <a href="rag-metrics.html">Reference: RAG metrics</a>
-  <a href="embeddings-and-retrieval.html">Reference: Embeddings</a>
-  Roadmap
-</div>

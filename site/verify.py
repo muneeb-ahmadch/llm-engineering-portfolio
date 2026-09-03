@@ -290,7 +290,10 @@ def check_page_shell(path, html, titles):
         if bad.lower() in html.lower():
             fail(f"{name}: contains '{bad}'")
     for pat, what in [(r'<script[^>]+src="https?://', "external script"),
-                      (r'<link[^>]+href="https?://', "external stylesheet/resource"),
+                      (r'<link[^>]+rel="(?:stylesheet|preload|preconnect|dns-prefetch|modulepreload)"[^>]*href="https?://',
+                       "external stylesheet/resource"),
+                      (r'<link[^>]+href="https?://[^"]*"[^>]*rel="(?:stylesheet|preload|preconnect|dns-prefetch|modulepreload)"',
+                       "external stylesheet/resource"),
                       (r'<img[^>]+src="https?://', "external image"),
                       (r"<iframe", "iframe"), (r"@import", "@import")]:
         if re.search(pat, html):
