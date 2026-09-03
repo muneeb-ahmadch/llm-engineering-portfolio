@@ -14,3 +14,8 @@ __pycache__/
 
 # os
 .DS_Store
+
+# site build artefacts
+site/screenshots/
+site/review/last.json
+.claude/stop-blocks
