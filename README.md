@@ -16,7 +16,7 @@ prediction is still in the repo next to the result.
 
 ## The short version
 
-I built one evaluation harness ([`rag_eval.py`](projects/01-chunking/rag_eval.py), 2,187 lines)
+I built one evaluation harness ([`rag_eval.py`](projects/01-chunking/rag_eval.py), 2,183 lines)
 and then spent thirteen sessions trying to break the pipeline it measures. The interesting
 results are mostly the negative ones:
 
@@ -38,6 +38,60 @@ results are mostly the negative ones:
 The two experiments not in that table are [04 Answer quality](projects/04-answer-quality/),
 a by-hand audit that overturned an earlier verdict of mine, and the numbering gaps, which
 are sessions that produced no separate codebase.
+
+---
+
+## Three questions I get asked
+
+**"Did you build an evaluation harness, or did you use one?"**
+
+Built. [`rag_eval.py`](projects/01-chunking/rag_eval.py) is 2,183 lines and it is the only
+measuring instrument in this repository. It carries the chunkers, the retriever, the
+cross-encoder reranker, the generation path, the trap set, the LLM judge, the agent loop and
+the Langfuse tracing, behind four subcommands. `check` validates the golden set before any
+run, because a question whose keywords match zero chunks scores zero forever, and a question
+whose keywords match fifty chunks pins MRR near 1.0 while measuring nothing. `gate` runs the
+trap set and the judge, applies a CI rule, and exits non-zero on failure. Every table in
+every report came out of this one file, which is the only reason numbers from thirteen
+different experiments can be compared at all.
+
+**"Have you built anything on MCP?"**
+
+[Experiment 14](projects/14-mcp/) is an MCP server over stdio, written against the
+2026-07-28 spec on `mcp==2.0.0`, exposing the experiment 06 index through all three
+primitives, split by who decides the content enters the model's context: `search_corpus` as
+a tool (the model decides), `corpus://manifest` as a resource (the application decides),
+`cited` as a prompt (the user decides). The tool imports the harness function rather than
+reimplementing it, so the server and the measurements cannot drift apart. Verified three
+ways: raw JSON-RPC over stdio with no SDK involved, the `@modelcontextprotocol/inspector`
+CLI, and Claude Code discovering and calling it unprompted. Then I attacked it. Two arms
+differing by exactly one tool description gave **0 of 3 compliance but 1 of 3
+contamination**: the model read the poisoned description, reasoned about it, and warned me
+off a tool it never called. The payload reached the context and changed the output without
+the tool ever running.
+
+**"We shipped an assistant and it is fragile under load. What would you do?"**
+
+Work out which kind of fragile it is first, because there are several and only one of them
+is the model's fault. The ones in this repository, with what each cost to find:
+
+- It invents answers the corpus cannot support. The prompt I had been shipping hallucinated
+  on **15 of 15** trap runs. A better prompt alone took that to **0 of 15**, faithfulness
+  3.90 to 4.80, groundedness 66.9% to 95.6% ([09](projects/09-answer-defense/report.md)).
+- It does whatever is written in its context. **1,820 bytes**, 0.255% of the corpus, and the
+  agent obeyed on **8 of 18** runs ([12](projects/12-injection/results.md)).
+- The guardrail you trust most is the one that fails. My own faithfulness judge scored the
+  most successful attack **5/5, fully grounded, three times out of three**, and forcing
+  citations caught **none** of the eight attacks that landed, because the attacker's method
+  is to make the citation true ([13](projects/13-citation-validation/results.md)).
+- It quietly loses paid work when a process dies. LangGraph with `durability="async"` lost a
+  model call I had already been billed for on a `kill -9`; `sync` fixes it
+  ([15](projects/15-langgraph/results.md)).
+
+None of those were found by reading the code. They were found by building something that
+produces a number, then trying to make the number move. The order is measure, instrument,
+fix, measure again, and keep the runs that proved me wrong. Five of these thirteen sessions
+ended by disproving the thing I set out to prove.
 
 ---
 
@@ -89,7 +143,11 @@ had read all of them, which means I can write golden questions from memory and c
 answers by eye. They also have heavy topic overlap between adjacent files, which makes
 retrieval work harder than a corpus of unrelated documents would.
 
-- `golden.jsonl`, 20 hand written questions with keyword relevance rules
+- `golden.jsonl`, 50 hand written questions with keyword relevance rules. The first 20 are
+  the set every report dated before 9 September 2026 was measured on. Thirty more were added
+  on 9 September 2026 to cover ten corpus files the original set never asked a question
+  about. **Any figure in this repository without an explicit n is n=20.** The n=50 retrieval
+  sweep has not been run yet, and no number here has been restated against it
 - `golden-trap.jsonl`, 5 questions the corpus provably cannot answer, used to measure hallucination
 - `check` validates both before any run, because a question matching zero chunks scores 0 forever and a question matching fifty chunks pins MRR near 1.0 while measuring nothing
 

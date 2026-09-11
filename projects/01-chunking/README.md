@@ -7,7 +7,7 @@
 ## What I built
 
 `rag_eval.py`, which every later experiment extends rather than replaces. By the end of the
-portfolio it is 2,187 lines with four commands and the flag surface built up across thirteen
+portfolio it is 2,183 lines with four commands and the flag surface built up across thirteen
 sessions:
 
 | Command | What it does |
