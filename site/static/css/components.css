@@ -151,6 +151,10 @@
 }
 @media (min-width: 960px) {
   .rail > .stage:nth-child(2n)::after { content: "\2192"; }
+  /* At 1440px the connector was a 12.8px glyph in faint grey sitting in a 34px gap, which
+     reads as empty space: review saw ten cards in a grid and took the order from the corner
+     numbers alone. Same arrow, enough weight to register as flow. */
+  .rail > .stage::after { font-size: 1.05rem; color: var(--ink-soft); }
   .rail > .stage:nth-child(5n)::after { content: none; }
   .rail > .stage:last-child::after { content: none; }
   .hero-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); }
