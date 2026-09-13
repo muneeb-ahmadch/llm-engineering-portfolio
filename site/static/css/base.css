@@ -84,19 +84,30 @@ td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
    columns: a five-column table in 390 px of viewport is unreadable when squeezed. */
 @media (max-width: 599px) {
   .scroll-x table { min-width: 33rem; }
-  /* Two affordances, because one was not readable at a glance: a shadow pinned to the
-     scrolling edge (it disappears once you reach the end) and a visible container edge. */
+  /* Three affordances, because the fade alone still read as a crop in review: a shadow
+     pinned to the scrolling edge (it disappears once you reach the end), a visible
+     container edge, and a written hint below the table. */
   .scroll-x {
     border-inline-end: 2px solid var(--rule-strong);
-    /* The fade is the cue that actually reads in a still image: content visibly
-       dissolves into the edge instead of stopping at a hard crop. */
-    -webkit-mask-image: linear-gradient(to right, #000 0 76%, rgb(0 0 0 / 0) 98%);
-    mask-image: linear-gradient(to right, #000 0 76%, rgb(0 0 0 / 0) 98%);
+    position: relative;
+    /* The fade says content continues; it must not eat a column, so it is narrow. */
+    -webkit-mask-image: linear-gradient(to right, #000 0 92%, rgb(0 0 0 / 0) 100%);
+    mask-image: linear-gradient(to right, #000 0 92%, rgb(0 0 0 / 0) 100%);
     background:
       linear-gradient(to right, var(--bg) 30%, rgb(0 0 0 / 0)) left center / 2.5rem 100% no-repeat local,
       linear-gradient(to left, var(--bg) 30%, rgb(0 0 0 / 0)) right center / 2.5rem 100% no-repeat local,
       radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / .3), rgb(0 0 0 / 0)) left center / 1.1rem 100% no-repeat scroll,
       radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / .3), rgb(0 0 0 / 0)) right center / 1.1rem 100% no-repeat scroll;
+  }
+  /* Sticky at the left edge so it stays readable however far the table is scrolled, and
+     so a still screenshot shows the table is scrollable rather than truncated. */
+  .scroll-x::after {
+    content: "Scroll sideways for the rest of this table \2192";
+    position: sticky; left: 0;
+    display: block; width: min(100%, 20rem);
+    padding-top: 0.5rem;
+    font-family: var(--sans); font-size: 0.63rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft);
   }
 }
 
