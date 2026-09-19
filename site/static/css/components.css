@@ -102,7 +102,7 @@
 .exp-metric .m-v { font-family: var(--sans); font-size: clamp(1.4rem, 3.6vw, 1.75rem); font-weight: 650;
                    color: var(--accent); line-height: 1.05; font-variant-numeric: tabular-nums;
                    letter-spacing: -0.015em; }
-.exp-metric .m-l { font-family: var(--sans); font-size: 0.72rem; color: var(--ink-soft);
+.exp-metric .m-l { font-family: var(--sans); font-size: 0.72rem; color: var(--ink-label);
                    line-height: 1.35; }
 
 .refgrid { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem;

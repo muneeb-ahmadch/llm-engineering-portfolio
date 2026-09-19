@@ -4,6 +4,7 @@
   --ink: #1a1a1a;
   --ink-soft: #5c5c5c;
   --ink-faint: #6b6b6b;
+  --ink-label: #353535;
   --bg: #fffef9;
   --bg-panel: #f6f4ec;
   --bg-sunk: #efece1;
@@ -29,8 +30,9 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ink: #e8e6df;
-    --ink-soft: #a8a49a;
-    --ink-faint: #8f8b80;
+    --ink-soft: #bebab0;
+    --ink-faint: #a7a398;
+    --ink-label: #d7d3c9;
     --bg: #16150f;
     --bg-panel: #201f18;
     --bg-sunk: #100f0a;
@@ -49,8 +51,9 @@
 
 :root[data-theme="dark"] {
   --ink: #e8e6df;
-  --ink-soft: #a8a49a;
-  --ink-faint: #8f8b80;
+  --ink-soft: #bebab0;
+  --ink-faint: #a7a398;
+  --ink-label: #d7d3c9;
   --bg: #16150f;
   --bg-panel: #201f18;
   --bg-sunk: #100f0a;
@@ -70,6 +73,7 @@
   --ink: #1a1a1a;
   --ink-soft: #5c5c5c;
   --ink-faint: #6b6b6b;
+  --ink-label: #353535;
   --bg: #fffef9;
   --bg-panel: #f6f4ec;
   --bg-sunk: #efece1;
