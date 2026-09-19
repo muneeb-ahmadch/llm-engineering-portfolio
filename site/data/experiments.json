@@ -8,7 +8,7 @@
     "finding_html": "The encoder. <strong>bge-small over minilm bought +0.128 MRR</strong> (0.627 → 0.754) at zero extra cost. Halving the chunk size hurt <em>both</em> encoders. At n=20 one question is worth 0.05 MRR, so the encoder gain clears the noise floor and the 0.015 gaps do not.",
     "answer": "The encoder",
     "metric_value": "+0.128",
-    "metric_label": "MRR from the encoder swap",
+    "metric_label": "MRR from the encoder swap, at n=20; the n=50 re-run gives +0.037",
     "tags": [
       "retrieval"
     ],

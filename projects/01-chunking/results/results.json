@@ -2,544 +2,1304 @@
   {
     "encoder": "minilm",
     "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunker": "fixed",
     "chunk_size": 1000,
     "overlap": 50,
     "top_k": 5,
     "relevance": "all",
+    "rerank": false,
+    "pool": null,
     "n_chunks": 734,
-    "n_questions": 20,
-    "mrr": 0.6266666666666666,
-    "keyword_coverage": 0.8666666666666668,
-    "misses": 4,
-    "embed_secs": null,
+    "n_questions": 50,
+    "question_set": "golden.jsonl",
+    "corpus_dir": "corpus",
+    "trap": false,
+    "mrr": 0.7073333333333334,
+    "keyword_coverage": 0.9166666666666667,
+    "misses": 7,
+    "embed_secs": 4.1,
+    "generate": false,
+    "agent": false,
+    "api": null,
+    "prompt_variant": null,
     "per_question": [
       {
         "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does LoRA stand for?",
+        "top_source": "day24-finetuning-showdown.md",
         "rr": 0.0,
-        "coverage": 0.5,
-        "top_source": "day24-finetuning-showdown.md"
+        "coverage": 0.5
       },
       {
         "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day21-langgraph.md"
+        "coverage": 1.0
       },
       {
         "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.0,
-        "coverage": 0.5,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 0.5
       },
       {
         "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day12-llm-apis.md"
+        "coverage": 1.0
       },
       {
         "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day14-prompt-context.md"
+        "coverage": 1.0
       },
       {
         "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day28-cv.md"
+        "coverage": 1.0
       },
       {
         "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does mAP measure in object detection?",
+        "top_source": "day31-cv-4.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day31-cv-4.md"
+        "coverage": 1.0
       },
       {
         "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.0,
-        "coverage": 0.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 0.0
       },
       {
         "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day19.md"
+        "coverage": 1.0
       },
       {
         "question": "What is overfitting in a neural network?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.0,
-        "coverage": 0.3333333333333333,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 0.3333333333333333
       },
       {
         "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day26-deep-learning.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day31-cv-4.md",
         "rr": 0.2,
-        "coverage": 1.0,
-        "top_source": "day31-cv-4.md"
+        "coverage": 1.0
+      },
+      {
+        "question": "What does Ollama let you do that a cloud LLM service does not?",
+        "top_source": "day11-llm-intro.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What counts against the context window besides the new message?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the Chinchilla Scaling Law say about parameters and training data?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is the GPQA benchmark called Google-proof?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why was MMLU Pro created to replace the original MMLU?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a vector embedding?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does overlap between chunks matter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.0,
+        "coverage": 0.5
+      },
+      {
+        "question": "Which matters more for semantic search quality, the encoder or the vector database?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How is MRR scored when the first relevant chunk is third in the results?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333
+      },
+      {
+        "question": "What three dimensions does an LLM judge score an answer on?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does precision matter less than recall in RAG?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which of the agentic hallmarks is treated as the litmus test?",
+        "top_source": "day17.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Anthropic distinguish a workflow from an agent?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is the evaluator-optimizer pattern?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What are the three types of guardrail?",
+        "top_source": "day20-deep-research.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is tool calling described as a conjuring trick?",
+        "top_source": "day18-agents.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the word resources mean when improving an LLM's answers?",
+        "top_source": "day18-agents.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What happens if you call a coroutine without awaiting it?",
+        "top_source": "day19.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a handoff in the OpenAI Agents SDK?",
+        "top_source": "day19.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why are Pydantic models used for structured outputs?",
+        "top_source": "day20-deep-research.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Where in a workflow can guardrails be placed?",
+        "top_source": "day20-deep-research.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does LangGraph keep state immutable?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What problem do reducers solve in LangGraph?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is quantization in the context of model weights?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 0.0,
+        "coverage": 0.6666666666666666
+      },
+      {
+        "question": "What makes NF4 better than naive 4-bit quantization?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which projections are targeted first when applying LoRA adapters?",
+        "top_source": "day24-finetuning-showdown.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is transfer learning and why does it work?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Otsu's method pick a threshold?",
+        "top_source": "day29-cv-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is hysteresis thresholding in the Canny edge detector?",
+        "top_source": "day29-cv-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does background subtraction differ from frame differencing?",
+        "top_source": "day30-cv-3.md",
+        "rr": 1.0,
+        "coverage": 1.0
       }
     ]
   },
   {
     "encoder": "minilm",
     "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "chunker": "fixed",
     "chunk_size": 500,
     "overlap": 50,
     "top_k": 10,
     "relevance": "all",
+    "rerank": false,
+    "pool": null,
     "n_chunks": 1539,
-    "n_questions": 20,
-    "mrr": 0.5291666666666667,
-    "keyword_coverage": 0.9249999999999998,
-    "misses": 4,
-    "embed_secs": null,
+    "n_questions": 50,
+    "question_set": "golden.jsonl",
+    "corpus_dir": "corpus",
+    "trap": false,
+    "mrr": 0.4761666666666666,
+    "keyword_coverage": 0.9266666666666665,
+    "misses": 11,
+    "embed_secs": 5.6,
+    "generate": false,
+    "agent": false,
+    "api": null,
+    "prompt_variant": null,
     "per_question": [
       {
         "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does LoRA stand for?",
+        "top_source": "day24-finetuning-showdown.md",
         "rr": 0.25,
-        "coverage": 1.0,
-        "top_source": "day24-finetuning-showdown.md"
+        "coverage": 1.0
       },
       {
         "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day21-langgraph.md"
+        "coverage": 1.0
       },
       {
         "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.0,
-        "coverage": 0.5,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 0.5
       },
       {
         "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day12-llm-apis.md"
+        "coverage": 1.0
       },
       {
         "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
         "rr": 0.0,
-        "coverage": 0.6666666666666666,
-        "top_source": "day14-prompt-context.md"
+        "coverage": 0.6666666666666666
       },
       {
         "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.0,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day28-cv.md"
+        "coverage": 1.0
       },
       {
         "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day19.md"
+        "coverage": 1.0
       },
       {
         "question": "What is overfitting in a neural network?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.0,
-        "coverage": 0.3333333333333333,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 0.3333333333333333
       },
       {
         "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day26-deep-learning.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day31-cv-4.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day31-cv-4.md"
+        "coverage": 1.0
+      },
+      {
+        "question": "What does Ollama let you do that a cloud LLM service does not?",
+        "top_source": "day11-llm-intro.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "What counts against the context window besides the new message?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the Chinchilla Scaling Law say about parameters and training data?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is the GPQA benchmark called Google-proof?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why was MMLU Pro created to replace the original MMLU?",
+        "top_source": "day21-langgraph.md",
+        "rr": 0.0,
+        "coverage": 0.3333333333333333
+      },
+      {
+        "question": "What is a vector embedding?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does overlap between chunks matter?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.0,
+        "coverage": 0.5
+      },
+      {
+        "question": "Which matters more for semantic search quality, the encoder or the vector database?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How is MRR scored when the first relevant chunk is third in the results?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "What three dimensions does an LLM judge score an answer on?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.16666666666666666,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does precision matter less than recall in RAG?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which of the agentic hallmarks is treated as the litmus test?",
+        "top_source": "day24-finetuning-showdown.md",
+        "rr": 0.125,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Anthropic distinguish a workflow from an agent?",
+        "top_source": "day17.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is the evaluator-optimizer pattern?",
+        "top_source": "day17.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "What are the three types of guardrail?",
+        "top_source": "day17.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is tool calling described as a conjuring trick?",
+        "top_source": "day19.md",
+        "rr": 0.0,
+        "coverage": 0.0
+      },
+      {
+        "question": "What does the word resources mean when improving an LLM's answers?",
+        "top_source": "day18-agents.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What happens if you call a coroutine without awaiting it?",
+        "top_source": "day19.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a handoff in the OpenAI Agents SDK?",
+        "top_source": "day19.md",
+        "rr": 0.1,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why are Pydantic models used for structured outputs?",
+        "top_source": "day20-deep-research.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Where in a workflow can guardrails be placed?",
+        "top_source": "day17.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does LangGraph keep state immutable?",
+        "top_source": "day21-langgraph.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What problem do reducers solve in LangGraph?",
+        "top_source": "day21-langgraph.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is quantization in the context of model weights?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What makes NF4 better than naive 4-bit quantization?",
+        "top_source": "day24-finetuning-showdown.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which projections are targeted first when applying LoRA adapters?",
+        "top_source": "day22-finetuning.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is transfer learning and why does it work?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Otsu's method pick a threshold?",
+        "top_source": "day29-cv-2.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is hysteresis thresholding in the Canny edge detector?",
+        "top_source": "day29-cv-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does background subtraction differ from frame differencing?",
+        "top_source": "day30-cv-3.md",
+        "rr": 0.5,
+        "coverage": 1.0
       }
     ]
   },
   {
     "encoder": "bge-small",
     "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
     "chunk_size": 1000,
     "overlap": 50,
     "top_k": 5,
     "relevance": "all",
+    "rerank": false,
+    "pool": null,
     "n_chunks": 734,
-    "n_questions": 20,
-    "mrr": 0.7541666666666667,
-    "keyword_coverage": 0.9499999999999998,
+    "n_questions": 50,
+    "question_set": "golden.jsonl",
+    "corpus_dir": "corpus",
+    "trap": false,
+    "mrr": 0.7446666666666667,
+    "keyword_coverage": 0.98,
     "misses": 2,
-    "embed_secs": null,
+    "embed_secs": 9.6,
+    "generate": false,
+    "agent": false,
+    "api": null,
+    "prompt_variant": null,
     "per_question": [
       {
         "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day22-finetuning.md"
+        "coverage": 1.0
       },
       {
         "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day21-langgraph.md"
+        "coverage": 1.0
       },
       {
         "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day12-llm-apis.md"
+        "coverage": 1.0
       },
       {
         "question": "How are chat models different from reasoning models?",
+        "top_source": "day14-prompt-context.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day14-prompt-context.md"
+        "coverage": 1.0
       },
       {
         "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day28-cv.md"
+        "coverage": 1.0
       },
       {
         "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.0,
-        "coverage": 0.6666666666666666,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 0.6666666666666666
       },
       {
         "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does mAP measure in object detection?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.25,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day19.md"
+        "coverage": 1.0
       },
       {
         "question": "What is overfitting in a neural network?",
+        "top_source": "day23-oss-finetuning.md",
         "rr": 0.0,
-        "coverage": 0.3333333333333333,
-        "top_source": "day23-oss-finetuning.md"
+        "coverage": 0.3333333333333333
       },
       {
         "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day26-deep-learning.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day31-cv-4.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day31-cv-4.md"
+        "coverage": 1.0
+      },
+      {
+        "question": "What does Ollama let you do that a cloud LLM service does not?",
+        "top_source": "day11-llm-intro.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What counts against the context window besides the new message?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the Chinchilla Scaling Law say about parameters and training data?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is the GPQA benchmark called Google-proof?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why was MMLU Pro created to replace the original MMLU?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a vector embedding?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does overlap between chunks matter?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.2,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which matters more for semantic search quality, the encoder or the vector database?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.2,
+        "coverage": 1.0
+      },
+      {
+        "question": "How is MRR scored when the first relevant chunk is third in the results?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "What three dimensions does an LLM judge score an answer on?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does precision matter less than recall in RAG?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which of the agentic hallmarks is treated as the litmus test?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Anthropic distinguish a workflow from an agent?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is the evaluator-optimizer pattern?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What are the three types of guardrail?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is tool calling described as a conjuring trick?",
+        "top_source": "day18-agents.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the word resources mean when improving an LLM's answers?",
+        "top_source": "day18-agents.md",
+        "rr": 0.25,
+        "coverage": 1.0
+      },
+      {
+        "question": "What happens if you call a coroutine without awaiting it?",
+        "top_source": "day19.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a handoff in the OpenAI Agents SDK?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why are Pydantic models used for structured outputs?",
+        "top_source": "day18-agents.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "Where in a workflow can guardrails be placed?",
+        "top_source": "day17.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does LangGraph keep state immutable?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What problem do reducers solve in LangGraph?",
+        "top_source": "day21-langgraph.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is quantization in the context of model weights?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "What makes NF4 better than naive 4-bit quantization?",
+        "top_source": "day24-finetuning-showdown.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which projections are targeted first when applying LoRA adapters?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is transfer learning and why does it work?",
+        "top_source": "day27-deep-learning-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Otsu's method pick a threshold?",
+        "top_source": "day29-cv-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is hysteresis thresholding in the Canny edge detector?",
+        "top_source": "day29-cv-2.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does background subtraction differ from frame differencing?",
+        "top_source": "day30-cv-3.md",
+        "rr": 1.0,
+        "coverage": 1.0
       }
     ]
   },
   {
     "encoder": "bge-small",
     "model": "BAAI/bge-small-en-v1.5",
+    "chunker": "fixed",
     "chunk_size": 500,
     "overlap": 50,
     "top_k": 10,
     "relevance": "all",
+    "rerank": false,
+    "pool": null,
     "n_chunks": 1539,
-    "n_questions": 20,
-    "mrr": 0.6416666666666666,
-    "keyword_coverage": 0.9333333333333332,
-    "misses": 4,
-    "embed_secs": null,
+    "n_questions": 50,
+    "question_set": "golden.jsonl",
+    "corpus_dir": "corpus",
+    "trap": false,
+    "mrr": 0.6306666666666666,
+    "keyword_coverage": 0.9633333333333333,
+    "misses": 9,
+    "embed_secs": 10.2,
+    "generate": false,
+    "agent": false,
+    "api": null,
+    "prompt_variant": null,
     "per_question": [
       {
         "question": "What does NDCG measure that MRR does not?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "How is IoU calculated for a predicted bounding box?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does LoRA stand for?",
+        "top_source": "day22-finetuning.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day22-finetuning.md"
+        "coverage": 1.0
       },
       {
         "question": "Which tool in the LangChain ecosystem handles monitoring and debugging?",
+        "top_source": "day21-langgraph.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day21-langgraph.md"
+        "coverage": 1.0
       },
       {
         "question": "Why is RAG optimization described as whack-a-mole?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "What is the Chat Completions API?",
+        "top_source": "day12-llm-apis.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day12-llm-apis.md"
+        "coverage": 1.0
       },
       {
         "question": "How are chat models different from reasoning models?",
+        "top_source": "day23-oss-finetuning.md",
         "rr": 0.0,
-        "coverage": 0.6666666666666666,
-        "top_source": "day23-oss-finetuning.md"
+        "coverage": 0.6666666666666666
       },
       {
         "question": "How are LangChain and LiteLLM different?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 0.0,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "What is prompt caching?",
+        "top_source": "day13-multimodal.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is computer vision?",
+        "top_source": "day28-cv.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day28-cv.md"
+        "coverage": 1.0
       },
       {
         "question": "How does RecursiveCharacterTextSplitter differ from a plain character splitter?",
+        "top_source": "day15-rag-langchain.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day15-rag-langchain.md"
+        "coverage": 1.0
       },
       {
         "question": "How does an LSTM solve the vanishing gradient problem?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 0.0,
-        "coverage": 0.6666666666666666,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 0.6666666666666666
       },
       {
         "question": "What problem do skip connections in ResNet solve?",
+        "top_source": "day27-deep-learning-2.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day27-deep-learning-2.md"
+        "coverage": 1.0
       },
       {
         "question": "What does mAP measure in object detection?",
+        "top_source": "day31-cv-4.md",
         "rr": 0.3333333333333333,
-        "coverage": 1.0,
-        "top_source": "day31-cv-4.md"
+        "coverage": 1.0
       },
       {
         "question": "What does reranking do in a RAG pipeline?",
+        "top_source": "day16-rag-evals.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day16-rag-evals.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Gradio used for?",
+        "top_source": "day13-multimodal.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day13-multimodal.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Async IO in Python?",
+        "top_source": "day19.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day19.md"
+        "coverage": 1.0
       },
       {
         "question": "What is overfitting in a neural network?",
+        "top_source": "day26-deep-learning.md",
         "rr": 0.0,
-        "coverage": 0.3333333333333333,
-        "top_source": "day26-deep-learning.md"
+        "coverage": 0.3333333333333333
       },
       {
         "question": "What is backpropagation?",
+        "top_source": "day26-deep-learning.md",
         "rr": 1.0,
-        "coverage": 1.0,
-        "top_source": "day26-deep-learning.md"
+        "coverage": 1.0
       },
       {
         "question": "What is Non-Maximum Suppression in object detection?",
+        "top_source": "day29-cv-2.md",
         "rr": 0.5,
-        "coverage": 1.0,
-        "top_source": "day29-cv-2.md"
+        "coverage": 1.0
+      },
+      {
+        "question": "What does Ollama let you do that a cloud LLM service does not?",
+        "top_source": "day17.md",
+        "rr": 0.25,
+        "coverage": 1.0
+      },
+      {
+        "question": "What counts against the context window besides the new message?",
+        "top_source": "day12-llm-apis.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What does the Chinchilla Scaling Law say about parameters and training data?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is the GPQA benchmark called Google-proof?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why was MMLU Pro created to replace the original MMLU?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a vector embedding?",
+        "top_source": "day14-prompt-context.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does overlap between chunks matter?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 0.16666666666666666,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which matters more for semantic search quality, the encoder or the vector database?",
+        "top_source": "day15-rag-langchain.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How is MRR scored when the first relevant chunk is third in the results?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What three dimensions does an LLM judge score an answer on?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 0.16666666666666666,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does precision matter less than recall in RAG?",
+        "top_source": "day16-rag-evals.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which of the agentic hallmarks is treated as the litmus test?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Anthropic distinguish a workflow from an agent?",
+        "top_source": "day17.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is the evaluator-optimizer pattern?",
+        "top_source": "day17.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What are the three types of guardrail?",
+        "top_source": "day17.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why is tool calling described as a conjuring trick?",
+        "top_source": "day18-agents.md",
+        "rr": 0.0,
+        "coverage": 0.5
+      },
+      {
+        "question": "What does the word resources mean when improving an LLM's answers?",
+        "top_source": "day18-agents.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What happens if you call a coroutine without awaiting it?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is a handoff in the OpenAI Agents SDK?",
+        "top_source": "day19.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why are Pydantic models used for structured outputs?",
+        "top_source": "day20-deep-research.md",
+        "rr": 0.3333333333333333,
+        "coverage": 1.0
+      },
+      {
+        "question": "Where in a workflow can guardrails be placed?",
+        "top_source": "day20-deep-research.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "Why does LangGraph keep state immutable?",
+        "top_source": "day21-langgraph.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What problem do reducers solve in LangGraph?",
+        "top_source": "day21-langgraph.md",
+        "rr": 0.25,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is quantization in the context of model weights?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What makes NF4 better than naive 4-bit quantization?",
+        "top_source": "day24-finetuning-showdown.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "Which projections are targeted first when applying LoRA adapters?",
+        "top_source": "day23-oss-finetuning.md",
+        "rr": 0.2,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is transfer learning and why does it work?",
+        "top_source": "day31-cv-4.md",
+        "rr": 0.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does Otsu's method pick a threshold?",
+        "top_source": "day29-cv-2.md",
+        "rr": 1.0,
+        "coverage": 1.0
+      },
+      {
+        "question": "What is hysteresis thresholding in the Canny edge detector?",
+        "top_source": "day29-cv-2.md",
+        "rr": 0.5,
+        "coverage": 1.0
+      },
+      {
+        "question": "How does background subtraction differ from frame differencing?",
+        "top_source": "day30-cv-3.md",
+        "rr": 1.0,
+        "coverage": 1.0
       }
     ]
   }

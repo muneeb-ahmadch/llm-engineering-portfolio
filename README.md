@@ -22,7 +22,7 @@ results are mostly the negative ones:
 
 | Experiment | The question | What the numbers said |
 |---|---|---|
-| [01 Chunking](projects/01-chunking/) | Chunk size or encoder: which lever matters? | Encoder. `bge-small` over `minilm` bought **+0.128 MRR** (0.627 to 0.754) at zero extra cost. Halving chunk size **hurt both** encoders. |
+| [01 Chunking](projects/01-chunking/) | Chunk size or encoder: which lever matters? | At **n=20**: encoder. `bge-small` over `minilm` bought **+0.128 MRR** (0.627 to 0.754) at zero extra cost. Re-run at **n=50** on 18 September 2026 the same swap is **+0.037** (0.707 to 0.745), which is 1.87 questions' worth against this repo's own 1/n noise rule and so no longer clears the two-question bar the n=20 write-up applied. Coverage rose 91.7% to 98.0% and misses fell 7/50 to 2/50. Halving chunk size **hurt both** encoders in both runs, and at n=50 it hurt `minilm` markedly harder (-0.231, against -0.098 at n=20) while `bge-small` was flat (-0.114, against -0.112). The n=50 conclusion is not yet written: see [`results.md`](projects/01-chunking/results/results.md). |
 | [05 Heading chunker](projects/05-heading-chunker/) | Does splitting on headings rescue a known miss? | No. The target chunk fell from full corpus rank **#8 to #67**. Cleaner chunks helped 66 competitors more than they helped the target. |
 | [06 Reranking](projects/06-reranking/) | Can a cross encoder rescue the two misses? | One of two. LSTM flipped to a hit at pool 20. Overfitting stayed a miss at **every pool size from 5 to 30**, so it was a scoring decision, not a recall problem. |
 | [07 Generation](projects/07-generation/) | What does an answer cost and how long does it take? | **$0.002174 per query, 2.1 s mean latency.** A live price check overruled my own memory, which had the model down as fiction. |
@@ -147,7 +147,11 @@ retrieval work harder than a corpus of unrelated documents would.
   the set every report dated before 9 September 2026 was measured on. Thirty more were added
   on 9 September 2026 to cover ten corpus files the original set never asked a question
   about. **Any figure in this repository without an explicit n is n=20.** The n=50 retrieval
-  sweep has not been run yet, and no number here has been restated against it
+  sweep was run on 18 September 2026; its table is in
+  `projects/01-chunking/results/results.md`, and the 01 row of the table above is the only
+  place restated against it. Everything else, including the n=20 sweep table in
+  `projects/01-chunking/README.md` and the encoder figures on the site and the reference
+  pages, is still the n=20 measurement and is labelled as such where it appears
 - `golden-trap.jsonl`, 5 questions the corpus provably cannot answer, used to measure hallucination
 - `check` validates both before any run, because a question matching zero chunks scores 0 forever and a question matching fifty chunks pins MRR near 1.0 while measuring nothing
 
