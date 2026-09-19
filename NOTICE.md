@@ -46,7 +46,7 @@ those by one. Reproduce the real number with:
 
 ```bash
 git ls-files | grep -v -e '^docs/' -e '^site/snapshots/' -e corpus -e NOTICE.md \
-  | xargs grep -o '—' | wc -l
+  | xargs grep -I -o '—' | wc -l
 ```
 
 The lecture notes under `corpus/` are untouched for the same reason as everything above.
