@@ -18,4 +18,6 @@ __pycache__/
 # site build artefacts
 site/screenshots/
 site/review/last.json
-.claude/stop-blocks
+
+# local tooling config, never committed
+.claude/
