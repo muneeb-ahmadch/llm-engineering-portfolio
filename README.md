@@ -148,10 +148,10 @@ retrieval work harder than a corpus of unrelated documents would.
   on 9 September 2026 to cover ten corpus files the original set never asked a question
   about. **Any figure in this repository without an explicit n is n=20.** The n=50 retrieval
   sweep was run on 18 September 2026; its table is in
-  `projects/01-chunking/results/results.md`, and the 01 row of the table above is the only
-  place restated against it. Everything else, including the n=20 sweep table in
-  `projects/01-chunking/README.md` and the encoder figures on the site and the reference
-  pages, is still the n=20 measurement and is labelled as such where it appears
+  `projects/01-chunking/results/results.md`. It is restated in the 01 row of the table above
+  and in `projects/01-chunking/README.md`, which shows both runs side by side. Everything
+  else, including the encoder figures on the site and the reference pages, is still the n=20
+  measurement and is labelled as such where it appears
 - `golden-trap.jsonl`, 5 questions the corpus provably cannot answer, used to measure hallucination
 - `check` validates both before any run, because a question matching zero chunks scores 0 forever and a question matching fifty chunks pins MRR near 1.0 while measuring nothing
 
